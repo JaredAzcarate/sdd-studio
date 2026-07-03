@@ -1,0 +1,36 @@
+---
+description: SDD Studio workflow — the specification is the source of truth; start with workspace/spec/vision.md.
+alwaysApply: true
+---
+
+# SDD Studio
+
+This project uses **Specification Driven Development (SDD)**.
+
+## Entry point
+
+Read `workspace/spec/vision.md` before making decisions about the product, architecture, language, or code organization.
+
+## Source of truth
+
+| Folder | Content | Forbidden |
+| ------ | ------- | --------- |
+| `workspace/spec/` | Product specification | tasks, releases, roadmap |
+| `workspace/workflow/` | Planning and execution | business rules, domains |
+
+## Skill flow
+
+1. **sdd-idea** — discover the problem; write only `workspace/spec/vision.md`
+2. **sdd-spec** — read the vision; generate the full `workspace/spec/`
+3. **sdd-review** — analyze changes; update only the specification
+4. **sdd-plan** — read validated spec; generate `workspace/workflow/`
+
+Invoke skills explicitly. Do not implement without a specification.
+
+## Conventions
+
+- Domain files: `<domain>-<category>.md` in the matching category folder
+- Workflow: `roadmap-NNN.md`, `milestone-NNN.md`, `release-NNN/`
+- IDs: `TASK-NNN`, `RELEASE-NNN`, `DECISION-NNN`
+
+Read each skill's STANDARDS.md before generating or modifying files.

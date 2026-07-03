@@ -1,0 +1,47 @@
+{
+  "name": "sdd-studio",
+  "version": "0.1.0",
+  "description": "Bootstrapper for Specification Driven Development workspaces",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "sdd-studio": "bin/sdd-studio.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run build && npm test",
+    "start": "node bin/sdd-studio.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "sdd",
+    "specification-driven-development",
+    "cli",
+    "cursor"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/prompts": "^7.10.1",
+    "commander": "^12.1.0",
+    "fs-extra": "^11.3.6",
+    "handlebars": "^4.7.9",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^26.1.0",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.4"
+  }
+}

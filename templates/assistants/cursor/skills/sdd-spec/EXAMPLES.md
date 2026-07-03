@@ -1,0 +1,430 @@
+# EXAMPLES — sdd-spec
+
+Reference domain: `task`. Generate the 10 spec files (plus `vision.md` from **sdd-idea**).
+
+## spec/domain/task-domain.md
+
+```markdown
+# Task
+
+## Purpose
+
+Represent an assignable unit of work within a team.
+
+---
+
+## Description
+
+A task has a title, description, owner, status, and dates. It is the core of the TaskFlow product.
+
+---
+
+## Attributes
+
+| Attribute   | Type     | Required | Description           |
+| ----------- | -------- | -------- | --------------------- |
+| id          | UUID     | yes      | Unique identifier     |
+| title       | string   | yes      | Short title           |
+| description | string   | no       | Optional detail       |
+| status      | enum     | yes      | pending, active, done |
+| assigneeId  | UUID     | no       | Responsible user      |
+| dueDate     | datetime | no       | Due date              |
+
+---
+
+## States
+
+- pending
+- active
+- done
+- cancelled
+
+---
+
+## Responsibilities
+
+- Record work to be done
+- Transition between valid states
+- Notify relevant changes via events
+
+---
+
+## Notes
+
+See `task-relations.md` for links to User and Team.
+```
+
+## spec/relations/task-relations.md
+
+```markdown
+# Task Relationships
+
+## Incoming Relations
+
+- User assigns tasks (assignee)
+- Team groups tasks
+
+---
+
+## Outgoing Relations
+
+- Task belongs to a Team
+
+---
+
+## Cardinality
+
+- Task → User (assignee): many to one
+- Team → Task: one to many
+
+---
+
+## Ownership
+
+- Task is owned by the Task domain
+- User and Team are external domains referenced by ID
+
+---
+
+## Notes
+```
+
+## spec/capabilities/task-capabilities.md
+
+```markdown
+# Task Capabilities
+
+## Capability List
+
+### Create Task
+
+Description
+
+Create a new task in pending state.
+
+Preconditions
+
+Authenticated user with create permission.
+
+Result
+
+Task persisted with assigned ID.
+
+---
+
+### Update Task
+
+Description
+
+Modify editable attributes of an existing task.
+
+Preconditions
+
+Task exists and user has edit permission.
+
+Result
+
+Task updated; Task Updated event emitted.
+
+---
+
+### Complete Task
+
+Description
+
+Mark task as done.
+
+Preconditions
+
+Task in active or pending state.
+
+Result
+
+Status done; Task Completed event emitted.
+```
+
+## spec/flows/task-flows.md
+
+```markdown
+# Task Flows
+
+## Flow: Create Task
+
+### Actor
+
+Team Member
+
+### Preconditions
+
+Authenticated user.
+
+### Steps
+
+1. User requests task creation with title
+2. System validates data
+3. System persists task in pending
+
+### Result
+
+Task created and visible on the board.
+
+---
+
+## Flow: Complete Task
+
+### Actor
+
+Assignee
+
+### Preconditions
+
+Task assigned to user; active state.
+
+### Steps
+
+1. User marks task as complete
+2. System validates transition
+3. System updates status to done
+
+### Result
+
+Task closed; metrics updated.
+```
+
+## spec/rules/task-rules.md
+
+```markdown
+# Task Rules
+
+## Validation Rules
+
+- Title cannot be empty
+- dueDate cannot be before creation date
+
+---
+
+## Business Rules
+
+- Only the assignee or an admin can complete the task
+- Cancelled tasks cannot return to active
+
+---
+
+## Lifecycle Rules
+
+- pending → active → done
+- pending → cancelled
+- active → cancelled
+
+---
+
+## Constraints
+
+- Maximum 500 active tasks per team in MVP
+```
+
+## spec/security/task-security.md
+
+```markdown
+# Task Security
+
+## Roles
+
+- member
+- admin
+
+---
+
+## Permissions
+
+| Action        | member | admin |
+| ------------- | ------ | ----- |
+| create        | yes    | yes   |
+| update own    | yes    | yes   |
+| update any    | no     | yes   |
+| complete own  | yes    | yes   |
+| delete        | no     | yes   |
+
+---
+
+## Authorization Rules
+
+- member edits only tasks where they are assignee
+- admin operates on any task in the team
+
+---
+
+## Policies
+
+- OAuth authentication required for all operations
+```
+
+## spec/events/task-events.md
+
+```markdown
+# Task Events
+
+## Event List
+
+### Task Created
+
+Description
+
+Emitted when a task is created.
+
+Trigger
+
+Successful Create Task.
+
+Consumers
+
+Notification, Analytics
+
+---
+
+### Task Completed
+
+Description
+
+Emitted when transitioning to done.
+
+Trigger
+
+Successful Complete Task.
+
+Consumers
+
+Notification, Analytics
+```
+
+## spec/api/task-api.md
+
+```markdown
+# Task API
+
+## Endpoints
+
+### POST /tasks
+
+Purpose
+
+Create task.
+
+Request
+
+    { "title": "string", "assigneeId": "uuid?", "dueDate": "iso8601?" }
+
+Response
+
+201 + Task object
+
+Errors
+
+400 validation, 401 unauthorized
+
+---
+
+### PATCH /tasks/:id
+
+Purpose
+
+Update task.
+
+Request
+
+Partial Task fields
+
+Response
+
+200 + Task object
+
+Errors
+
+404 not found, 403 forbidden
+```
+
+## spec/ui/task-ui.md
+
+```markdown
+# Task UI
+
+## Screens
+
+- Task Board (columns by status)
+- Task Detail (modal or page)
+
+---
+
+## Components
+
+- TaskCard
+- TaskForm
+- StatusBadge
+
+---
+
+## User Actions
+
+- Create task from "+" button
+- Drag card between columns (status change)
+- Open detail on click
+
+---
+
+## Messages
+
+- "Task created successfully"
+- "You don't have permission to edit this task"
+
+---
+
+## Validations
+
+- Title required in form
+- Inline message if title is empty
+
+---
+
+## Navigation
+
+Board → Task Detail → back to Board
+```
+
+## spec/testing/task-testing.md
+
+```markdown
+# Task Testing
+
+## Acceptance Scenarios
+
+- User creates task and it appears in pending column
+- Assignee completes task and it moves to done
+
+---
+
+## Success Cases
+
+- Create with valid title
+- Complete from active
+
+---
+
+## Validation Cases
+
+- Reject empty title
+- Reject dueDate in the past
+
+---
+
+## Error Cases
+
+- member tries to edit another user's task
+- Complete cancelled task
+
+---
+
+## Edge Cases
+
+- Create task without assignee
+- 500 active tasks in team (MVP limit)
+```
