@@ -1,12 +1,12 @@
 ---
 name: sdd-plan
-description: Reads workspace/project.md, workspace/user-manual.md, and validated workspace/spec/ to generate or update workspace/workflow/ with roadmaps, milestones, releases, tasks, reviews, and decisions per SDD Studio conventions. Use when planning from spec or when the user invokes /sdd-plan. Never modifies workspace/spec/, workspace/user-manual.md, or workspace/project.md.
+description: Reads workspace/project.md, workspace/product-guide.md, and validated workspace/spec/ to generate or update workspace/workflow/ with roadmaps, milestones, releases, tasks, reviews, and decisions per SDD Studio conventions. Use when planning from spec or when the user invokes /sdd-plan. Never modifies workspace/spec/, workspace/product-guide.md, or workspace/project.md.
 disable-model-invocation: true
 ---
 
 # SDD Plan
 
-Read project configuration, the User Manual, and validated specification, then generate or update `workspace/workflow/`.
+Read project configuration, the Product Guide, and validated specification, then generate or update `workspace/workflow/`.
 
 ## Required documents
 
@@ -19,15 +19,15 @@ Before planning, read:
 
 | Allowed | Forbidden |
 |---------|-----------|
-| Read `workspace/project.md`, `workspace/user-manual.md`, and all of `workspace/spec/` | Modify `workspace/spec/`, `workspace/user-manual.md`, or `workspace/project.md` |
+| Read `workspace/project.md`, `workspace/product-guide.md`, and all of `workspace/spec/` | Modify `workspace/spec/`, `workspace/product-guide.md`, or `workspace/project.md` |
 | Create/update `workspace/workflow/` | Write code in `src/` |
 | Ask the user questions | Change rules or domains in spec |
-| Run validation script | Patch spec, user manual, or project when gaps exist |
+| Run validation script | Patch spec, product guide, or project when gaps exist |
 
 ## Pre-execution
 
 1. Read `workspace/project.md`.
-2. Read `workspace/user-manual.md`.
+2. Read `workspace/product-guide.md`.
 3. Read all of `workspace/spec/`.
 4. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
 5. Verify substantial spec (domains with 10 files each).
@@ -38,22 +38,22 @@ Before planning, read:
 
 ### Phase 1 — Synthesis (read-only)
 
-From `project.md`, `user-manual.md`, and spec, extract:
+From `project.md`, `product-guide.md`, and spec, extract:
 
 - Technical constraints (stack, architecture, methodology from `project.md`)
-- Product constraints (features, scenarios, and scope from `user-manual.md`)
+- Product constraints (user journeys and experiences from `product-guide.md`)
 - Domains and dependencies (`*-relations.md`)
 - Priority capabilities and flows
 - Gaps that block planning
 
-If critical gaps exist, report and suggest **sdd-review**; do not modify spec, user manual, or project files.
+If critical gaps exist, report and suggest **sdd-review**; do not modify spec, product guide, or project files.
 
 ### Phase 2 — Questions
 
 1. Roadmap horizon
 2. External deadlines
 3. Priority: time-to-market, quality, or balance
-4. First release scope (MVP), aligned with `user-manual.md`
+4. First release scope (MVP), aligned with `product-guide.md` journeys
 5. New release or update existing?
 
 ### Phase 3 — Roadmap and milestones
@@ -94,7 +94,7 @@ Fix errors and re-run until `OK`.
 
 ```
 - [ ] STANDARDS.md and EXAMPLES.md read
-- [ ] project.md, user-manual.md, and spec/ read (not modified)
+- [ ] project.md, product-guide.md, and spec/ read (not modified)
 - [ ] roadmap-NNN.md and milestone-NNN.md created/updated
 - [ ] release-NNN/ with exactly 4 files
 - [ ] validate-workflow.mjs passes with no errors

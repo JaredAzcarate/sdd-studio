@@ -1,5 +1,5 @@
 ---
-description: SDD Studio workflow — user manual, project config, spec, and workflow in workspace/.
+description: SDD Studio workflow — product guide, project config, spec, and workflow in workspace/.
 alwaysApply: true
 ---
 
@@ -10,7 +10,7 @@ This project uses **Specification Driven Development (SDD)**.
 ## Official cycle
 
 ```text
-Idea → User Manual → Specification → Planning → Implementation
+Idea → Product Guide → Specification → Planning → Implementation
 ```
 
 Each stage answers a different question.
@@ -20,34 +20,36 @@ Each stage answers a different question.
 | Location | Question |
 | -------- | -------- |
 | `workspace/project.md` | How will we develop this product? |
-| `workspace/user-manual.md` | How does this product work for a user? |
+| `workspace/product-guide.md` | How does the product work for a user? |
 | `workspace/spec/` | How is the product specified? |
 | `workspace/workflow/` | How do we organize the work to build it? |
 
 ## Entry points
 
 - Read `workspace/project.md` for technical and development configuration.
-- Read `workspace/user-manual.md` for user-facing product behavior (narrative, non-technical).
+- Read `workspace/product-guide.md` for the complete user journey (narrative, non-technical).
 - Read `workspace/spec/` for structured technical and functional specification.
-- Never mix technical details into `user-manual.md` or user-facing content into `project.md`.
+- Never mix technical details into `product-guide.md` or user-facing content into `project.md`.
 
 ## Source of truth
 
 | Folder / file | Content | Forbidden |
 | ------------- | ------- | --------- |
-| `workspace/project.md` | Technical configuration | user manual content, domains, tasks |
-| `workspace/user-manual.md` | User-facing product manual | APIs, stack, architecture, domains, tasks |
+| `workspace/project.md` | Technical configuration | product guide content, domains, tasks |
+| `workspace/product-guide.md` | Product guide (user journey) | APIs, stack, architecture, domains, tasks |
 | `workspace/spec/` | Structured specification | narrative user docs, tasks, releases, roadmap |
-| `workspace/workflow/` | Planning and execution | business rules, domains, user manual |
+| `workspace/workflow/` | Planning and execution | business rules, domains, product guide |
+
+The Product Guide is the **root of functional knowledge**. Specification derives entirely from it.
 
 ## Skill flow
 
 ### Greenfield (no code yet)
 
-1. **sdd-idea** — discover product idea; write `workspace/project.md` and `workspace/user-manual.md`
-2. **sdd-spec** — read project + user manual; generate domain files under `workspace/spec/`
-3. **sdd-review** — analyze changes; update `user-manual.md` and/or `workspace/spec/`
-4. **sdd-plan** — read project + user manual + spec; generate `workspace/workflow/`
+1. **sdd-idea** — discover product; write `workspace/project.md` and `workspace/product-guide.md`
+2. **sdd-spec** — read product guide + project; generate domain files under `workspace/spec/`
+3. **sdd-review** — analyze changes; update `product-guide.md` and/or `workspace/spec/`
+4. **sdd-plan** — read project + product guide + spec; generate `workspace/workflow/`
 
 ### Existing codebase (brownfield)
 
@@ -61,6 +63,6 @@ Invoke skills explicitly. Do not implement without a specification.
 - Domain files: `<domain>-<category>.md` in the matching category folder
 - Workflow: `roadmap-NNN.md`, `milestone-NNN.md`, `release-NNN/`
 - IDs: `TASK-NNN`, `RELEASE-NNN`, `DECISION-NNN`
-- Forbidden in `spec/`: `product.md`, `vision.md`, `user-manual.md`
+- Only category folders allowed at the top level of `spec/` (narrative docs belong in `workspace/product-guide.md`)
 
 Read each skill's STANDARDS.md before generating or modifying files.

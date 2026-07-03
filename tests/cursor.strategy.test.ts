@@ -47,7 +47,7 @@ describe("CursorAssistantStrategy", () => {
       "utf8",
     );
     expect(rule).toContain("workspace/project.md");
-    expect(rule).toContain("workspace/user-manual.md");
+    expect(rule).toContain("workspace/product-guide.md");
     expect(rule).toContain("sdd-idea");
   });
 

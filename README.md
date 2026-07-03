@@ -13,7 +13,7 @@ npx sdd-studio init
 `sdd-studio init` scaffolds:
 
 - `workspace/project.md` — technical and development configuration
-- `workspace/user-manual.md` — user-facing product manual (narrative)
+- `workspace/product-guide.md` — narrative product guide (user journey)
 - `workspace/spec/` — structured technical and functional specification (domain files)
 - `workspace/workflow/` — planning (roadmap, milestones, releases, tasks)
 - `.cursor/` — SDD skills and rules (when Cursor is selected)
@@ -23,7 +23,7 @@ It does **not** generate application code (`src/`, `tests/`, etc.). You implemen
 ## Official cycle
 
 ```text
-Idea → User Manual → Specification → Planning → Implementation
+Idea → Product Guide → Specification → Planning → Implementation
 ```
 
 ## Four questions
@@ -31,9 +31,11 @@ Idea → User Manual → Specification → Planning → Implementation
 | Location | Question |
 | -------- | -------- |
 | `workspace/project.md` | How will we develop this product? |
-| `workspace/user-manual.md` | How does this product work for a user? |
+| `workspace/product-guide.md` | How does the product work for a user? |
 | `workspace/spec/` | How is the product specified? |
 | `workspace/workflow/` | How do we organize the work? |
+
+The Product Guide is the root of functional knowledge. Specification derives entirely from it.
 
 ## Quick start
 
@@ -48,7 +50,7 @@ Non-interactive (defaults to Cursor):
 npx sdd-studio init --yes --assistant cursor
 ```
 
-Then in Cursor, run the **sdd-idea** skill to complete `workspace/project.md` and `workspace/user-manual.md`.
+Then in Cursor, run the **sdd-idea** skill to complete `workspace/project.md` and `workspace/product-guide.md`.
 
 ## Updating assistant files
 
@@ -72,7 +74,7 @@ Requires an existing SDD project (`workspace/project.md` or `.cursor/skills/` fr
 ./
 ├── workspace/
 │   ├── project.md
-│   ├── user-manual.md
+│   ├── product-guide.md
 │   ├── spec/
 │   │   ├── domain/
 │   │   ├── relations/
@@ -109,10 +111,10 @@ Requires an existing SDD project (`workspace/project.md` or `.cursor/skills/` fr
 
 | Skill | Purpose |
 | ----- | ------- |
-| **sdd-idea** | Discover product idea; write `project.md` and `user-manual.md` |
-| **sdd-spec** | Read project + user manual; generate domain files under `workspace/spec/` |
-| **sdd-review** | Analyze changes; update `user-manual.md` and/or `workspace/spec/` |
-| **sdd-plan** | Read project + user manual + spec; generate `workspace/workflow/` |
+| **sdd-idea** | Discover product; write `project.md` and `product-guide.md` |
+| **sdd-spec** | Read product guide + project; generate domain files under `workspace/spec/` |
+| **sdd-review** | Analyze changes; update `product-guide.md` and/or `workspace/spec/` |
+| **sdd-plan** | Read project + product guide + spec; generate `workspace/workflow/` |
 
 ### Existing codebase
 
@@ -153,10 +155,10 @@ sdd-studio sync [options]
 | Layer | Responsibility |
 | ----- | -------------- |
 | **CLI** | Scaffold folders, templates, and assistant setup |
-| **Skills** | Discovery, user manual, specification, review, and planning |
+| **Skills** | Discovery, product guide, specification, review, and planning |
 | **You** | Implementation in your codebase |
 
-The user manual explains the product. The specification is the technical source of truth. The workflow is the plan.
+The product guide explains the product. The specification is the technical source of truth. The workflow is the plan.
 
 ## License
 

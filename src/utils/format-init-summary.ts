@@ -13,7 +13,7 @@ export function formatInitSummary(
   ];
 
   if (result?.assistant.installed) {
-    lines.push("", "Next step: run the **sdd-idea** skill to complete project.md and user-manual.md.");
+    lines.push("", "Next step: run the **sdd-idea** skill to complete project.md and product-guide.md.");
   } else if (result?.assistant.message) {
     lines.push("", result.assistant.message);
   }

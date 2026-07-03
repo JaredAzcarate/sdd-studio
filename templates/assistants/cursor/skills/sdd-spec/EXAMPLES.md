@@ -1,6 +1,6 @@
 # EXAMPLES — sdd-spec
 
-Reference domain: `task`. Generate the 10 spec files per domain (`user-manual.md` and `project.md` come from **sdd-idea**).
+Reference domain: `task`. Generate the 10 spec files per domain (`product-guide.md` and `project.md` come from **sdd-idea**).
 
 ## spec/domain/task-domain.md
 

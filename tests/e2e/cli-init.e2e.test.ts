@@ -38,13 +38,13 @@ describe("cli init e2e", () => {
       join(tempDir, "workspace/project.md"),
       "utf8",
     );
-    const userManualMd = readFileSync(
-      join(tempDir, "workspace/user-manual.md"),
+    const productGuideMd = readFileSync(
+      join(tempDir, "workspace/product-guide.md"),
       "utf8",
     );
 
     expect(projectMd).toContain("# Project");
-    expect(userManualMd).toContain("# User Manual");
+    expect(productGuideMd).toContain("# Product Guide");
     expect(output).toContain("SDD project generated successfully");
     expect(output).toContain("sdd-idea");
   });

@@ -1,78 +1,67 @@
 # EXAMPLES — sdd-idea
 
-Valid examples of `workspace/user-manual.md` and `workspace/project.md`.
+Valid examples of `workspace/product-guide.md` and `workspace/project.md`.
 
-## workspace/user-manual.md
+## workspace/product-guide.md
 
 ```markdown
-# User Manual
+# Product Guide
 
 > Este documento explica el producto desde el punto de vista del usuario.
 >
-> Su objetivo es que cualquier persona pueda comprender qué hace el producto, qué problema resuelve y cómo utilizar cada una de sus funcionalidades, sin necesidad de conocimientos técnicos.
+> Su objetivo es que cualquier persona pueda comprender qué hace el producto, cómo funciona y cómo utilizar cada una de sus funcionalidades sin necesidad de conocimientos técnicos.
 >
-> Este documento debe mantenerse siempre actualizado y reflejar fielmente el comportamiento del producto. Cada cambio funcional incorporado al sistema debe actualizar también este manual.
+> Este documento debe mantenerse siempre actualizado y reflejar fielmente el comportamiento del producto.
+>
+> Cada modificación funcional realizada sobre el producto deberá actualizar también este documento.
 
-## Introduction
+## Crear cuenta
 
-TaskFlow helps small teams see who is doing what, without the complexity of enterprise tools.
+El usuario llega a TaskFlow para organizar el trabajo de su equipo. En esta pantalla puede registrarse con correo y contraseña o continuar con Google.
 
----
+Ve un formulario con nombre, correo y contraseña, o el botón "Continuar con Google".
 
-## Problem
-
-Teams of 3–10 people coordinate work in spreadsheets and chat threads. Tasks get lost, status is unclear, and new members take days to catch up.
-
----
-
-## Who is this product for?
-
-- **Team leads** who need visibility across all work
-- **Team members** who need a simple place to track assigned tasks
+Si completa el registro con correo, recibe un mensaje de confirmación y pasa a **Verificar correo**. Si usa Google, salta directamente a **Pantalla de bienvenida**.
 
 ---
 
-## Core Concepts
+## Verificar correo
 
-- **Task:** a unit of work with an owner and a status
-- **Board:** a visual view of tasks grouped by status
+El usuario abre el enlace recibido por correo. La pantalla confirma que su cuenta quedó activa y ofrece un botón para continuar.
 
----
-
-## Getting Started
-
-1. Create an account with your work email
-2. Invite your teammates
-3. Create your first task and assign it
+Al continuar, llega a **Pantalla de bienvenida**.
 
 ---
 
-## Features
+## Pantalla de bienvenida
 
-- Create, assign, and complete tasks
-- View tasks on a board by status
-- Receive notifications when a task status changes
+El usuario ve un resumen breve de TaskFlow y un botón para comenzar el recorrido guiado.
 
----
-
-## Typical User Scenarios
-
-**Scenario — Daily standup:** A team lead opens the board, sees blocked tasks, and reassigns work before the meeting.
-
-**Scenario — New member:** A developer joins, reads open tasks, and picks up their first assignment in under 15 minutes.
+Al pulsar "Comenzar", pasa a **Onboarding**.
 
 ---
 
-## Frequently Asked Questions
+## Onboarding
 
-**Can I use TaskFlow on my phone?** The web app works on mobile browsers. Native apps are not available yet.
+El usuario recorre tres pasos cortos: crear el primer tablero, invitar a un compañero y crear la primera tarea.
+
+Al finalizar, llega al **Dashboard**.
 
 ---
 
-## Glossary
+## Dashboard
 
-- **Board:** the main view showing tasks by status
-- **Task:** a single piece of work tracked in TaskFlow
+El usuario ve sus tableros y tareas pendientes. Desde aquí puede abrir un tablero, crear una tarea o invitar colaboradores.
+
+La experiencia habitual continúa en **Gestionar tareas en el tablero**.
+
+---
+
+## Gestionar tareas en el tablero
+
+El usuario mueve tarjetas entre columnas (Por hacer, En progreso, Hecho) y asigna responsables.
+
+Cuando cambia el estado de una tarea, los involucrados reciben una notificación.
 ```
 
 ## workspace/project.md
@@ -159,43 +148,54 @@ Cursor
 
 ## Anti-examples
 
-**Incorrect — technical content in user-manual.md:**
+**Incorrect — technical content in product-guide.md:**
 
 ```markdown
-## Database
+## Dashboard
 
-PostgreSQL stores all tasks.
+Los datos se almacenan en PostgreSQL y se sirven vía API REST.
 ```
 
 Belongs in `workspace/project.md`.
 
-**Incorrect — product behavior in project.md:**
+**Incorrect — product journey in project.md:**
+
+```markdown
+## Architecture
+
+Users move tasks between columns on the board.
+```
+
+Belongs in `workspace/product-guide.md`.
+
+**Incorrect — domains in product-guide.md:**
+
+```markdown
+## Dominio Task
+
+Las tareas tienen estados y asignados.
+```
+
+Domains belong in **sdd-spec**, not in the product guide.
+
+**Incorrect — feature-list structure instead of journey:**
 
 ```markdown
 ## Features
 
-Users can assign tasks to teammates.
+- Create tasks
+- Assign users
+- Board view
 ```
 
-Belongs in `workspace/user-manual.md`.
+Organize by user experiences in journey order, not feature lists.
 
-**Incorrect — domains in user-manual.md:**
+**Incorrect — API details:**
 
 ```markdown
-## Domains
+## Crear cuenta
 
-- Task
-- User
+POST /auth/register crea la cuenta.
 ```
 
-Domains are defined in **sdd-spec**, not in the user manual.
-
-**Incorrect — API details in user-manual.md:**
-
-```markdown
-## API
-
-POST /tasks creates a new task.
-```
-
-Never include APIs in the user manual.
+Never include APIs in the product guide.

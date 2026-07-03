@@ -1,6 +1,6 @@
 export const WORKSPACE_PATHS = [
   "workspace/project.md",
-  "workspace/user-manual.md",
+  "workspace/product-guide.md",
   "workspace/spec/domain/.gitkeep",
   "workspace/spec/relations/.gitkeep",
   "workspace/spec/capabilities/.gitkeep",
@@ -51,7 +51,7 @@ export const NPM_PACK_REQUIRED_PATHS = [
   "bin/sdd-studio.js",
   "dist/cli.js",
   "templates/workspace/project.md",
-  "templates/workspace/user-manual.md",
+  "templates/workspace/product-guide.md",
   "templates/assistants/cursor/rules/sdd-studio.mdc",
   "templates/assistants/cursor/skills/sdd-idea/SKILL.md",
 ] as const;

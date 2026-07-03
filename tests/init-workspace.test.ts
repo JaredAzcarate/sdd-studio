@@ -18,7 +18,7 @@ function createContext(targetDir: string): InitContextWithLabels {
 
 const REQUIRED_PATHS = [
   "workspace/project.md",
-  "workspace/user-manual.md",
+  "workspace/product-guide.md",
   "workspace/spec/domain/.gitkeep",
   "workspace/spec/relations/.gitkeep",
   "workspace/spec/capabilities/.gitkeep",
@@ -72,17 +72,15 @@ describe("initWorkspace", () => {
       join(tempDir, "workspace/project.md"),
       "utf8",
     );
-    const userManualMd = readFileSync(
-      join(tempDir, "workspace/user-manual.md"),
+    const productGuideMd = readFileSync(
+      join(tempDir, "workspace/product-guide.md"),
       "utf8",
     );
 
     expect(projectMd).toContain("# Project");
     expect(projectMd).toContain("sdd-idea");
-    expect(userManualMd).toContain("# User Manual");
-    expect(userManualMd).toContain("sdd-idea");
-    expect(existsSync(join(tempDir, "workspace/spec/product.md"))).toBe(false);
-    expect(existsSync(join(tempDir, "workspace/spec/vision.md"))).toBe(false);
+    expect(productGuideMd).toContain("# Product Guide");
+    expect(productGuideMd).toContain("sdd-idea");
     expect(result.assistant.installed).toBe(true);
 
     for (const relativePath of CURSOR_PATHS) {

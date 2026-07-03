@@ -14,7 +14,7 @@ export function formatGenerationResult(
     "",
     "Main structure:",
     "  workspace/project.md",
-    "  workspace/user-manual.md",
+    "  workspace/product-guide.md",
     "  workspace/spec/",
     "  workspace/workflow/releases/release-001/",
   ];

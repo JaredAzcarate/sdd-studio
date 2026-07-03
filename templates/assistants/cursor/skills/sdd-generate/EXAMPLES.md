@@ -2,7 +2,7 @@
 
 ## Example 1 — Empty spec, existing Express API
 
-**Context:** `src/routes/tasks.ts`, `package.json` shows TypeScript + Express + PostgreSQL. `workspace/user-manual.md` and `project.md` are stubs.
+**Context:** `src/routes/tasks.ts`, `package.json` shows TypeScript + Express + PostgreSQL. `workspace/product-guide.md` and `project.md` are stubs.
 
 ### Analysis (excerpt)
 
@@ -18,7 +18,7 @@ Task CRUD API exists; workspace has no domain spec. Product intent partially vis
 | Item | Severity | Notes |
 | ---- | -------- | ----- |
 | project.md | high | Stub only |
-| user-manual.md | high | Stub only |
+| product-guide.md | high | Stub only |
 | task domain (×10) | high | No domain files |
 
 ## Open questions
@@ -37,7 +37,7 @@ Task CRUD API exists; workspace has no domain spec. Product intent partially vis
 | File | Action | Summary |
 | ---- | ------ | ------- |
 | workspace/project.md | update | TypeScript, Express, PostgreSQL, Clean Architecture inferred |
-| workspace/user-manual.md | update | Task management for small teams (narrative, confirm scope) |
+| workspace/product-guide.md | update | Task management for small teams (narrative, confirm scope) |
 | workspace/spec/domain/task-*.md | create | 10 files from code analysis |
 
 ## Implementation alignment (recommendation only)
@@ -73,7 +73,7 @@ Task CRUD API exists; workspace has no domain spec. Product intent partially vis
 
 ## Example 3 — Wrong file boundary (anti-pattern)
 
-**Incorrect** — language in `user-manual.md`:
+**Incorrect** — language in `product-guide.md`:
 
 ```markdown
 ## Features
@@ -90,19 +90,3 @@ Built with TypeScript and PostgreSQL.
 **Incorrect:** generating `task-domain.md` immediately after reading `src/`.
 
 **Correct:** complete Phases 1–3, wait for **approved**, then Phase 4.
-
----
-
-## Example 5 — Legacy spec/product.md migration
-
-**Context:** Older project has `workspace/spec/product.md` with vision and scope.
-
-**Proposal:**
-
-| File | Action |
-| ---- | ------ |
-| workspace/user-manual.md | create from migrated narrative content |
-| workspace/spec/product.md | delete after migration approved |
-| workspace/spec/domain/... | create per **sdd-spec** |
-
-Wait for approval before moving content.

@@ -1,59 +1,90 @@
 # STANDARDS — sdd-idea
 
-Mandatory rules for generating `workspace/project.md` and `workspace/user-manual.md`.
+Mandatory rules for generating `workspace/project.md` and `workspace/product-guide.md`.
 
 ## Separation of concerns
 
 | File | Question it answers | Contains |
 | ---- | ------------------- | -------- |
-| `workspace/user-manual.md` | How does this product work for a user? | Narrative user manual only |
+| `workspace/product-guide.md` | How does the product work for a user? | Narrative product guide only |
 | `workspace/project.md` | How will we develop this product? | Technical and development configuration |
 
 Never mix content between these files. Never create files under `workspace/spec/`.
 
 ---
 
-## workspace/user-manual.md
+## workspace/product-guide.md
 
 ### Location
 
-- Exact path: `workspace/user-manual.md`
-- One user manual per project
-- Do not place user-manual inside `workspace/spec/`
+- Exact path: `workspace/product-guide.md`
+- One product guide per project
+- Do not place product-guide inside `workspace/spec/`
 
 ### Purpose
 
-Explain the product from the user's perspective. The manual tells the product as a story — not organized by technical domains.
+The Product Guide is the **entry point** for understanding the product.
 
-Any person should understand the full product by reading this document alone.
+It explains the complete product from the user's perspective using a **continuous narrative** organized by the **real user journey** — not by domains, features, or technical structure.
+
+Any person should understand the full product by reading this document alone, from start to finish, as if it were a book.
+
+It is **not** a specification. It can be delivered with the product as official user documentation.
 
 ### Mandatory opening
 
 The file must begin **exactly** with:
 
 ```markdown
-# User Manual
+# Product Guide
 
 > Este documento explica el producto desde el punto de vista del usuario.
 >
-> Su objetivo es que cualquier persona pueda comprender qué hace el producto, qué problema resuelve y cómo utilizar cada una de sus funcionalidades, sin necesidad de conocimientos técnicos.
+> Su objetivo es que cualquier persona pueda comprender qué hace el producto, cómo funciona y cómo utilizar cada una de sus funcionalidades sin necesidad de conocimientos técnicos.
 >
-> Este documento debe mantenerse siempre actualizado y reflejar fielmente el comportamiento del producto. Cada cambio funcional incorporado al sistema debe actualizar también este manual.
+> Este documento debe mantenerse siempre actualizado y reflejar fielmente el comportamiento del producto.
+>
+> Cada modificación funcional realizada sobre el producto deberá actualizar también este documento.
 ```
 
-### Allowed content
+### Organization
 
-User-facing, narrative content:
+Organize by **user experiences** in journey order:
 
-- introduction and product purpose
-- problem being solved
-- target users
-- core concepts users need
-- getting started
-- features and how to use them
-- typical user scenarios (stories)
-- frequently asked questions
-- glossary of user-facing terms
+```text
+Crear cuenta → Verificar correo → Pantalla de bienvenida → Onboarding → ...
+```
+
+- Each experience is one H2 section (`## Experience name`)
+- Do **not** organize by domains, APIs, or feature lists
+- Do **not** use generic sections like "Introduction", "Features", or "Glossary" as the primary structure
+- Describe **all alternative paths** narratively when they exist (e.g. manual signup vs Google, individual vs team, admin vs guest)
+
+### Narrative structure per experience
+
+Each experience section must read like a usage guide:
+
+```markdown
+## Crear cuenta
+
+[What is the goal of this screen/experience]
+
+[What the user sees]
+
+[What actions the user can take]
+
+[What happens when the process completes successfully]
+
+[Alternative paths or error flows, if any]
+
+[What experience comes next]
+```
+
+### Writing style
+
+- Clear, professional, natural language
+- Narrative and continuous — not a technical spec
+- Oriented exclusively to product usage
 
 ### Forbidden content
 
@@ -68,58 +99,13 @@ Never mention:
 - development methodology or AI assistant configuration
 - tasks, releases, roadmap, or planning
 
-### Document structure
-
-```markdown
-# User Manual
-
-> [mandatory blockquote — see above]
-
-## Introduction
-
----
-
-## Problem
-
----
-
-## Who is this product for?
-
----
-
-## Core Concepts
-
----
-
-## Getting Started
-
----
-
-## Features
-
----
-
-## Typical User Scenarios
-
----
-
-## Frequently Asked Questions
-
----
-
-## Glossary
-```
-
-Sections may evolve over time. The focus must remain narrative and user-facing.
-
 ### Format rules
 
-1. Single H1: `# User Manual`
+1. Single H1: `# Product Guide` (mandatory opening only)
 2. Mandatory blockquote immediately after H1
-3. Main sections with H2 only (`##`)
-4. Separate main sections with `---`
-5. Simple, clear language — understandable without technical knowledge
-6. No `TODO:` left without documenting open questions
+3. User experiences as H2 (`##`)
+4. Separate experiences with `---`
+5. No `TODO:` left without documenting open questions
 
 ---
 
@@ -146,8 +132,8 @@ Technical and development configuration:
 
 ### Forbidden content
 
-- product behavior, user scenarios, or features
-- user manual content
+- product behavior, user journeys, or experiences
+- product guide content
 - domain specifications
 - tasks, releases, roadmap, or milestones
 
@@ -227,7 +213,7 @@ Specification Driven Development
 
 ## Prohibitions
 
-- Do not create files outside `workspace/project.md` and `workspace/user-manual.md`
+- Do not create files outside `workspace/project.md` and `workspace/product-guide.md`
 - Do not modify `workspace/workflow/` or any file under `workspace/spec/`
-- Do not duplicate user-manual content in `project.md` or technical content in `user-manual.md`
-- Do not create `workspace/spec/product.md` or `workspace/spec/vision.md`
+- Do not duplicate product-guide content in `project.md` or technical content in `product-guide.md`
+- Do not create files under `workspace/spec/`

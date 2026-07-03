@@ -25,10 +25,10 @@ If the user says "generate everything without asking", still present a one-page 
 
 ### Mode A — Empty or stub spec
 
-Triggers: only `user-manual.md` / `project.md` TODOs, no domain files.
+Triggers: only `product-guide.md` / `project.md` TODOs, no domain files.
 
 1. Infer technical context → draft `project.md`
-2. Infer product from README, naming, features → draft `user-manual.md` (mark low-confidence items `TODO:`)
+2. Infer product from README, naming, features → draft `product-guide.md` (mark low-confidence items `TODO:`)
 3. Propose domains from code structure
 4. After approval, generate domain files per **sdd-spec** STANDARDS
 
@@ -74,7 +74,7 @@ Do not read `.env` or credential files.
 | Path | When |
 | ---- | ---- |
 | `workspace/project.md` | Missing, stub, or approved technical update |
-| `workspace/user-manual.md` | Missing, stub, or approved user-manual update |
+| `workspace/product-guide.md` | Missing, stub, or approved product guide update |
 | `workspace/spec/<domain>-*.md` | Approved domain generation or update |
 
 **Never write:** `workspace/workflow/`, `src/`, `tests/` (application tests).
@@ -83,13 +83,13 @@ Do not read `.env` or credential files.
 
 Same separation as **sdd-idea**:
 
-- `user-manual.md` — narrative user-facing manual only (no technical content)
+- `product-guide.md` — narrative user-facing manual only (no technical content)
 - `project.md` — stack, architecture, modeling, organization, assistant, etc.
 
 When inferring from code:
 
 - Framework, language, DB → `project.md`
-- User-facing purpose → `user-manual.md` (confirm with user if unclear)
+- User-facing purpose → `product-guide.md` (confirm with user if unclear)
 
 ## Domain generation
 
@@ -197,5 +197,5 @@ node .cursor/skills/sdd-spec/scripts/validate-spec.mjs workspace/spec
 - No application code changes
 - No workflow files
 - No tasks or releases in spec
-- No mixing technical content into `user-manual.md`
+- No mixing technical content into `product-guide.md`
 - No duplicating full templates from sdd-spec inside generated domain files — use correct section structure

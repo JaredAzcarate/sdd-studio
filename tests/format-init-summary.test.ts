@@ -22,7 +22,7 @@ describe("formatInitSummary", () => {
     const summary = formatInitSummary(sampleContext, cursorResult);
 
     expect(summary).toContain("Cursor");
-    expect(summary).toContain("project.md and user-manual.md");
+    expect(summary).toContain("project.md and product-guide.md");
     expect(summary).not.toContain("Organization");
   });
 

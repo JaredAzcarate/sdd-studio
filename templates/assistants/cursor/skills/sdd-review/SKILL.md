@@ -1,12 +1,12 @@
 ---
 name: sdd-review
-description: Analyzes change requests against workspace/user-manual.md, workspace/project.md, and workspace/spec/, detects impacts and inconsistencies, updates user-manual and specification files per SDD Studio standards, and validates with validate-spec.mjs. Use when reviewing spec changes or when the user invokes /sdd-review. Never modifies workspace/workflow/.
+description: Analyzes change requests against workspace/product-guide.md, workspace/project.md, and workspace/spec/, detects impacts and inconsistencies, updates product-guide and specification files per SDD Studio standards, and validates with validate-spec.mjs. Use when reviewing spec changes or when the user invokes /sdd-review. Never modifies workspace/workflow/.
 disable-model-invocation: true
 ---
 
 # SDD Review
 
-Analyze change requests and update `workspace/user-manual.md`, `workspace/project.md`, and/or `workspace/spec/` as needed. Never touch `workspace/workflow/`.
+Analyze change requests and update `workspace/product-guide.md`, `workspace/project.md`, and/or `workspace/spec/` as needed. Never touch `workspace/workflow/`.
 
 ## Required documents
 
@@ -19,16 +19,16 @@ Before editing, read:
 
 | Allowed | Forbidden |
 |---------|-----------|
-| Read `workspace/user-manual.md`, `workspace/project.md`, and all of `workspace/spec/` | Modify `workspace/workflow/` |
-| Update `workspace/user-manual.md` for functional or user-facing changes | Write or modify application code |
+| Read `workspace/product-guide.md`, `workspace/project.md`, and all of `workspace/spec/` | Modify `workspace/workflow/` |
+| Update `workspace/product-guide.md` for functional or user-facing changes | Write or modify application code |
 | Update `workspace/project.md` when technical context changes | Generate tasks, releases, or milestones |
-| Update files in `workspace/spec/` | Change user-manual scope without explicit approval |
+| Update files in `workspace/spec/` | Change product-guide scope without explicit approval |
 | Ask the user questions | |
 | Run validation script | |
 
 ## Pre-execution
 
-1. Read `workspace/user-manual.md`.
+1. Read `workspace/product-guide.md`.
 2. Read `workspace/project.md`.
 3. Read all of `workspace/spec/`.
 4. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
@@ -40,8 +40,8 @@ Before editing, read:
 ### Step 1 — Understand the change
 
 - What to change, add, or remove
-- Type: user-facing behavior, technical config, rule, API, UI, new domain, security, event
-- Whether it affects **user manual** (`user-manual.md`), **project** (`project.md`), or **domains** (spec files)
+- Type: user journey, experience, technical config, rule, API, UI, new domain, security, event
+- Whether it affects **product guide** (`product-guide.md`), **project** (`project.md`), or **domains** (spec files)
 - Priority and requester
 
 ### Step 2 — Impact analysis
@@ -49,9 +49,9 @@ Before editing, read:
 Map against existing files. Identify:
 
 - Directly affected spec files (`<domain>-<category>.md`)
-- Whether `user-manual.md` or `project.md` must change
+- Whether `product-guide.md` or `project.md` must change
 - Dependent domains via `*-relations.md`
-- Inconsistencies between `user-manual.md`, `project.md`, and domain files
+- Inconsistencies between `product-guide.md`, `project.md`, and domain files
 - Information gaps
 
 ### Step 3 — Questions
@@ -66,14 +66,14 @@ Present a summary with files to create/update/delete. Wait for confirmation if i
 
 Follow [STANDARDS.md](STANDARDS.md):
 
-- Functional or user-facing changes → `workspace/user-manual.md`
+- Functional or user-facing changes → `workspace/product-guide.md` (journey narrative)
 - Technical changes → `workspace/project.md` only
 - Domain changes → files under `workspace/spec/`
 - Keep `<domain>-<category>.md` naming and section templates
 - When adding a domain: create all 10 files
 - When removing a domain: delete all 10 files
 - Propagate changes to `relations`, `rules`, `api`, `ui` as needed
-- Keep user manual and spec aligned after functional changes
+- Keep product guide and spec aligned after functional changes
 
 ### Step 6 — Validation
 
@@ -87,9 +87,9 @@ Fix errors and re-run until `OK`.
 
 ```
 - [ ] STANDARDS.md and EXAMPLES.md read
-- [ ] user-manual.md, project.md, and spec/ reviewed
+- [ ] product-guide.md, project.md, and spec/ reviewed
 - [ ] Impact documented and confirmed if applicable
-- [ ] Only user-manual.md, project.md, and/or workspace/spec/ modified
+- [ ] Only product-guide.md, project.md, and/or workspace/spec/ modified
 - [ ] validate-spec.mjs passes with no errors
 - [ ] workflow/ untouched
 ```

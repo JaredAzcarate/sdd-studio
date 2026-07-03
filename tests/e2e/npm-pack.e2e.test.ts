@@ -88,7 +88,7 @@ describe("npm pack e2e", () => {
       "utf8",
     );
     const productMd = readFileSync(
-      join(targetDir, "workspace/user-manual.md"),
+      join(targetDir, "workspace/product-guide.md"),
       "utf8",
     );
 
