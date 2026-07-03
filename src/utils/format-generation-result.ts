@@ -13,7 +13,8 @@ export function formatGenerationResult(
     "SDD project generated successfully.",
     "",
     "Main structure:",
-    "  workspace/spec/vision.md",
+    "  workspace/project.md",
+    "  workspace/user-manual.md",
     "  workspace/spec/",
     "  workspace/workflow/releases/release-001/",
   ];
@@ -22,6 +23,7 @@ export function formatGenerationResult(
     lines.push(
       "  .cursor/rules/sdd-studio.mdc",
       "  .cursor/skills/sdd-idea/",
+      "  .cursor/skills/sdd-generate/",
       "  .cursor/skills/sdd-spec/",
       "  .cursor/skills/sdd-review/",
       "  .cursor/skills/sdd-plan/",

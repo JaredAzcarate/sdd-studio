@@ -17,7 +17,8 @@ function createContext(targetDir: string): InitContextWithLabels {
 }
 
 const REQUIRED_PATHS = [
-  "workspace/spec/vision.md",
+  "workspace/project.md",
+  "workspace/user-manual.md",
   "workspace/spec/domain/.gitkeep",
   "workspace/spec/relations/.gitkeep",
   "workspace/spec/capabilities/.gitkeep",
@@ -39,6 +40,7 @@ const REQUIRED_PATHS = [
 const CURSOR_PATHS = [
   ".cursor/rules/sdd-studio.mdc",
   ".cursor/skills/sdd-idea/SKILL.md",
+  ".cursor/skills/sdd-generate/SKILL.md",
   ".cursor/skills/sdd-spec/SKILL.md",
   ".cursor/skills/sdd-review/SKILL.md",
   ".cursor/skills/sdd-plan/SKILL.md",
@@ -66,14 +68,21 @@ describe("initWorkspace", () => {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
     }
 
-    const visionMd = readFileSync(
-      join(tempDir, "workspace/spec/vision.md"),
+    const projectMd = readFileSync(
+      join(tempDir, "workspace/project.md"),
+      "utf8",
+    );
+    const userManualMd = readFileSync(
+      join(tempDir, "workspace/user-manual.md"),
       "utf8",
     );
 
-    expect(visionMd).toContain("# Project");
-    expect(visionMd).toContain("sdd-idea");
-    expect(existsSync(join(tempDir, "workspace/project.md"))).toBe(false);
+    expect(projectMd).toContain("# Project");
+    expect(projectMd).toContain("sdd-idea");
+    expect(userManualMd).toContain("# User Manual");
+    expect(userManualMd).toContain("sdd-idea");
+    expect(existsSync(join(tempDir, "workspace/spec/product.md"))).toBe(false);
+    expect(existsSync(join(tempDir, "workspace/spec/vision.md"))).toBe(false);
     expect(result.assistant.installed).toBe(true);
 
     for (const relativePath of CURSOR_PATHS) {

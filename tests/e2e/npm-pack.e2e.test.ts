@@ -83,12 +83,17 @@ describe("npm pack e2e", () => {
       stdio: "pipe",
     });
 
-    const visionMd = readFileSync(
-      join(targetDir, "workspace/spec/vision.md"),
+    const projectMd = readFileSync(
+      join(targetDir, "workspace/project.md"),
+      "utf8",
+    );
+    const productMd = readFileSync(
+      join(targetDir, "workspace/user-manual.md"),
       "utf8",
     );
 
-    expect(visionMd).toContain("sdd-idea");
+    expect(projectMd).toContain("# Project");
+    expect(productMd).toContain("sdd-idea");
     expect(existsSync(join(targetDir, ".cursor/skills/sdd-idea/SKILL.md"))).toBe(
       true,
     );

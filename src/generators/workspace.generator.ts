@@ -25,10 +25,15 @@ export async function generateWorkspace(
     },
   );
 
-  const visionMdPath = join(workspaceTarget, "spec", "vision.md");
+  const projectMdPath = join(workspaceTarget, "project.md");
+  const userManualPath = join(workspaceTarget, "user-manual.md");
 
-  if (!createdPaths.includes(visionMdPath)) {
-    throw new Error(`Failed to generate ${visionMdPath}`);
+  if (!createdPaths.includes(projectMdPath)) {
+    throw new Error(`Failed to generate ${projectMdPath}`);
+  }
+
+  if (!createdPaths.includes(userManualPath)) {
+    throw new Error(`Failed to generate ${userManualPath}`);
   }
 
   return {

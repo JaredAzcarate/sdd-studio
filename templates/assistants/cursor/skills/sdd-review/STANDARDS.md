@@ -1,16 +1,29 @@
 # STANDARDS — sdd-review
 
-Mandatory rules when reviewing and updating `workspace/spec/`.
+Mandatory rules when reviewing and updating `workspace/user-manual.md`, `workspace/project.md`, and `workspace/spec/`.
 
 ## Edit scope
 
-- Modify only files under `workspace/spec/`
+- May modify `workspace/user-manual.md` for functional or user-facing changes
+- May modify `workspace/project.md` for technical configuration changes
+- May modify files under `workspace/spec/` for specification changes
 - **Never** modify `workspace/workflow/`
 - **Never** write code in `src/`
+- **Never** place `user-manual.md` inside `workspace/spec/`
 
-If the change requires replanning, suggest **sdd-plan** to the user. Do not create tasks or releases.
+If the change requires replanning, suggest **sdd-plan**. Do not create tasks or releases.
 
-## Naming (unchanged)
+## File responsibilities
+
+| File | Changes when |
+| ---- | ------------ |
+| `workspace/user-manual.md` | User-facing behavior, features, scenarios, scope, or product narrative change |
+| `workspace/project.md` | Stack, architecture, modeling, or development configuration change |
+| `workspace/spec/<domain>-*.md` | Domain-level specification change |
+
+Do not put technical details in `user-manual.md`. Do not put product behavior in `project.md`.
+
+## Nomenclature (unchanged)
 
 Keep the per-domain pattern:
 
@@ -27,16 +40,23 @@ Keep the per-domain pattern:
 | `ui/` | `<domain>-ui.md` |
 | `testing/` | `<domain>-testing.md` |
 
-Forbidden: `index.md`, `README.md`, `map.md`, per-domain folders.
+Forbidden in `spec/`: `index.md`, `README.md`, `map.md`, `product.md`, `vision.md`, `user-manual.md`, per-domain folders.
 
-## vision.md
+## user-manual.md
 
-- Do not modify except for **scope or objectives** changes explicitly approved
-- If the change is only technical or domain-level, edit the corresponding domain files
+- Modify only for **user-facing** changes (features, scenarios, scope, glossary, FAQ)
+- Preserve the mandatory opening blockquote from **sdd-idea** STANDARDS
+- Requires explicit approval for scope changes that contradict existing domain specs
+- After functional changes, ensure `workspace/spec/` stays aligned
+
+## project.md
+
+- Modify only for **technical** changes
+- Keep section structure from **sdd-idea** STANDARDS
 
 ## One question per document
 
-When editing, each file answers only its question (see **sdd-spec** STANDARDS for templates).
+Each domain file answers only its question (see **sdd-spec** STANDARDS for templates).
 
 Do not move business rules to `*-ui.md`. Do not put UI states in `*-flows.md`.
 
@@ -44,7 +64,9 @@ Do not move business rules to `*-ui.md`. Do not put UI states in `*-flows.md`.
 
 | Type | Typical files |
 | ---- | ------------- |
-| New domain | All 10 domain files |
+| User-facing scope change | `user-manual.md`; may require domain updates via **sdd-spec** |
+| Technical stack change | `project.md` |
+| New domain | 10 domain files |
 | New capability | `*-capabilities.md`, possibly `*-flows.md`, `*-api.md` |
 | Rule change | `*-rules.md`; verify `*-flows.md`, `*-testing.md` |
 | API change | `*-api.md`; verify `*-capabilities.md`, `*-security.md` |
@@ -70,7 +92,7 @@ Delete all 10 `<domain>-*.md` files in every folder. Clean references in other `
 Require explicit user confirmation when:
 
 - High impact (new domain, deletion, scope change)
-- Contradiction with `vision.md`
+- Contradiction between `user-manual.md`, `project.md`, or domain files
 - Unresolved open questions
 
 ## Post-edit validation

@@ -63,15 +63,15 @@ Do not touch `workflow/`.
 | update | `ui/task-ui.md` (form field) |
 | update | `testing/task-testing.md` |
 
-## Scenario 4 — Scope change (requires vision.md)
+## Scenario 4 — Scope change (requires user-manual.md)
 
 **Request:** "Include native mobile app in MVP."
 
 **Action:**
 
-1. Ask for confirmation (contradicts out of scope in `vision.md`)
-2. Only with approval: update `vision.md` Scope
-3. Then update spec according to new scope
+1. Ask for confirmation (contradicts out of scope in `user-manual.md`)
+2. Only with approval: update `user-manual.md` Features and Typical User Scenarios
+3. Then update domain spec according to new scope
 
 ## Anti-example — Incorrect
 

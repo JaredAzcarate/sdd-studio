@@ -25,9 +25,12 @@ const CATEGORIES = [
   { folder: "testing", suffix: "testing" },
 ];
 
-const ALLOWED_TOP = new Set([
+const ALLOWED_TOP = new Set(CATEGORIES.map((c) => c.folder));
+
+const FORBIDDEN_ROOT_FILES = new Set([
+  "product.md",
   "vision.md",
-  ...CATEGORIES.map((c) => c.folder),
+  "user-manual.md",
 ]);
 
 const FORBIDDEN_IN_SPEC = [
@@ -100,22 +103,39 @@ function main() {
     process.exit(1);
   }
 
+  const productPath = path.join(specRoot, "product.md");
+  if (exists(productPath)) {
+    errors.push(
+      "Forbidden file in spec/: product.md (use workspace/user-manual.md instead)",
+    );
+  }
+
   const visionPath = path.join(specRoot, "vision.md");
-  if (!exists(visionPath)) {
-    errors.push("Missing workspace/spec/vision.md (run sdd-idea first)");
-  } else {
-    validateH1(visionPath);
+  if (exists(visionPath)) {
+    errors.push("Forbidden file in spec/: vision.md");
+  }
+
+  const userManualPath = path.join(specRoot, "user-manual.md");
+  if (exists(userManualPath)) {
+    errors.push(
+      "Forbidden file in spec/: user-manual.md (belongs at workspace/user-manual.md)",
+    );
   }
 
   const topEntries = fs.readdirSync(specRoot);
   for (const entry of topEntries) {
     const full = path.join(specRoot, entry);
     const stat = fs.statSync(full);
-    if (stat.isFile() && entry !== "vision.md") {
+    if (stat.isFile()) {
+      if (FORBIDDEN_ROOT_FILES.has(entry)) {
+        continue;
+      }
       if (FORBIDDEN_IN_SPEC.some((re) => re.test(entry))) {
         errors.push(`Forbidden file in spec/: ${entry}`);
       } else if (!entry.endsWith(".md")) {
         warnings.push(`Unexpected non-markdown file in spec/: ${entry}`);
+      } else {
+        errors.push(`Unexpected file in spec/: ${entry} (only category folders allowed at top level)`);
       }
     }
     if (stat.isDirectory() && !ALLOWED_TOP.has(entry)) {

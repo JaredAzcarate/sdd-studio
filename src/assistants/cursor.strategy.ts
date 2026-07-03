@@ -5,6 +5,7 @@ import { resolveAssistantTemplatePath } from "../core/template-resolver.js";
 import type {
   AssistantInstallResult,
   AssistantStrategy,
+  AssistantSyncOptions,
 } from "./assistant.strategy.js";
 
 const CURSOR_SKILLS_MARKER = join(
@@ -35,6 +36,30 @@ export class CursorAssistantStrategy implements AssistantStrategy {
       cursorTarget,
       { overwrite },
     );
+
+    return {
+      assistantId: this.id,
+      installed: true,
+      createdPaths,
+    };
+  }
+
+  async sync(
+    targetDir: string,
+    options: AssistantSyncOptions = {},
+  ): Promise<AssistantInstallResult> {
+    const scope = options.scope ?? "all";
+    const templateRoot = resolveAssistantTemplatePath("cursor");
+    const sourceDir =
+      scope === "skills" ? join(templateRoot, "skills") : templateRoot;
+    const cursorTarget =
+      scope === "skills"
+        ? join(targetDir, ".cursor", "skills")
+        : join(targetDir, ".cursor");
+
+    const { createdPaths } = await copyTemplateTree(sourceDir, cursorTarget, {
+      overwrite: true,
+    });
 
     return {
       assistantId: this.id,

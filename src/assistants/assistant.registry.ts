@@ -2,6 +2,7 @@ import type { AssistantId } from "../types/init-context.js";
 import type {
   AssistantInstallResult,
   AssistantStrategy,
+  AssistantSyncOptions,
 } from "./assistant.strategy.js";
 import { cursorAssistantStrategy } from "./cursor.strategy.js";
 
@@ -34,4 +35,23 @@ export async function installAssistant(
   }
 
   return strategy.install(targetDir, overwrite);
+}
+
+export async function syncAssistant(
+  assistantId: AssistantId,
+  targetDir: string,
+  options: AssistantSyncOptions = {},
+): Promise<AssistantInstallResult> {
+  const strategy = getAssistantStrategy(assistantId);
+
+  if (!strategy) {
+    return {
+      assistantId,
+      installed: false,
+      createdPaths: [],
+      message: `Assistant "${assistantId}" will be available in a future release.`,
+    };
+  }
+
+  return strategy.sync(targetDir, options);
 }

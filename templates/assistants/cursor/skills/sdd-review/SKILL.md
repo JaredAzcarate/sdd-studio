@@ -1,12 +1,12 @@
 ---
 name: sdd-review
-description: Analyzes change requests against workspace/spec/, detects impacts and inconsistencies, asks clarifying questions, updates only the specification per SDD Studio standards, and validates with validate-spec.mjs. Use when reviewing spec changes or when the user invokes /sdd-review. Never modifies workspace/workflow/.
+description: Analyzes change requests against workspace/user-manual.md, workspace/project.md, and workspace/spec/, detects impacts and inconsistencies, updates user-manual and specification files per SDD Studio standards, and validates with validate-spec.mjs. Use when reviewing spec changes or when the user invokes /sdd-review. Never modifies workspace/workflow/.
 disable-model-invocation: true
 ---
 
 # SDD Review
 
-Analyze change requests and update **only** `workspace/spec/`.
+Analyze change requests and update `workspace/user-manual.md`, `workspace/project.md`, and/or `workspace/spec/` as needed. Never touch `workspace/workflow/`.
 
 ## Required documents
 
@@ -19,33 +19,39 @@ Before editing, read:
 
 | Allowed | Forbidden |
 |---------|-----------|
-| Read all of `workspace/spec/` | Modify `workspace/workflow/` |
-| Update files in `workspace/spec/` | Write or modify code |
-| Ask the user questions | Generate tasks, releases, or milestones |
-| Run validation script | Change `vision.md` without explicit approval |
+| Read `workspace/user-manual.md`, `workspace/project.md`, and all of `workspace/spec/` | Modify `workspace/workflow/` |
+| Update `workspace/user-manual.md` for functional or user-facing changes | Write or modify application code |
+| Update `workspace/project.md` when technical context changes | Generate tasks, releases, or milestones |
+| Update files in `workspace/spec/` | Change user-manual scope without explicit approval |
+| Ask the user questions | |
+| Run validation script | |
 
 ## Pre-execution
 
-1. Read `workspace/spec/vision.md` and the rest of `workspace/spec/`.
-2. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
-3. Inventory `workspace/spec/`.
-4. Identify the change request; if ambiguous, ask before analyzing.
+1. Read `workspace/user-manual.md`.
+2. Read `workspace/project.md`.
+3. Read all of `workspace/spec/`.
+4. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
+5. Inventory `workspace/spec/` and note current state of all root documents.
+6. Identify the change request; if ambiguous, ask before analyzing.
 
 ## Flow
 
 ### Step 1 — Understand the change
 
 - What to change, add, or remove
-- Type: scope, rule, API, UI, new domain, security, event
+- Type: user-facing behavior, technical config, rule, API, UI, new domain, security, event
+- Whether it affects **user manual** (`user-manual.md`), **project** (`project.md`), or **domains** (spec files)
 - Priority and requester
 
 ### Step 2 — Impact analysis
 
-Map against existing spec. Identify:
+Map against existing files. Identify:
 
-- Directly affected files (`<domain>-<category>.md` format)
+- Directly affected spec files (`<domain>-<category>.md`)
+- Whether `user-manual.md` or `project.md` must change
 - Dependent domains via `*-relations.md`
-- Inconsistencies with `vision.md` or other domains
+- Inconsistencies between `user-manual.md`, `project.md`, and domain files
 - Information gaps
 
 ### Step 3 — Questions
@@ -60,11 +66,14 @@ Present a summary with files to create/update/delete. Wait for confirmation if i
 
 Follow [STANDARDS.md](STANDARDS.md):
 
-- Keep `<domain>-<category>.md` naming
-- Keep section templates
+- Functional or user-facing changes → `workspace/user-manual.md`
+- Technical changes → `workspace/project.md` only
+- Domain changes → files under `workspace/spec/`
+- Keep `<domain>-<category>.md` naming and section templates
 - When adding a domain: create all 10 files
 - When removing a domain: delete all 10 files
 - Propagate changes to `relations`, `rules`, `api`, `ui` as needed
+- Keep user manual and spec aligned after functional changes
 
 ### Step 6 — Validation
 
@@ -78,8 +87,9 @@ Fix errors and re-run until `OK`.
 
 ```
 - [ ] STANDARDS.md and EXAMPLES.md read
+- [ ] user-manual.md, project.md, and spec/ reviewed
 - [ ] Impact documented and confirmed if applicable
-- [ ] Only workspace/spec/ modified
+- [ ] Only user-manual.md, project.md, and/or workspace/spec/ modified
 - [ ] validate-spec.mjs passes with no errors
 - [ ] workflow/ untouched
 ```
@@ -90,4 +100,4 @@ Fix errors and re-run until `OK`.
 2. Modified files
 3. Resolved and open inconsistencies
 4. If replanning is needed: **sdd-plan**
-5. If a new vision is needed: **sdd-idea**
+5. If product or project discovery is needed: **sdd-idea**

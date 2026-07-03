@@ -34,13 +34,17 @@ describe("cli init e2e", () => {
 
     assertPathsExist(tempDir, ALL_CURSOR_INIT_PATHS);
 
-    const visionMd = readFileSync(
-      join(tempDir, "workspace/spec/vision.md"),
+    const projectMd = readFileSync(
+      join(tempDir, "workspace/project.md"),
+      "utf8",
+    );
+    const userManualMd = readFileSync(
+      join(tempDir, "workspace/user-manual.md"),
       "utf8",
     );
 
-    expect(visionMd).toContain("# Project");
-    expect(visionMd).toContain("sdd-idea");
+    expect(projectMd).toContain("# Project");
+    expect(userManualMd).toContain("# User Manual");
     expect(output).toContain("SDD project generated successfully");
     expect(output).toContain("sdd-idea");
   });

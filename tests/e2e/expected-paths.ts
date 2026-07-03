@@ -1,5 +1,6 @@
 export const WORKSPACE_PATHS = [
-  "workspace/spec/vision.md",
+  "workspace/project.md",
+  "workspace/user-manual.md",
   "workspace/spec/domain/.gitkeep",
   "workspace/spec/relations/.gitkeep",
   "workspace/spec/capabilities/.gitkeep",
@@ -23,6 +24,9 @@ export const CURSOR_PATHS = [
   ".cursor/skills/sdd-idea/SKILL.md",
   ".cursor/skills/sdd-idea/STANDARDS.md",
   ".cursor/skills/sdd-idea/EXAMPLES.md",
+  ".cursor/skills/sdd-generate/SKILL.md",
+  ".cursor/skills/sdd-generate/STANDARDS.md",
+  ".cursor/skills/sdd-generate/EXAMPLES.md",
   ".cursor/skills/sdd-spec/SKILL.md",
   ".cursor/skills/sdd-spec/STANDARDS.md",
   ".cursor/skills/sdd-spec/EXAMPLES.md",
@@ -46,7 +50,8 @@ export const NPM_PACK_REQUIRED_PATHS = [
   "package.json",
   "bin/sdd-studio.js",
   "dist/cli.js",
-  "templates/workspace/spec/vision.md",
+  "templates/workspace/project.md",
+  "templates/workspace/user-manual.md",
   "templates/assistants/cursor/rules/sdd-studio.mdc",
   "templates/assistants/cursor/skills/sdd-idea/SKILL.md",
 ] as const;

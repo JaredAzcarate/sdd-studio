@@ -17,8 +17,6 @@ Do not create:
 ```text
 workspace/spec/
 
-    vision.md
-
     domain/
 
     relations/
