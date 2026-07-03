@@ -1,12 +1,12 @@
 ---
 name: sdd-spec
-description: Reads workspace/product-guide.md and workspace/project.md, discovers domains through questions, and generates the full specification tree under workspace/spec/ using SDD Studio naming conventions. Use when specifying domains, APIs, flows, or when the user invokes /sdd-spec.
+description: Reads .workspace/product-guide.md and .workspace/project.md, discovers domains through questions, and generates the full specification tree under .workspace/spec/ using SDD Studio naming conventions. Use when specifying domains, APIs, flows, or when the user invokes /sdd-spec.
 disable-model-invocation: true
 ---
 
 # SDD Spec
 
-Read the Product Guide and project configuration, discover domains, and generate the full technical specification under `workspace/spec/`.
+Read the Product Guide and project configuration, discover domains, and generate the full technical specification under `.workspace/spec/`.
 
 The Product Guide is the **primary and sole source** of functional knowledge. Transform its narrative into structured spec files. **Never invent functionality** not described in the Product Guide.
 
@@ -21,8 +21,8 @@ Before generating, read:
 
 | Allowed | Forbidden |
 |---------|-----------|
-| Read `workspace/product-guide.md` and `workspace/project.md` | Modify `workspace/workflow/` |
-| Create/update domain files in `workspace/spec/` | Modify `product-guide.md` or `project.md` without explicit permission |
+| Read `.workspace/product-guide.md` and `.workspace/project.md` | Modify `.workspace/workflow/` |
+| Create/update domain files in `.workspace/spec/` | Modify `product-guide.md` or `project.md` without explicit permission |
 | Ask the user questions | Write code in `src/` |
 | Run validation script | Generate tasks, releases, or roadmap |
 | | Invent features not in the Product Guide |
@@ -30,11 +30,11 @@ Before generating, read:
 
 ## Pre-execution
 
-1. Read `workspace/product-guide.md` (primary source).
-2. Read `workspace/project.md` (technical context only).
+1. Read `.workspace/product-guide.md` (primary source).
+2. Read `.workspace/project.md` (technical context only).
 3. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
 4. Verify both files exist; if not, stop and suggest **sdd-idea** (greenfield) or **sdd-generate** (existing codebase).
-5. Inventory existing files in `workspace/spec/`.
+5. Inventory existing files in `.workspace/spec/`.
 6. Use `project.md` for technical context (architecture, DDD, stack). Derive all functional behavior from `product-guide.md` only.
 
 ## Flow
@@ -82,7 +82,7 @@ Use the exact templates from [STANDARDS.md](STANDARDS.md). See [EXAMPLES.md](EXA
 Run the validator from the project root:
 
 ```bash
-node .cursor/skills/sdd-spec/scripts/validate-spec.mjs workspace/spec
+node .cursor/skills/sdd-spec/scripts/validate-spec.mjs .workspace/spec
 ```
 
 If it fails:

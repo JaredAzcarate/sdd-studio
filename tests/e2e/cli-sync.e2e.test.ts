@@ -36,7 +36,7 @@ describe("cli sync e2e", () => {
     });
 
     expect(output).toContain("SDD assistant files synced successfully");
-    expect(output).toContain("workspace/ files were not modified");
+    expect(output).toContain(".workspace/ files were not modified");
     expect(readFileSync(skillPath, "utf8")).toContain("SDD Idea");
     expect(readFileSync(skillPath, "utf8")).not.toContain("# Tampered skill");
   });

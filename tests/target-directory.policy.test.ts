@@ -22,9 +22,9 @@ describe("assertTargetDirectoryAvailable", () => {
     expect(() => assertTargetDirectoryAvailable(tempDir)).not.toThrow();
   });
 
-  it("blocks when workspace/project.md already exists", () => {
+  it("blocks when .workspace/project.md already exists", () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
-    const workspaceDir = join(tempDir, "workspace");
+    const workspaceDir = join(tempDir, ".workspace");
     mkdirSync(workspaceDir, { recursive: true });
     writeFileSync(join(workspaceDir, "project.md"), "# Existing");
 
@@ -44,9 +44,9 @@ describe("assertSyncTargetEligible", () => {
     }
   });
 
-  it("allows a directory with workspace/project.md", () => {
+  it("allows a directory with .workspace/project.md", () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
-    const workspaceDir = join(tempDir, "workspace");
+    const workspaceDir = join(tempDir, ".workspace");
     mkdirSync(workspaceDir, { recursive: true });
     writeFileSync(join(workspaceDir, "project.md"), "# Existing");
 
@@ -59,7 +59,34 @@ describe("assertSyncTargetEligible", () => {
     mkdirSync(skillDir, { recursive: true });
     writeFileSync(join(skillDir, "SKILL.md"), "# Skill");
 
-    expect(() => assertSyncTargetEligible(tempDir)).not.toThrow();
+    expect(() => assertSyncTargetEligible(tempDir, "cursor")).not.toThrow();
+  });
+
+  it("allows a directory with only claude skills installed", () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
+    const skillDir = join(tempDir, ".claude", "skills", "sdd-idea");
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(join(skillDir, "SKILL.md"), "# Skill");
+
+    expect(() => assertSyncTargetEligible(tempDir, "claude")).not.toThrow();
+  });
+
+  it("allows a directory with only codex skills installed", () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
+    const skillDir = join(tempDir, ".agents", "skills", "sdd-idea");
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(join(skillDir, "SKILL.md"), "# Skill");
+
+    expect(() => assertSyncTargetEligible(tempDir, "codex")).not.toThrow();
+  });
+
+  it("allows a directory with only opencode commands installed", () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
+    const commandsDir = join(tempDir, ".opencode", "commands");
+    mkdirSync(commandsDir, { recursive: true });
+    writeFileSync(join(commandsDir, "sdd-idea.md"), "# Command");
+
+    expect(() => assertSyncTargetEligible(tempDir, "opencode")).not.toThrow();
   });
 
   it("blocks when no SDD markers exist", () => {

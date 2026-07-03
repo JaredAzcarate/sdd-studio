@@ -1,6 +1,6 @@
 {
   "name": "sdd-studio",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Bootstrapper for Specification Driven Development workspaces",
   "type": "module",
   "engines": {
@@ -27,7 +27,9 @@
     "sdd",
     "specification-driven-development",
     "cli",
-    "cursor"
+    "cursor",
+    "opencode",
+    "claude"
   ],
   "license": "MIT",
   "repository": {

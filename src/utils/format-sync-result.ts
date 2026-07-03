@@ -1,11 +1,15 @@
 import { relative } from "node:path";
+import { getAssistantLayout } from "../assistants/assistant-layout.js";
+import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
 import type {
   AssistantInstallResult,
   AssistantSyncScope,
 } from "../assistants/assistant.strategy.js";
+import type { AssistantId } from "../types/init-context.js";
 
 export function formatSyncResult(
   targetDir: string,
+  assistantId: AssistantId,
   scope: AssistantSyncScope,
   result: AssistantInstallResult,
 ): string {
@@ -13,23 +17,9 @@ export function formatSyncResult(
     .map((filePath) => relative(targetDir, filePath))
     .sort();
 
+  const layout = getAssistantLayout(assistantId);
   const updatedPaths =
-    scope === "skills"
-      ? [
-          "  .cursor/skills/sdd-idea/",
-          "  .cursor/skills/sdd-generate/",
-          "  .cursor/skills/sdd-spec/",
-          "  .cursor/skills/sdd-review/",
-          "  .cursor/skills/sdd-plan/",
-        ]
-      : [
-          "  .cursor/rules/sdd-studio.mdc",
-          "  .cursor/skills/sdd-idea/",
-          "  .cursor/skills/sdd-generate/",
-          "  .cursor/skills/sdd-spec/",
-          "  .cursor/skills/sdd-review/",
-          "  .cursor/skills/sdd-plan/",
-        ];
+    scope === "skills" ? layout.syncLabels.skills : layout.syncLabels.all;
 
   const lines = [
     "SDD assistant files synced successfully.",
@@ -39,7 +29,7 @@ export function formatSyncResult(
     "",
     `Total files: ${relativePaths.length}`,
     "",
-    "Your workspace/ files were not modified.",
+    `Your ${SDD_WORKSPACE_DIR}/ files were not modified.`,
   ];
 
   if (result.message) {

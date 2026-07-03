@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { copyTemplateTree } from "../core/file-system.js";
+import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
 import { resolveWorkspaceTemplatePath } from "../core/template-resolver.js";
 
 export type GenerateWorkspaceOptions = {
@@ -15,7 +16,7 @@ export type GenerateWorkspaceResult = {
 export async function generateWorkspace(
   options: GenerateWorkspaceOptions,
 ): Promise<GenerateWorkspaceResult> {
-  const workspaceTarget = join(options.targetDir, "workspace");
+  const workspaceTarget = join(options.targetDir, SDD_WORKSPACE_DIR);
 
   const { createdPaths } = await copyTemplateTree(
     resolveWorkspaceTemplatePath(),

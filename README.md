@@ -2,7 +2,7 @@
 
 Bootstrap a **Specification Driven Development (SDD)** workspace for AI-assisted projects.
 
-The CLI prepares your folder structure and Cursor skills. The intelligence lives in the skills — not in this tool.
+The CLI prepares your folder structure and assistant-specific SDD skills. The intelligence lives in the skills — not in this tool.
 
 ```bash
 npx sdd-studio init
@@ -12,11 +12,11 @@ npx sdd-studio init
 
 `sdd-studio init` scaffolds:
 
-- `workspace/project.md` — technical and development configuration
-- `workspace/product-guide.md` — narrative product guide (user journey)
-- `workspace/spec/` — structured technical and functional specification (domain files)
-- `workspace/workflow/` — planning (roadmap, milestones, releases, tasks)
-- `.cursor/` — SDD skills and rules (when Cursor is selected)
+- `.workspace/project.md` — technical and development configuration
+- `.workspace/product-guide.md` — narrative product guide (user journey)
+- `.workspace/spec/` — structured technical and functional specification (domain files)
+- `.workspace/workflow/` — planning (roadmap, milestones, releases, tasks)
+- Assistant files — skills, rules, or commands for your chosen AI tool
 
 It does **not** generate application code (`src/`, `tests/`, etc.). You implement after the spec is ready.
 
@@ -30,10 +30,10 @@ Idea → Product Guide → Specification → Planning → Implementation
 
 | Location | Question |
 | -------- | -------- |
-| `workspace/project.md` | How will we develop this product? |
-| `workspace/product-guide.md` | How does the product work for a user? |
-| `workspace/spec/` | How is the product specified? |
-| `workspace/workflow/` | How do we organize the work? |
+| `.workspace/project.md` | How will we develop this product? |
+| `.workspace/product-guide.md` | How does the product work for a user? |
+| `.workspace/spec/` | How is the product specified? |
+| `.workspace/workflow/` | How do we organize the work? |
 
 The Product Guide is the root of functional knowledge. Specification derives entirely from it.
 
@@ -50,29 +50,53 @@ Non-interactive (defaults to Cursor):
 npx sdd-studio init --yes --assistant cursor
 ```
 
-Then in Cursor, run the **sdd-idea** skill to complete `workspace/project.md` and `workspace/product-guide.md`.
+Then run the **sdd-idea** skill (or `/sdd-idea` in OpenCode) to complete `.workspace/project.md` and `.workspace/product-guide.md`.
 
 ## Updating assistant files
 
-After upgrading `sdd-studio`, refresh Cursor skills and rules without touching your `workspace/`:
+After upgrading `sdd-studio`, refresh assistant files without touching your `.workspace/`:
 
 ```bash
 npx sdd-studio sync
 ```
 
-Sync only skills (keep your `.cursor/rules/` as-is):
+Sync only skills (keep your rules or project instructions as-is):
 
 ```bash
 npx sdd-studio sync --skills
 ```
 
-Requires an existing SDD project (`workspace/project.md` or `.cursor/skills/` from a prior `init`).
+Requires an existing SDD project (`.workspace/project.md` or installed assistant skills from a prior `init`).
 
-## Generated structure
+## Assistant-specific layout
+
+`--assistant` controls which AI tooling receives the SDD skills:
+
+| Assistant | Project instructions | Skills / commands |
+| --------- | ---------------------- | ----------------- |
+| `cursor` (default) | `.cursor/rules/sdd-studio.mdc` | `.cursor/skills/sdd-*/` |
+| `claude` | `CLAUDE.md` | `.claude/skills/sdd-*/` |
+| `codex` | `AGENTS.md` | `.agents/skills/sdd-*/` (+ `agents/openai.yaml` per skill) |
+| `opencode` | — | `.opencode/commands/sdd-*.md` (+ assets in `.opencode/sdd-studio/`) |
+
+`.workspace/` is identical for all assistants.
+
+```bash
+npx sdd-studio init --yes --assistant claude
+npx sdd-studio init --yes --assistant codex
+npx sdd-studio init --yes --assistant opencode
+npx sdd-studio sync --assistant opencode
+```
+
+### Merge-safe install
+
+If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist with your own skills or commands, `init` adds only the SDD files and **does not delete** unrelated entries. Run `sync` to overwrite SDD files from the package.
+
+## Generated structure (Cursor)
 
 ```
 ./
-├── workspace/
+├── .workspace/
 │   ├── project.md
 │   ├── product-guide.md
 │   ├── spec/
@@ -105,6 +129,26 @@ Requires an existing SDD project (`workspace/project.md` or `.cursor/skills/` fr
         └── sdd-plan/
 ```
 
+### OpenCode layout
+
+```
+./
+├── .workspace/                 # same as above
+└── .opencode/
+    ├── commands/
+    │   ├── sdd-idea.md
+    │   ├── sdd-generate.md
+    │   ├── sdd-spec.md
+    │   ├── sdd-review.md
+    │   └── sdd-plan.md
+    └── sdd-studio/             # STANDARDS, EXAMPLES, validation scripts
+        ├── sdd-idea/
+        ├── sdd-spec/
+        └── ...
+```
+
+Invoke with `/sdd-idea`, `/sdd-spec`, etc.
+
 ## Skill workflow
 
 ### Greenfield
@@ -112,9 +156,9 @@ Requires an existing SDD project (`workspace/project.md` or `.cursor/skills/` fr
 | Skill | Purpose |
 | ----- | ------- |
 | **sdd-idea** | Discover product; write `project.md` and `product-guide.md` |
-| **sdd-spec** | Read product guide + project; generate domain files under `workspace/spec/` |
-| **sdd-review** | Analyze changes; update `product-guide.md` and/or `workspace/spec/` |
-| **sdd-plan** | Read project + product guide + spec; generate `workspace/workflow/` |
+| **sdd-spec** | Read product guide + project; generate domain files under `.workspace/spec/` |
+| **sdd-review** | Analyze changes; update `product-guide.md` and/or `.workspace/spec/` |
+| **sdd-plan** | Read project + product guide + spec; generate `.workspace/workflow/` |
 
 ### Existing codebase
 
@@ -123,7 +167,7 @@ Requires an existing SDD project (`workspace/project.md` or `.cursor/skills/` fr
 | **sdd-generate** | Explore code, compare with spec, propose gaps; generate or align spec (conservative) |
 | **sdd-review** / **sdd-plan** | After spec is aligned |
 
-Invoke skills explicitly in Cursor. Do not implement without a specification.
+Invoke skills explicitly in your AI assistant. Do not implement without a specification.
 
 ## CLI reference
 
@@ -135,15 +179,15 @@ sdd-studio sync [options]
 | Command | Description |
 | ------- | ----------- |
 | `init` | Scaffold a new SDD workspace |
-| `sync` | Update `.cursor/` skills and rules from the installed package |
+| `sync` | Update assistant files from the installed package |
 
 | Option | Description |
 | ------ | ----------- |
 | `--yes` | Skip prompts; use defaults (`init` only) |
-| `--assistant <id>` | `cursor` (default), `claude`, or `codex` |
-| `--skills` | Sync only `.cursor/skills/` (`sync` only) |
+| `--assistant <id>` | `cursor` (default), `claude`, `codex`, or `opencode` |
+| `--skills` | Sync only skills/commands, not instructions or rules (`sync` only) |
 
-`claude` and `codex` are reserved for future releases; only Cursor installs skills today.
+All assistants install the same five SDD skills with provider-native paths.
 
 ## Requirements
 

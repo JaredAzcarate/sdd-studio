@@ -1,5 +1,6 @@
 import { cwd } from "node:process";
 import { Command } from "commander";
+import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
 import { assertSyncTargetEligible } from "../policies/target-directory.policy.js";
 import { syncAssistant } from "../use-cases/sync-assistant.use-case.js";
 import { assistantIdSchema } from "../types/init-context.js";
@@ -14,19 +15,19 @@ type SyncCommandOptions = {
 export function createSyncCommand(): Command {
   return new Command("sync")
     .description(
-      "Update assistant files (.cursor/) from the installed package without modifying workspace/",
+      `Update assistant files from the installed package without modifying ${SDD_WORKSPACE_DIR}/`,
     )
-    .option("--skills", "Sync only .cursor/skills/, not rules")
+    .option("--skills", "Sync only skills, not project instructions or rules")
     .option(
       "--assistant <assistant>",
-      "Assistant ID: cursor, claude, codex",
+      "Assistant ID: cursor, claude, codex, opencode",
       INIT_CONTEXT_DEFAULTS.assistant,
     )
     .action(async (options: SyncCommandOptions) => {
       const targetDir = cwd();
-      assertSyncTargetEligible(targetDir);
-
       const assistant = assistantIdSchema.parse(options.assistant);
+      assertSyncTargetEligible(targetDir, assistant);
+
       const scope = options.skills ? "skills" : "all";
 
       const result = await syncAssistant({
@@ -35,15 +36,8 @@ export function createSyncCommand(): Command {
         scope,
       });
 
-      if (!result.installed) {
-        throw new Error(
-          result.message ??
-            `Assistant "${assistant}" is not available for sync.`,
-        );
-      }
-
       console.log("");
-      console.log(formatSyncResult(targetDir, scope, result));
+      console.log(formatSyncResult(targetDir, assistant, scope, result));
       console.log("");
     });
 }

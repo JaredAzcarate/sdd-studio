@@ -4,18 +4,22 @@ import type {
   AssistantStrategy,
   AssistantSyncOptions,
 } from "./assistant.strategy.js";
+import { claudeAssistantStrategy } from "./claude.strategy.js";
+import { codexAssistantStrategy } from "./codex.strategy.js";
 import { cursorAssistantStrategy } from "./cursor.strategy.js";
+import { opencodeAssistantStrategy } from "./opencode.strategy.js";
 
-const STRATEGIES: Record<AssistantId, AssistantStrategy | null> = {
+const STRATEGIES: Record<AssistantId, AssistantStrategy> = {
   cursor: cursorAssistantStrategy,
-  claude: null,
-  codex: null,
+  claude: claudeAssistantStrategy,
+  codex: codexAssistantStrategy,
+  opencode: opencodeAssistantStrategy,
 };
 
 export function getAssistantStrategy(
   assistantId: AssistantId,
-): AssistantStrategy | null {
-  return STRATEGIES[assistantId] ?? null;
+): AssistantStrategy {
+  return STRATEGIES[assistantId];
 }
 
 export async function installAssistant(
@@ -24,16 +28,6 @@ export async function installAssistant(
   overwrite = false,
 ): Promise<AssistantInstallResult> {
   const strategy = getAssistantStrategy(assistantId);
-
-  if (!strategy) {
-    return {
-      assistantId,
-      installed: false,
-      createdPaths: [],
-      message: `Assistant "${assistantId}" will be available in a future release.`,
-    };
-  }
-
   return strategy.install(targetDir, overwrite);
 }
 
@@ -43,15 +37,5 @@ export async function syncAssistant(
   options: AssistantSyncOptions = {},
 ): Promise<AssistantInstallResult> {
   const strategy = getAssistantStrategy(assistantId);
-
-  if (!strategy) {
-    return {
-      assistantId,
-      installed: false,
-      createdPaths: [],
-      message: `Assistant "${assistantId}" will be available in a future release.`,
-    };
-  }
-
   return strategy.sync(targetDir, options);
 }

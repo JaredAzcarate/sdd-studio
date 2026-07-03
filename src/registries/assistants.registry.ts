@@ -9,6 +9,7 @@ export const ASSISTANTS: RegistryItem<AssistantId>[] = [
   { id: "cursor", label: "Cursor" },
   { id: "claude", label: "Claude Code" },
   { id: "codex", label: "Codex CLI" },
+  { id: "opencode", label: "OpenCode" },
 ];
 
 export function getAssistantLabel(id: AssistantId): string {

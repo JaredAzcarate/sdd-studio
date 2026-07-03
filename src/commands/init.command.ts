@@ -22,7 +22,7 @@ export function createInitCommand(): Command {
     .option("--yes", "Skip prompts and use defaults")
     .option(
       "--assistant <assistant>",
-      "Assistant ID: cursor, claude, codex",
+      "Assistant ID: cursor, claude, codex, opencode",
     )
     .action(async (options: InitCommandOptions) => {
       const targetDir = cwd();
@@ -45,7 +45,7 @@ export function createInitCommand(): Command {
       console.log("");
       console.log(formatInitSummary(context, result));
       console.log("");
-      console.log(formatGenerationResult(targetDir, result));
+      console.log(formatGenerationResult(targetDir, context.assistant, result));
       console.log("");
     });
 }

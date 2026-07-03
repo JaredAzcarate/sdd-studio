@@ -1,0 +1,3 @@
+display_name: SDD Spec
+short_description: Read the product guide and generate the full specification tree under .workspace/spec/.
+default_prompt: Run the sdd-spec skill to generate domain specification files from the product guide.

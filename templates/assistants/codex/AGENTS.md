@@ -1,0 +1,67 @@
+# SDD Studio
+
+This project uses **Specification Driven Development (SDD)**.
+
+## Execution protocol
+
+1. Read this file before starting any task.
+2. Load a skill from `.agents/skills/` only when its description matches the task.
+3. After loading a skill, follow its STANDARDS.md and EXAMPLES.md before modifying files.
+
+## Official cycle
+
+```text
+Idea → Product Guide → Specification → Planning → Implementation
+```
+
+## Four questions
+
+| Location | Question |
+| -------- | -------- |
+| `.workspace/project.md` | How will we develop this product? |
+| `.workspace/product-guide.md` | How does the product work for a user? |
+| `.workspace/spec/` | How is the product specified? |
+| `.workspace/workflow/` | How do we organize the work to build it? |
+
+## Entry points
+
+- Read `.workspace/project.md` for technical and development configuration.
+- Read `.workspace/product-guide.md` for the complete user journey (narrative, non-technical).
+- Read `.workspace/spec/` for structured technical and functional specification.
+- Never mix technical details into `product-guide.md` or user-facing content into `project.md`.
+
+## Source of truth
+
+| Folder / file | Content | Forbidden |
+| ------------- | ------- | --------- |
+| `.workspace/project.md` | Technical configuration | product guide content, domains, tasks |
+| `.workspace/product-guide.md` | Product guide (user journey) | APIs, stack, architecture, domains, tasks |
+| `.workspace/spec/` | Structured specification | narrative user docs, tasks, releases, roadmap |
+| `.workspace/workflow/` | Planning and execution | business rules, domains, product guide |
+
+The Product Guide is the **root of functional knowledge**. Specification derives entirely from it.
+
+## Skills
+
+SDD skills live in `.agents/skills/` (`sdd-idea`, `sdd-generate`, `sdd-spec`, `sdd-review`, `sdd-plan`).
+
+### Greenfield (no code yet)
+
+1. **sdd-idea** — discover product; write `.workspace/project.md` and `.workspace/product-guide.md`
+2. **sdd-spec** — read product guide + project; generate domain files under `.workspace/spec/`
+3. **sdd-review** — analyze changes; update `product-guide.md` and/or `.workspace/spec/`
+4. **sdd-plan** — read project + product guide + spec; generate `.workspace/workflow/`
+
+### Existing codebase (brownfield)
+
+1. **sdd-generate** — explore code + workspace; compare; propose gaps; generate or align spec (conservative; approval required)
+2. **sdd-review** / **sdd-plan** — as needed after spec is aligned
+
+Do not implement without a specification.
+
+## Conventions
+
+- Domain files: `<domain>-<category>.md` in the matching category folder
+- Workflow: `roadmap-NNN.md`, `milestone-NNN.md`, `release-NNN/`
+- IDs: `TASK-NNN`, `RELEASE-NNN`, `DECISION-NNN`
+- Only category folders allowed at the top level of `spec/` (narrative docs belong in `.workspace/product-guide.md`)

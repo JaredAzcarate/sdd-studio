@@ -35,11 +35,11 @@ describe("cli init e2e", () => {
     assertPathsExist(tempDir, ALL_CURSOR_INIT_PATHS);
 
     const projectMd = readFileSync(
-      join(tempDir, "workspace/project.md"),
+      join(tempDir, ".workspace/project.md"),
       "utf8",
     );
     const productGuideMd = readFileSync(
-      join(tempDir, "workspace/product-guide.md"),
+      join(tempDir, ".workspace/product-guide.md"),
       "utf8",
     );
 

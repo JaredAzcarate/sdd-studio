@@ -7,6 +7,7 @@ const HANDLEBARS_EXTENSION = ".hbs";
 export type CopyTemplateTreeOptions = {
   variables?: Record<string, unknown>;
   overwrite?: boolean;
+  skipIfExists?: boolean;
 };
 
 export type CopyTemplateTreeResult = {
@@ -18,10 +19,18 @@ export async function copyTemplateTree(
   targetDir: string,
   options: CopyTemplateTreeOptions = {},
 ): Promise<CopyTemplateTreeResult> {
-  const { variables = {}, overwrite = false } = options;
+  const { variables = {}, overwrite = false, skipIfExists = false } = options;
   const createdPaths: string[] = [];
 
-  await walkDirectory(sourceDir, targetDir, "", variables, overwrite, createdPaths);
+  await walkDirectory(
+    sourceDir,
+    targetDir,
+    "",
+    variables,
+    overwrite,
+    skipIfExists,
+    createdPaths,
+  );
 
   return { createdPaths };
 }
@@ -32,6 +41,7 @@ async function walkDirectory(
   relativePath: string,
   variables: Record<string, unknown>,
   overwrite: boolean,
+  skipIfExists: boolean,
   createdPaths: string[],
 ): Promise<void> {
   const currentSourceDir = join(sourceDir, relativePath);
@@ -54,6 +64,7 @@ async function walkDirectory(
         entryRelativePath,
         variables,
         overwrite,
+        skipIfExists,
         createdPaths,
       );
       continue;
@@ -70,14 +81,28 @@ async function walkDirectory(
 
     await fs.ensureDir(dirname(destinationPath));
 
+    let copied = false;
+
     if (entry.name.endsWith(HANDLEBARS_EXTENSION)) {
       const rendered = await renderTemplateFile(sourcePath, variables);
-      await writeOutputFile(destinationPath, rendered, overwrite);
+      copied = await writeOutputFile(
+        destinationPath,
+        rendered,
+        overwrite,
+        skipIfExists,
+      );
     } else {
-      await copyOutputFile(sourcePath, destinationPath, overwrite);
+      copied = await copyOutputFile(
+        sourcePath,
+        destinationPath,
+        overwrite,
+        skipIfExists,
+      );
     }
 
-    createdPaths.push(destinationPath);
+    if (copied) {
+      createdPaths.push(destinationPath);
+    }
   }
 }
 
@@ -85,23 +110,71 @@ async function writeOutputFile(
   destinationPath: string,
   content: string,
   overwrite: boolean,
-): Promise<void> {
+  skipIfExists: boolean,
+): Promise<boolean> {
   if (!overwrite && (await fs.pathExists(destinationPath))) {
+    if (skipIfExists) {
+      return false;
+    }
+
     throw new Error(`File already exists: ${destinationPath}`);
   }
 
   await fs.writeFile(destinationPath, content, "utf8");
+  return true;
 }
 
 async function copyOutputFile(
   sourcePath: string,
   destinationPath: string,
   overwrite: boolean,
-): Promise<void> {
+  skipIfExists: boolean,
+): Promise<boolean> {
+  if (!overwrite && (await fs.pathExists(destinationPath))) {
+    if (skipIfExists) {
+      return false;
+    }
+  }
+
   await fs.copy(sourcePath, destinationPath, {
     overwrite,
-    errorOnExist: !overwrite,
+    errorOnExist: !overwrite && !skipIfExists,
   });
+
+  return true;
+}
+
+export type CopyTemplateFileOptions = {
+  overwrite?: boolean;
+  skipIfExists?: boolean;
+};
+
+export async function copyTemplateFile(
+  sourceFile: string,
+  targetFile: string,
+  options: CopyTemplateFileOptions | boolean = false,
+): Promise<CopyTemplateTreeResult> {
+  const resolvedOptions =
+    typeof options === "boolean" ? { overwrite: options } : options;
+  const overwrite = resolvedOptions.overwrite ?? false;
+  const skipIfExists = resolvedOptions.skipIfExists ?? false;
+
+  await fs.ensureDir(dirname(targetFile));
+
+  if (!overwrite && (await fs.pathExists(targetFile))) {
+    if (skipIfExists) {
+      return { createdPaths: [] };
+    }
+
+    throw new Error(`File already exists: ${targetFile}`);
+  }
+
+  await fs.copy(sourceFile, targetFile, {
+    overwrite: true,
+    errorOnExist: !overwrite && !skipIfExists,
+  });
+
+  return { createdPaths: [targetFile] };
 }
 
 export async function copyPlainDirectory(

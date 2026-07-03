@@ -1,33 +1,40 @@
 import { relative } from "node:path";
+import { getAssistantLayout } from "../assistants/assistant-layout.js";
+import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
+import type { AssistantId } from "../types/init-context.js";
 import type { InitWorkspaceResult } from "../use-cases/init-workspace.use-case.js";
 
 export function formatGenerationResult(
   targetDir: string,
+  assistantId: AssistantId,
   result: InitWorkspaceResult,
 ): string {
   const relativePaths = result.createdPaths
     .map((filePath) => relative(targetDir, filePath))
     .sort();
 
+  const layout = getAssistantLayout(assistantId);
+
   const lines = [
     "SDD project generated successfully.",
     "",
     "Main structure:",
-    "  workspace/project.md",
-    "  workspace/product-guide.md",
-    "  workspace/spec/",
-    "  workspace/workflow/releases/release-001/",
+    `  ${SDD_WORKSPACE_DIR}/project.md`,
+    `  ${SDD_WORKSPACE_DIR}/product-guide.md`,
+    `  ${SDD_WORKSPACE_DIR}/spec/`,
+    `  ${SDD_WORKSPACE_DIR}/workflow/releases/release-001/`,
   ];
 
   if (result.assistant.installed) {
-    lines.push(
-      "  .cursor/rules/sdd-studio.mdc",
-      "  .cursor/skills/sdd-idea/",
-      "  .cursor/skills/sdd-generate/",
-      "  .cursor/skills/sdd-spec/",
-      "  .cursor/skills/sdd-review/",
-      "  .cursor/skills/sdd-plan/",
-    );
+    if (layout.installedPaths.instructions) {
+      lines.push(`  ${layout.installedPaths.instructions}`);
+    }
+    if (layout.installedPaths.rules) {
+      lines.push(`  ${layout.installedPaths.rules}`);
+    }
+    for (const skill of layout.skillNames) {
+      lines.push(`  ${layout.installedPaths.skills}${skill}/`);
+    }
   }
 
   lines.push("", `Total files: ${relativePaths.length}`);
@@ -37,7 +44,10 @@ export function formatGenerationResult(
   }
 
   if (result.assistant.installed) {
-    lines.push("", "Next step: run the **sdd-idea** skill in Cursor.");
+    lines.push(
+      "",
+      `Next step: run the **sdd-idea** skill in ${layout.nextStepLabel}.`,
+    );
   }
 
   return lines.join("\n");

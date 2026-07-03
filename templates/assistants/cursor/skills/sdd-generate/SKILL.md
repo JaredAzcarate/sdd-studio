@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # SDD Generate
 
-Explore the project, compare code with `workspace/`, and generate or align the specification — **conservative mode**: ask first, write only after approval.
+Explore the project, compare code with `.workspace/`, and generate or align the specification — **conservative mode**: ask first, write only after approval.
 
 ## When to use
 
@@ -32,13 +32,13 @@ Before any write, read:
 
 | Allowed | Forbidden |
 | --------- | ----------- |
-| Read application code (`src/`, `app/`, `lib/`, tests, configs) | Modify `workspace/workflow/` |
-| Read and write `workspace/project.md` | Write or modify application code |
-| Read and write `workspace/product-guide.md` | Implement features in `src/` |
-| Create/update domain files in `workspace/spec/` | Generate tasks, releases, or roadmap |
+| Read application code (`src/`, `app/`, `lib/`, tests, configs) | Modify `.workspace/workflow/` |
+| Read and write `.workspace/project.md` | Write or modify application code |
+| Read and write `.workspace/product-guide.md` | Implement features in `src/` |
+| Create/update domain files in `.workspace/spec/` | Generate tasks, releases, or roadmap |
 | Ask the user; propose implementation plans | Write files without explicit approval |
 | Run `validate-spec.mjs` after approved writes | Invent business rules or product scope without evidence or confirmation |
-| | Narrative content inside `workspace/spec/` |
+| | Narrative content inside `.workspace/spec/` |
 
 ## Conservative interference (mandatory)
 
@@ -52,10 +52,10 @@ Before any write, read:
 ## Pre-execution
 
 1. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
-2. Inventory `workspace/project.md`, `workspace/product-guide.md`, `workspace/spec/`, and `workspace/workflow/` (read-only).
+2. Inventory `.workspace/project.md`, `.workspace/product-guide.md`, `.workspace/spec/`, and `.workspace/workflow/` (read-only).
 3. Inventory codebase: `package.json`, README, `src/` (or equivalent), tests, API routes, DB schemas if present.
 4. Determine mode: empty spec, partial spec, or compare/drift.
-5. If `workspace/` is missing, stop and suggest `npx sdd-studio init`.
+5. If `.workspace/` is missing, stop and suggest `npx sdd-studio init`.
 
 ## Flow
 
@@ -92,7 +92,7 @@ Present a **Proposal** (no writes yet):
 
 Include:
 
-- **Spec changes** — files to create or update under `workspace/`
+- **Spec changes** — files to create or update under `.workspace/`
 - **Implementation alignment** (optional) — high-level steps to align code with approved spec (no code edits)
 
 Wait for explicit user approval. If the user adjusts the proposal, revise and confirm again.
@@ -101,8 +101,8 @@ Wait for explicit user approval. If the user adjusts the proposal, revise and co
 
 Write only approved files:
 
-- `workspace/project.md` — per **sdd-idea** STANDARDS
-- `workspace/product-guide.md` — per **sdd-idea** STANDARDS (narrative, no technical content)
+- `.workspace/project.md` — per **sdd-idea** STANDARDS
+- `.workspace/product-guide.md` — per **sdd-idea** STANDARDS (narrative, no technical content)
 - Domain files — per **sdd-spec** STANDARDS (10 files per approved domain)
 
 Use `TODO:` for anything not confirmed.
@@ -110,7 +110,7 @@ Use `TODO:` for anything not confirmed.
 ### Phase 5 — Validation
 
 ```bash
-node .cursor/skills/sdd-spec/scripts/validate-spec.mjs workspace/spec
+node .cursor/skills/sdd-spec/scripts/validate-spec.mjs .workspace/spec
 ```
 
 Fix validation errors within approved scope. Re-run until exit code 0.

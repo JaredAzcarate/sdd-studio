@@ -84,11 +84,11 @@ describe("npm pack e2e", () => {
     });
 
     const projectMd = readFileSync(
-      join(targetDir, "workspace/project.md"),
+      join(targetDir, ".workspace/project.md"),
       "utf8",
     );
     const productMd = readFileSync(
-      join(targetDir, "workspace/product-guide.md"),
+      join(targetDir, ".workspace/product-guide.md"),
       "utf8",
     );
 

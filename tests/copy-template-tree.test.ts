@@ -48,4 +48,24 @@ describe("copyTemplateTree", () => {
       }),
     ).rejects.toThrow(/already exists/i);
   });
+
+  it("skips existing files when skipIfExists is true", async () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-copy-"));
+    const targetDir = join(tempDir, "output");
+    mkdirSync(targetDir, { recursive: true });
+
+    await copyTemplateTree(fixturesDir, targetDir, {
+      variables: { name: "World" },
+    });
+
+    const { createdPaths } = await copyTemplateTree(fixturesDir, targetDir, {
+      variables: { name: "Again" },
+      skipIfExists: true,
+    });
+
+    expect(createdPaths).toHaveLength(0);
+    expect(readFileSync(join(targetDir, "greeting.md"), "utf8")).toBe(
+      "Hello World\n",
+    );
+  });
 });

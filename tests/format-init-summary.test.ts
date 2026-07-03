@@ -26,17 +26,16 @@ describe("formatInitSummary", () => {
     expect(summary).not.toContain("Organization");
   });
 
-  it("shows skip message for unsupported assistants", () => {
-    const summary = formatInitSummary(sampleContext, {
-      ...cursorResult,
-      assistant: {
-        assistantId: "claude",
-        installed: false,
-        createdPaths: [],
-        message: "Assistant will be available in a future release.",
+  it("shows next step for claude when installed", () => {
+    const summary = formatInitSummary(
+      { ...sampleContext, assistant: "claude", labels: { assistant: "Claude Code" } },
+      {
+        ...cursorResult,
+        assistant: { assistantId: "claude", installed: true, createdPaths: [] },
       },
-    });
+    );
 
-    expect(summary).toContain("future release");
+    expect(summary).toContain("Claude Code");
+    expect(summary).toContain("product-guide.md");
   });
 });

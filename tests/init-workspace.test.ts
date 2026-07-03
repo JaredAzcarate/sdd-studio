@@ -17,24 +17,24 @@ function createContext(targetDir: string): InitContextWithLabels {
 }
 
 const REQUIRED_PATHS = [
-  "workspace/project.md",
-  "workspace/product-guide.md",
-  "workspace/spec/domain/.gitkeep",
-  "workspace/spec/relations/.gitkeep",
-  "workspace/spec/capabilities/.gitkeep",
-  "workspace/spec/flows/.gitkeep",
-  "workspace/spec/rules/.gitkeep",
-  "workspace/spec/security/.gitkeep",
-  "workspace/spec/events/.gitkeep",
-  "workspace/spec/api/.gitkeep",
-  "workspace/spec/ui/.gitkeep",
-  "workspace/spec/testing/.gitkeep",
-  "workspace/workflow/roadmap/.gitkeep",
-  "workspace/workflow/milestones/.gitkeep",
-  "workspace/workflow/releases/release-001/release.md",
-  "workspace/workflow/releases/release-001/tasks.md",
-  "workspace/workflow/releases/release-001/reviews.md",
-  "workspace/workflow/releases/release-001/decisions.md",
+  ".workspace/project.md",
+  ".workspace/product-guide.md",
+  ".workspace/spec/domain/.gitkeep",
+  ".workspace/spec/relations/.gitkeep",
+  ".workspace/spec/capabilities/.gitkeep",
+  ".workspace/spec/flows/.gitkeep",
+  ".workspace/spec/rules/.gitkeep",
+  ".workspace/spec/security/.gitkeep",
+  ".workspace/spec/events/.gitkeep",
+  ".workspace/spec/api/.gitkeep",
+  ".workspace/spec/ui/.gitkeep",
+  ".workspace/spec/testing/.gitkeep",
+  ".workspace/workflow/roadmap/.gitkeep",
+  ".workspace/workflow/milestones/.gitkeep",
+  ".workspace/workflow/releases/release-001/release.md",
+  ".workspace/workflow/releases/release-001/tasks.md",
+  ".workspace/workflow/releases/release-001/reviews.md",
+  ".workspace/workflow/releases/release-001/decisions.md",
 ];
 
 const CURSOR_PATHS = [
@@ -69,11 +69,11 @@ describe("initWorkspace", () => {
     }
 
     const projectMd = readFileSync(
-      join(tempDir, "workspace/project.md"),
+      join(tempDir, ".workspace/project.md"),
       "utf8",
     );
     const productGuideMd = readFileSync(
-      join(tempDir, "workspace/product-guide.md"),
+      join(tempDir, ".workspace/product-guide.md"),
       "utf8",
     );
 
@@ -92,7 +92,7 @@ describe("initWorkspace", () => {
     );
   });
 
-  it("skips cursor setup when assistant is not cursor", async () => {
+  it("installs claude assistant files when assistant is claude", async () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-init-"));
     const context = createContext(tempDir);
     context.assistant = "claude";
@@ -100,8 +100,32 @@ describe("initWorkspace", () => {
 
     const result = await initWorkspace({ context });
 
-    expect(result.assistant.installed).toBe(false);
-    expect(result.assistant.message).toContain("future release");
+    expect(result.assistant.installed).toBe(true);
+    expect(existsSync(join(tempDir, "CLAUDE.md"))).toBe(true);
+    expect(existsSync(join(tempDir, ".claude/skills/sdd-idea/SKILL.md"))).toBe(
+      true,
+    );
+    expect(existsSync(join(tempDir, ".cursor"))).toBe(false);
+  });
+
+  it("installs codex assistant files when assistant is codex", async () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-init-"));
+    const context = createContext(tempDir);
+    context.assistant = "codex";
+    context.labels.assistant = "Codex CLI";
+
+    const result = await initWorkspace({ context });
+
+    expect(result.assistant.installed).toBe(true);
+    expect(existsSync(join(tempDir, "AGENTS.md"))).toBe(true);
+    expect(
+      existsSync(join(tempDir, ".agents/skills/sdd-idea/SKILL.md")),
+    ).toBe(true);
+    expect(
+      existsSync(
+        join(tempDir, ".agents/skills/sdd-idea/agents/openai.yaml"),
+      ),
+    ).toBe(true);
     expect(existsSync(join(tempDir, ".cursor"))).toBe(false);
   });
 

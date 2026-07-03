@@ -1,0 +1,3 @@
+display_name: SDD Generate
+short_description: Explore an existing codebase, compare with the SDD workspace, and align spec with conservative approval.
+default_prompt: Run the sdd-generate skill to explore the codebase and align .workspace/ with SDD conventions.

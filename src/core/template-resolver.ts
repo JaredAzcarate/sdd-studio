@@ -6,7 +6,7 @@ export function resolveTemplatePath(...segments: string[]): string {
 }
 
 export function resolveWorkspaceTemplatePath(...segments: string[]): string {
-  return resolveTemplatePath("workspace", ...segments);
+  return resolveTemplatePath(".workspace", ...segments);
 }
 
 export function resolveAssistantTemplatePath(

@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -46,18 +46,38 @@ describe("CursorAssistantStrategy", () => {
       join(tempDir, ".cursor/rules/sdd-studio.mdc"),
       "utf8",
     );
-    expect(rule).toContain("workspace/project.md");
-    expect(rule).toContain("workspace/product-guide.md");
+    expect(rule).toContain(".workspace/project.md");
+    expect(rule).toContain(".workspace/product-guide.md");
     expect(rule).toContain("sdd-idea");
   });
 
-  it("fails when cursor skills are already installed", async () => {
+  it("is idempotent when SDD skills are already installed", async () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-cursor-"));
 
     await cursorAssistantStrategy.install(tempDir);
+    const result = await cursorAssistantStrategy.install(tempDir);
 
-    await expect(cursorAssistantStrategy.install(tempDir)).rejects.toThrow(
-      /SDD Studio skills already exist/,
+    expect(result.installed).toBe(true);
+    expect(existsSync(join(tempDir, ".cursor/skills/sdd-idea/SKILL.md"))).toBe(
+      true,
+    );
+  });
+
+  it("preserves unrelated skills in .cursor/skills/", async () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-cursor-"));
+
+    const customSkillDir = join(tempDir, ".cursor/skills/my-custom-skill");
+    mkdirSync(customSkillDir, { recursive: true });
+    writeFileSync(join(customSkillDir, "SKILL.md"), "# My custom skill");
+
+    await cursorAssistantStrategy.install(tempDir);
+
+    expect(existsSync(join(customSkillDir, "SKILL.md"))).toBe(true);
+    expect(readFileSync(join(customSkillDir, "SKILL.md"), "utf8")).toBe(
+      "# My custom skill",
+    );
+    expect(existsSync(join(tempDir, ".cursor/skills/sdd-idea/SKILL.md"))).toBe(
+      true,
     );
   });
 
