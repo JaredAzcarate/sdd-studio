@@ -24,7 +24,7 @@ function createTarball(): string {
     rmSync(tarballPath, { force: true });
   }
 
-  execSync("npm pack", { cwd: projectRoot, stdio: "ignore" });
+  execSync("npm pack --ignore-scripts", { cwd: projectRoot, stdio: "ignore" });
 
   if (!existsSync(tarballPath)) {
     throw new Error(`Tarball not found: ${tarballPath}`);
