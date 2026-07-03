@@ -78,6 +78,7 @@ Requires an existing SDD project (`.workspace/project.md` or installed assistant
 | `claude` | `CLAUDE.md` | `.claude/skills/sdd-*/` |
 | `codex` | `AGENTS.md` | `.agents/skills/sdd-*/` (+ `agents/openai.yaml` per skill) |
 | `opencode` | — | `.opencode/commands/sdd-*.md` (+ assets in `.opencode/sdd-studio/`) |
+| `copilot` | `.github/copilot-instructions.md` | `.github/agents/sdd-*.agent.md` + `.github/prompts/sdd-*.prompt.md` (+ assets in `.github/sdd-studio/`) |
 
 `.workspace/` is identical for all assistants.
 
@@ -85,7 +86,9 @@ Requires an existing SDD project (`.workspace/project.md` or installed assistant
 npx sdd-studio init --yes --assistant claude
 npx sdd-studio init --yes --assistant codex
 npx sdd-studio init --yes --assistant opencode
+npx sdd-studio init --yes --assistant copilot
 npx sdd-studio sync --assistant opencode
+npx sdd-studio sync --assistant copilot
 ```
 
 ### Merge-safe install
@@ -149,6 +152,31 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
 
 Invoke with `/sdd-idea`, `/sdd-spec`, etc.
 
+### GitHub Copilot layout
+
+```
+./
+├── .workspace/                 # same as above
+└── .github/
+    ├── copilot-instructions.md # repo-wide SDD context (always on)
+    ├── agents/
+    │   ├── sdd-idea.agent.md
+    │   ├── sdd-generate.agent.md
+    │   ├── sdd-spec.agent.md
+    │   ├── sdd-review.agent.md
+    │   └── sdd-plan.agent.md
+    ├── prompts/
+    │   ├── sdd-idea.prompt.md
+    │   └── ...
+    └── sdd-studio/             # STANDARDS, EXAMPLES, validation scripts
+        ├── sdd-idea/
+        └── ...
+```
+
+- **Agents** (`.github/agents/*.agent.md`): specialist personas with full SDD instructions ([custom agents](https://docs.github.com/en/copilot/reference/custom-agents-configuration)).
+- **Prompts** (`.github/prompts/*.prompt.md`): slash commands that delegate to the matching agent ([prompt files](https://code.visualstudio.com/docs/copilot/customization/prompt-files)).
+- Invoke prompts with `/sdd-idea`, `/sdd-spec`, etc. in VS Code or select the agent from the dropdown.
+
 ## Skill workflow
 
 ### Greenfield
@@ -184,7 +212,7 @@ sdd-studio sync [options]
 | Option | Description |
 | ------ | ----------- |
 | `--yes` | Skip prompts; use defaults (`init` only) |
-| `--assistant <id>` | `cursor` (default), `claude`, `codex`, or `opencode` |
+| `--assistant <id>` | `cursor` (default), `claude`, `codex`, `opencode`, or `copilot` |
 | `--skills` | Sync only skills/commands, not instructions or rules (`sync` only) |
 
 All assistants install the same five SDD skills with provider-native paths.

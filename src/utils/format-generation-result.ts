@@ -32,8 +32,29 @@ export function formatGenerationResult(
     if (layout.installedPaths.rules) {
       lines.push(`  ${layout.installedPaths.rules}`);
     }
-    for (const skill of layout.skillNames) {
-      lines.push(`  ${layout.installedPaths.skills}${skill}/`);
+
+    if (layout.skillFormat === "copilot") {
+      for (const skill of layout.skillNames) {
+        const agentFile = layout.skillAgentFiles?.[skill];
+        const promptFile = layout.skillPromptFiles?.[skill];
+        if (agentFile && layout.installedPaths.agents) {
+          lines.push(`  ${layout.installedPaths.agents}${agentFile}`);
+        }
+        if (promptFile && layout.installedPaths.prompts) {
+          lines.push(`  ${layout.installedPaths.prompts}${promptFile}`);
+        }
+      }
+    } else if (layout.skillFormat === "command-file") {
+      for (const skill of layout.skillNames) {
+        const commandFile = layout.skillCommandFiles?.[skill];
+        if (commandFile) {
+          lines.push(`  ${layout.installedPaths.skills}${commandFile}`);
+        }
+      }
+    } else {
+      for (const skill of layout.skillNames) {
+        lines.push(`  ${layout.installedPaths.skills}${skill}/`);
+      }
     }
   }
 

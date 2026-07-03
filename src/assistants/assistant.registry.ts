@@ -6,6 +6,7 @@ import type {
 } from "./assistant.strategy.js";
 import { claudeAssistantStrategy } from "./claude.strategy.js";
 import { codexAssistantStrategy } from "./codex.strategy.js";
+import { copilotAssistantStrategy } from "./copilot.strategy.js";
 import { cursorAssistantStrategy } from "./cursor.strategy.js";
 import { opencodeAssistantStrategy } from "./opencode.strategy.js";
 
@@ -14,6 +15,7 @@ const STRATEGIES: Record<AssistantId, AssistantStrategy> = {
   claude: claudeAssistantStrategy,
   codex: codexAssistantStrategy,
   opencode: opencodeAssistantStrategy,
+  copilot: copilotAssistantStrategy,
 };
 
 export function getAssistantStrategy(

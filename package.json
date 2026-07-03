@@ -29,6 +29,7 @@
     "cli",
     "cursor",
     "opencode",
+    "copilot",
     "claude"
   ],
   "license": "MIT",

@@ -20,7 +20,7 @@ export function createSyncCommand(): Command {
     .option("--skills", "Sync only skills, not project instructions or rules")
     .option(
       "--assistant <assistant>",
-      "Assistant ID: cursor, claude, codex, opencode",
+      "Assistant ID: cursor, claude, codex, opencode, copilot",
       INIT_CONTEXT_DEFAULTS.assistant,
     )
     .action(async (options: SyncCommandOptions) => {

@@ -51,4 +51,27 @@ describe("installAssistant", () => {
       ),
     ).toBe(true);
   });
+
+  it("installs copilot agents, prompts, and instructions", async () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-copilot-"));
+
+    const result = await installAssistant("copilot", tempDir);
+
+    expect(result.installed).toBe(true);
+    expect(
+      result.createdPaths.some((path) =>
+        path.endsWith(".github/agents/sdd-idea.agent.md"),
+      ),
+    ).toBe(true);
+    expect(
+      result.createdPaths.some((path) =>
+        path.endsWith(".github/prompts/sdd-idea.prompt.md"),
+      ),
+    ).toBe(true);
+    expect(
+      result.createdPaths.some((path) =>
+        path.endsWith(".github/copilot-instructions.md"),
+      ),
+    ).toBe(true);
+  });
 });

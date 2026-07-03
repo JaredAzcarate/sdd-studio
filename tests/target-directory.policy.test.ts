@@ -89,6 +89,15 @@ describe("assertSyncTargetEligible", () => {
     expect(() => assertSyncTargetEligible(tempDir, "opencode")).not.toThrow();
   });
 
+  it("allows a directory with only copilot agents installed", () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
+    const agentsDir = join(tempDir, ".github", "agents");
+    mkdirSync(agentsDir, { recursive: true });
+    writeFileSync(join(agentsDir, "sdd-idea.agent.md"), "# Agent");
+
+    expect(() => assertSyncTargetEligible(tempDir, "copilot")).not.toThrow();
+  });
+
   it("blocks when no SDD markers exist", () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
 

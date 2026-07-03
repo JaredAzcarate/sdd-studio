@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-export const assistantIdSchema = z.enum(["cursor", "claude", "codex", "opencode"]);
+export const assistantIdSchema = z.enum([
+  "cursor",
+  "claude",
+  "codex",
+  "opencode",
+  "copilot",
+]);
 
 export const initContextSchema = z.object({
   targetDir: z.string().min(1),

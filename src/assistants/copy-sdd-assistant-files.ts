@@ -19,6 +19,48 @@ export async function copySddAssistantFiles(
   const skipIfExists = !options.overwrite;
 
   for (const skillName of layout.skillNames) {
+    if (layout.skillFormat === "copilot") {
+      const agentFile = layout.skillAgentFiles?.[skillName];
+      const promptFile = layout.skillPromptFiles?.[skillName];
+
+      if (!agentFile || !promptFile) {
+        throw new Error(
+          `Missing agent or prompt mapping for skill "${skillName}" (${assistantId}).`,
+        );
+      }
+
+      if (!layout.installedPaths.agents || !layout.installedPaths.prompts) {
+        throw new Error(
+          `Missing agents or prompts install path for assistant "${assistantId}".`,
+        );
+      }
+
+      const { createdPaths: agentPaths } = await copyTemplateFile(
+        resolveAssistantTemplatePath(assistantId, "agents", agentFile),
+        join(targetDir, layout.installedPaths.agents, agentFile),
+        { overwrite: options.overwrite, skipIfExists },
+      );
+      createdPaths.push(...agentPaths);
+
+      const { createdPaths: promptPaths } = await copyTemplateFile(
+        resolveAssistantTemplatePath(assistantId, "prompts", promptFile),
+        join(targetDir, layout.installedPaths.prompts, promptFile),
+        { overwrite: options.overwrite, skipIfExists },
+      );
+      createdPaths.push(...promptPaths);
+
+      if (layout.installedPaths.assets) {
+        const { createdPaths: assetPaths } = await copyTemplateTree(
+          resolveAssistantTemplatePath(assistantId, "assets", skillName),
+          join(targetDir, layout.installedPaths.assets, skillName),
+          { overwrite: options.overwrite, skipIfExists },
+        );
+        createdPaths.push(...assetPaths);
+      }
+
+      continue;
+    }
+
     if (layout.skillFormat === "command-file") {
       const commandFile = layout.skillCommandFiles?.[skillName];
 

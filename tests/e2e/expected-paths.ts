@@ -61,4 +61,7 @@ export const NPM_PACK_REQUIRED_PATHS = [
   "templates/assistants/codex/skills/sdd-idea/agents/openai.yaml",
   "templates/assistants/opencode/commands/sdd-idea.md",
   "templates/assistants/opencode/assets/sdd-idea/STANDARDS.md",
+  "templates/assistants/copilot/agents/sdd-idea.agent.md",
+  "templates/assistants/copilot/prompts/sdd-idea.prompt.md",
+  "templates/assistants/copilot/.github/copilot-instructions.md",
 ] as const;
