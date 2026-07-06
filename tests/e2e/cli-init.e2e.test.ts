@@ -42,20 +42,20 @@ describe("cli init e2e", () => {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(false);
     }
 
-    const projectMd = readFileSync(
-      join(tempDir, ".workspace/project.md"),
+    const developmentMd = readFileSync(
+      join(tempDir, ".workspace/brief/technical/development.md"),
       "utf8",
     );
     const productPrinciplesMd = readFileSync(
-      join(tempDir, ".workspace/product-principles.md"),
+      join(tempDir, ".workspace/brief/business/product-principles.md"),
       "utf8",
     );
     const productGuideMd = readFileSync(
-      join(tempDir, ".workspace/product-guide.md"),
+      join(tempDir, ".workspace/brief/business/product-guide.md"),
       "utf8",
     );
 
-    expect(projectMd).toContain("# Project");
+    expect(developmentMd).toContain("# Development");
     expect(productPrinciplesMd).toContain("# Product Principles");
     expect(productGuideMd).toContain("# Product Guide");
     expect(output).toContain("SDD project generated successfully");

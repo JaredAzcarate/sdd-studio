@@ -6,7 +6,7 @@ Mandatory rules for generating files in `.workspace/workflow/`.
 
 `workflow/` represents planning. It **never** describes functional product behavior.
 
-Do not modify `.workspace/spec/`. If spec is missing information, report and suggest **sdd-review**.
+Do not modify `.workspace/brief/` or `.workspace/spec/`. If spec is missing information, report and suggest **sdd-review**.
 
 ## Structure
 
@@ -143,21 +143,22 @@ Identifiers are **never** reused.
 
 Each task must reference spec:
 
-- `spec/capabilities/<domain>-capabilities.md`
-- `spec/flows/<domain>-flows.md`
+- `spec/business/capabilities/<domain>-capabilities.md`
+- `spec/business/flows/<domain>-flows.md`
+- `spec/technical/api/<domain>-api.md`
 - or relevant domain document
 
 ## Validation
 
 ```bash
-node .github/sdd-studio/sdd-plan/scripts/validate-workflow.mjs .workspace/workflow
+node .cursor/skills/sdd-plan/scripts/validate-workflow.mjs .workspace/workflow
 ```
 
 Do not finish until exit code is 0.
 
 ## Prohibitions
 
-- Do not modify `.workspace/spec/`
+- Do not modify `.workspace/brief/` or `.workspace/spec/`
 - Do not create `index.md` in roadmap or milestones
 - Do not add extra files inside `release-NNN/`
 - Do not invent IDs outside the `TYPE-NNN` pattern

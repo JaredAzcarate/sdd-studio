@@ -22,7 +22,21 @@ describe("assertTargetDirectoryAvailable", () => {
     expect(() => assertTargetDirectoryAvailable(tempDir)).not.toThrow();
   });
 
-  it("blocks when .workspace/project.md already exists", () => {
+  it("blocks when .workspace/brief/technical/development.md already exists", () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
+    const markerPath = join(
+      tempDir,
+      ".workspace/brief/technical/development.md",
+    );
+    mkdirSync(join(markerPath, ".."), { recursive: true });
+    writeFileSync(markerPath, "# Existing");
+
+    expect(() => assertTargetDirectoryAvailable(tempDir)).toThrow(
+      /An SDD project already exists/,
+    );
+  });
+
+  it("blocks when legacy .workspace/project.md already exists", () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
     const workspaceDir = join(tempDir, ".workspace");
     mkdirSync(workspaceDir, { recursive: true });
@@ -44,7 +58,19 @@ describe("assertSyncTargetEligible", () => {
     }
   });
 
-  it("allows a directory with .workspace/project.md", () => {
+  it("allows a directory with .workspace/brief/technical/development.md", () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
+    const markerPath = join(
+      tempDir,
+      ".workspace/brief/technical/development.md",
+    );
+    mkdirSync(join(markerPath, ".."), { recursive: true });
+    writeFileSync(markerPath, "# Existing");
+
+    expect(() => assertSyncTargetEligible(tempDir)).not.toThrow();
+  });
+
+  it("allows a directory with legacy .workspace/project.md", () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
     const workspaceDir = join(tempDir, ".workspace");
     mkdirSync(workspaceDir, { recursive: true });

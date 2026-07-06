@@ -10,17 +10,19 @@ Review scenarios and affected files.
 
 | Action | File |
 | ------ | ---- |
-| create | `domain/comment-domain.md` |
-| create | `relations/comment-relations.md` |
-| create | `capabilities/comment-capabilities.md` |
-| create | `flows/comment-flows.md` |
-| create | `rules/comment-rules.md` |
-| create | `security/comment-security.md` |
-| create | `events/comment-events.md` |
-| create | `api/comment-api.md` |
-| create | `ui/comment-ui.md` |
-| create | `testing/comment-testing.md` |
-| update | `relations/task-relations.md` (Task → Comment) |
+| create | `business/domain/comment-domain.md` |
+| create | `business/relations/comment-relations.md` |
+| create | `business/capabilities/comment-capabilities.md` |
+| create | `business/flows/comment-flows.md` |
+| create | `business/rules/comment-rules.md` |
+| create | `business/security/comment-security.md` |
+| create | `business/events/comment-events.md` |
+| create | `technical/api/comment-api.md` |
+| create | `technical/ui/comment-ui.md` |
+| create | `technical/testing/comment-testing.md` |
+| create | `technical/architecture/comment-architecture.md` |
+| create | `technical/database/comment-database.md` |
+| update | `business/relations/task-relations.md` (Task → Comment) |
 
 **Proposal to user:**
 
@@ -31,8 +33,8 @@ Add Comment domain linked to Task.
 ## Files to modify
 | File | Action |
 | ---- | ------ |
-| comment-*.md (×10) | create |
-| relations/task-relations.md | update |
+| comment-*.md (×12) | create |
+| business/relations/task-relations.md | update |
 ```
 
 ## Scenario 2 — Business rule change
@@ -43,10 +45,10 @@ Add Comment domain linked to Task.
 
 | Action | File |
 | ------ | ------- |
-| update | `rules/task-rules.md` |
-| update | `security/task-security.md` |
-| update | `flows/task-flows.md` (new Cancel flow) |
-| update | `testing/task-testing.md` |
+| update | `business/rules/task-rules.md` |
+| update | `business/security/task-security.md` |
+| update | `business/flows/task-flows.md` (new Cancel flow) |
+| update | `technical/testing/task-testing.md` |
 
 Do not touch `workflow/`.
 
@@ -58,10 +60,10 @@ Do not touch `workflow/`.
 
 | Action | File |
 | ------ | ------- |
-| update | `api/task-api.md` |
-| update | `domain/task-domain.md` (priority attribute) |
-| update | `ui/task-ui.md` (form field) |
-| update | `testing/task-testing.md` |
+| update | `technical/api/task-api.md` |
+| update | `business/domain/task-domain.md` (priority attribute) |
+| update | `technical/ui/task-ui.md` (form field) |
+| update | `technical/testing/task-testing.md` |
 
 ## Scenario 4 — Scope change (requires product-guide.md)
 
@@ -69,9 +71,19 @@ Do not touch `workflow/`.
 
 **Action:**
 
-1. Ask for confirmation (contradicts out of scope in `product-guide.md`)
+1. Ask for confirmation (contradicts out of scope in `brief/business/product-guide.md`)
 2. Only with approval: update `product-guide.md` affected experiences
 3. Then update domain spec according to new scope
+
+## Scenario 5 — Stack change (requires brief/technical/)
+
+**Request:** "Migrate from PostgreSQL to MongoDB."
+
+**Action:**
+
+1. Update `brief/technical/stack/database.md`
+2. Update affected `technical/database/<domain>-database.md` files
+3. Verify `technical/architecture/<domain>-architecture.md` consistency
 
 ## Anti-example — Incorrect
 

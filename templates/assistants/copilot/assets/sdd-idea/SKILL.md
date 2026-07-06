@@ -1,137 +1,152 @@
 ---
 name: sdd-idea
-description: Discovers the product through structured questions and writes .workspace/product-principles.md, .workspace/product-guide.md, and .workspace/project.md. Use when starting a new SDD project, defining product principles, the user journey, or when the user invokes /sdd-idea.
+description: Discovers the product and writes the Brief under .workspace/brief/ (business and technical perspectives). Use when starting a new SDD project, defining product principles, the user journey, or development decisions. Never writes .workspace/spec/.
 disable-model-invocation: true
 ---
 
 # SDD Idea
 
-Discover the product and define project configuration.
+Discover the product and build the **Brief** — project context, not specification.
 
-**Output files (in generation order):**
-
-1. `.workspace/product-principles.md` — conceptual product principles (what the product is, not how the user walks through it)
-2. `.workspace/product-guide.md` — narrative product guide (user journey, non-technical)
-3. `.workspace/project.md` — technical and development configuration
+**Output scope:** `.workspace/brief/` only (Business Brief + Technical Brief).
 
 Use **sdd-generate** when the project already has application code to analyze. Use **sdd-idea** for greenfield discovery through questions only.
 
-Never generate files under `.workspace/spec/` or `.workspace/workflow/`.
+Never generate or modify files under `.workspace/spec/` or `.workspace/workflow/`.
 
 ## Required documents
 
 Before writing, read:
 
-- [STANDARDS.md](STANDARDS.md) — structure and rules for all three files
+- [STANDARDS.md](STANDARDS.md) — structure and rules for all Brief files
 - [EXAMPLES.md](EXAMPLES.md) — valid examples
 
 ## Scope
 
 | Allowed | Forbidden |
 |---------|-----------|
-| Read `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md` (if they exist) | Create or modify files in `.workspace/spec/` |
+| Read and write files under `.workspace/brief/` | Create or modify `.workspace/spec/` |
 | Ask the user questions | Generate domains, APIs, workflow, or code |
-| Write the three output files above | Modify `.workspace/workflow/` |
-| | User journeys or screens in `product-principles.md` |
-| | Technical content in `product-guide.md` or `product-principles.md` |
-| | Principles or journeys in `project.md` |
+| Build Business Brief and Technical Brief | Modify `.workspace/workflow/` |
+| | User journeys in `product-principles.md` |
+| | Technical stack in `development.md` or `modeling.md` |
+| | Product narratives in Technical Brief files |
 
 ## Pre-execution
 
-1. Read existing `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md` if present.
+1. Read existing files under `.workspace/brief/` if present.
 2. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
-3. If any output file exists, ask: **create from scratch** or **update** (per file or globally, as appropriate).
+3. If any Brief file exists, ask: **create from scratch** or **update** (per file or globally).
 4. Use the user's message context as the starting point.
 
 ## Flow
 
-### Phase 1 — Principles discovery (Product Principles)
+### Phase 1 — Principles discovery (Business Brief)
 
 Ask in blocks (max 3–5 per turn). Conceptual product questions only:
 
-1. **What the product represents:** what problem space it owns and what it is not
-2. **Primary unit:** the central concept everything revolves around (e.g. task, order, patient, document)
-3. **Immutable concepts:** names and meanings that must stay stable across versions
-4. **Business understanding:** how the product interprets value, customers, and success
-5. **Guiding principles:** rules every future feature must respect
-6. **Shared mental model:** what every contributor should assume before designing or building
+1. What the product represents and what it is not
+2. Primary unit around which everything revolves
+3. Immutable concepts
+4. How the product understands the business
+5. Principles every future feature must respect
+6. Shared mental model for contributors and AI
 
-Do not ask about screens, clicks, onboarding steps, APIs, or stack.
+Store answers **only** in `.workspace/brief/business/product-principles.md`.
 
-Store answers **only** in `.workspace/product-principles.md`. Use clear, durable language. Never put user journeys or technical details here.
+### Phase 2 — Product discovery (Business Brief)
 
-### Phase 2 — Product discovery (Product Guide)
+Ask in blocks (max 3–5 per turn). User-journey questions only:
 
-Ask in blocks (max 3–5 per turn). Product and user-journey questions only:
+1. Entry point
+2. Onboarding journey
+3. Core loop
+4. Alternative paths
+5. Edge experiences
 
-1. **Entry point:** how users first encounter the product
-2. **Onboarding journey:** ordered experiences from signup to first value
-3. **Core loop:** recurring experiences after onboarding
-4. **Alternative paths:** different user types, signup methods, roles, or flows
-5. **Edge experiences:** errors, empty states, permissions, invitations
+Align with **product-principles.md** without duplicating conceptual content.
 
-Align the journey with **product-principles.md** without duplicating its conceptual content.
+Store answers **only** in `.workspace/brief/business/product-guide.md`.
 
-Map answers into a **continuous user journey**. Each experience becomes one H2 section in `product-guide.md`.
+### Phase 3 — Development discovery (Technical Brief)
 
-Store answers **only** in `.workspace/product-guide.md`. Use narrative, professional language. Never put technical details or abstract principles here.
+Ask in blocks (max 3–5 per turn). Development decisions only — **no specific technologies**:
 
-### Phase 3 — Project discovery
+1. Development model (default: Specification Driven Development)
+2. Workflow methodology
+3. Repository strategy
+4. Code organization
+5. Development conventions
 
-Ask in blocks (max 3–5 per turn). Technical and development questions only:
+Store answers **only** in `.workspace/brief/technical/development.md`.
 
-1. **Name and description**
-2. **Development model** (default: Specification Driven Development)
-3. **Workflow methodology** (e.g. Kanban, Scrum)
-4. **Architecture** (e.g. Clean, Hexagonal, monolith, modular)
-5. **Modeling** (e.g. DDD, anemic domain)
-6. **Code organization** (e.g. feature-first, layer-first)
-7. **Language, framework, backend, frontend, database**
-8. **AI assistant** and SDD conventions
+### Phase 4 — Modeling discovery (Technical Brief)
 
-Store answers **only** in `.workspace/project.md`. Never put product journeys, principles, or user behavior here.
+Ask in blocks (max 3–5 per turn). Modeling decisions only:
 
-If a business rule is unclear, **ask**; do not infer.
+1. Domain Driven Design approach
+2. Bounded contexts
+3. Aggregates
+4. Ubiquitous language
+5. Modeling principles
 
-### Phase 4 — Generation
+Store answers **only** in `.workspace/brief/technical/modeling.md`.
 
-Write files in this order, following [STANDARDS.md](STANDARDS.md) exactly:
+### Phase 5 — Stack discovery (Technical Brief)
 
-1. `.workspace/product-principles.md`
-2. `.workspace/product-guide.md`
-3. `.workspace/project.md`
+Ask in blocks (max 3–5 per turn). Technology choices only:
 
-### Phase 5 — Validation
+1. Frontend stack
+2. Backend stack
+3. Persistence stack
+4. Infrastructure and operations
+5. AI tools in development
 
-Review manually against [STANDARDS.md](STANDARDS.md):
+Store answers in `.workspace/brief/technical/stack/{frontend,backend,database,infrastructure,ai}.md`.
 
-- [ ] Product Principles starts with the mandatory header blockquote
-- [ ] Principles are conceptual only (no screens, journeys, or technical content)
-- [ ] Product Guide starts with the mandatory header blockquote
-- [ ] Product Guide organized by user journey, not domains or feature lists
-- [ ] Each experience follows the narrative structure
-- [ ] Alternative paths described where applicable
-- [ ] No technical content in `product-principles.md` or `product-guide.md`
-- [ ] No product content in `project.md`
-- [ ] Only the three output files were modified
+### Phase 6 — Generation
+
+Write files in this order, following [STANDARDS.md](STANDARDS.md):
+
+1. `.workspace/brief/business/product-principles.md`
+2. `.workspace/brief/business/product-guide.md`
+3. `.workspace/brief/technical/development.md`
+4. `.workspace/brief/technical/modeling.md`
+5. `.workspace/brief/technical/stack/frontend.md`
+6. `.workspace/brief/technical/stack/backend.md`
+7. `.workspace/brief/technical/stack/database.md`
+8. `.workspace/brief/technical/stack/infrastructure.md`
+9. `.workspace/brief/technical/stack/ai.md`
+
+### Phase 7 — Validation
+
+Review against [STANDARDS.md](STANDARDS.md):
+
+- [ ] Business Brief files contain no technical implementation details
+- [ ] Technical Brief files contain no user journeys or product narratives
+- [ ] `development.md` and `modeling.md` contain no specific technologies
+- [ ] Stack files contain only their respective technology scope
+- [ ] Only files under `.workspace/brief/` were modified
 - [ ] User confirmed or open items documented
 
 ## Checklist
 
 ```
 - [ ] STANDARDS.md and EXAMPLES.md read
-- [ ] Principles, product, and project questions answered
-- [ ] .workspace/product-principles.md written
-- [ ] .workspace/product-guide.md written
-- [ ] .workspace/project.md written
-- [ ] No other files modified
+- [ ] Business and Technical Brief questions answered
+- [ ] brief/business/product-principles.md written
+- [ ] brief/business/product-guide.md written
+- [ ] brief/technical/development.md written
+- [ ] brief/technical/modeling.md written
+- [ ] brief/technical/stack/*.md written
+- [ ] No files outside brief/ modified
 ```
 
 ## Report
 
-1. Product principles summary (primary unit and immutable concepts)
-2. User journey summary (ordered experiences)
-3. Alternative paths identified
-4. Technical stack summary (from project.md)
+1. Product principles summary
+2. User journey summary
+3. Development and modeling decisions summary
+4. Stack summary
 5. Open items
 6. Next step: **sdd-spec**

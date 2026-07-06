@@ -9,7 +9,7 @@ Mandatory rules for exploring the codebase and generating or aligning SDD worksp
 - Reads **code** and **workspace**
 - Compares them
 - Reports gaps and inconsistencies
-- Writes spec **only after user approval** (conservative interference)
+- Writes Brief and spec **only after user approval** (conservative interference)
 
 ## Conservative interference level
 
@@ -25,10 +25,10 @@ If the user says "generate everything without asking", still present a one-page 
 
 ### Mode A — Empty or stub spec
 
-Triggers: only `product-guide.md` / `project.md` TODOs, no domain files.
+Triggers: only Brief TODOs, no domain files.
 
-1. Infer technical context → draft `project.md`
-2. Infer product from README, naming, features → draft `product-guide.md` (mark low-confidence items `TODO:`)
+1. Infer technical context → draft `brief/technical/development.md`, `modeling.md`, and `stack/*.md`
+2. Infer product from README, naming, features → draft `brief/business/product-guide.md` (mark low-confidence items `TODO:`)
 3. Propose domains from code structure
 4. After approval, generate domain files per **sdd-spec** STANDARDS
 
@@ -73,29 +73,38 @@ Do not read `.env` or credential files.
 
 | Path | When |
 | ---- | ---- |
-| `.workspace/project.md` | Missing, stub, or approved technical update |
-| `.workspace/product-guide.md` | Missing, stub, or approved product guide update |
-| `.workspace/spec/<domain>-*.md` | Approved domain generation or update |
+| `.workspace/brief/business/product-principles.md` | Missing, stub, or approved conceptual update |
+| `.workspace/brief/business/product-guide.md` | Missing, stub, or approved product guide update |
+| `.workspace/brief/technical/development.md` | Missing, stub, or approved development model update |
+| `.workspace/brief/technical/modeling.md` | Missing, stub, or approved modeling update |
+| `.workspace/brief/technical/stack/*.md` | Missing, stub, or approved stack update |
+| `.workspace/spec/business/<category>/<domain>-*.md` | Approved domain generation or update |
+| `.workspace/spec/technical/<category>/<domain>-*.md` | Approved domain generation or update |
 
 **Never write:** `.workspace/workflow/`, `src/`, `tests/` (application tests).
 
-## Product vs project (strict)
+## Business Brief vs Technical Brief (strict)
 
 Same separation as **sdd-idea**:
 
-- `product-guide.md` — narrative user-facing manual only (no technical content)
-- `project.md` — stack, architecture, modeling, organization, assistant, etc.
+- `brief/business/product-principles.md` — conceptual foundations only
+- `brief/business/product-guide.md` — narrative user-facing manual only (no technical content)
+- `brief/technical/development.md` — development model and conventions (no specific technologies)
+- `brief/technical/modeling.md` — modeling approach and DDD context
+- `brief/technical/stack/*.md` — technology choices per layer
 
 When inferring from code:
 
-- Framework, language, DB → `project.md`
-- User-facing purpose → `product-guide.md` (confirm with user if unclear)
+- Framework, language, DB → `brief/technical/stack/*.md`
+- Architecture patterns, DDD → `brief/technical/modeling.md`
+- Development workflow, conventions → `brief/technical/development.md`
+- User-facing purpose → `brief/business/product-guide.md` (confirm with user if unclear)
 
 ## Domain generation
 
 Follow **sdd-spec** STANDARDS exactly:
 
-- 10 files per domain: `domain`, `relations`, `capabilities`, `flows`, `rules`, `security`, `events`, `api`, `ui`, `testing`
+- 12 files per domain: 7 business (`domain`, `relations`, `capabilities`, `flows`, `rules`, `security`, `events`) + 5 technical (`api`, `ui`, `testing`, `architecture`, `database`)
 - Naming: `<domain>-<category>.md`
 - One question per document
 
@@ -129,7 +138,7 @@ Inferred from `src/modules/task/` — confirm with product owner.
 ## Inconsistencies
 
 | ID | Spec says | Code does | Suggested handling |
-| -- | --------- | --------- | ---------------- |
+| -- | --------- | --------- | ------------------ |
 
 ## Open questions
 
@@ -148,6 +157,11 @@ Inferred from `src/modules/task/` — confirm with product owner.
 ## Approved scope confirmation
 
 Reply **approved** or list changes before writes.
+
+## Brief files
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
 
 ## Spec files
 
@@ -169,7 +183,7 @@ Reply **approved** or list changes before writes.
 When the user wants alignment with spec:
 
 - Describe **what** should change (files, modules, behaviors)
-- Reference spec paths (`spec/api/task-api.md`, etc.)
+- Reference spec paths (`spec/technical/api/task-api.md`, etc.)
 - Do **not** edit application code in this skill
 - Order steps by dependency
 - Flag breaking changes
@@ -179,7 +193,7 @@ When the user wants alignment with spec:
 After any write:
 
 ```bash
-node .github/sdd-studio/sdd-spec/scripts/validate-spec.mjs .workspace/spec
+node .cursor/skills/sdd-spec/scripts/validate-spec.mjs .workspace/spec
 ```
 
 ## Handoffs
@@ -197,5 +211,5 @@ node .github/sdd-studio/sdd-spec/scripts/validate-spec.mjs .workspace/spec
 - No application code changes
 - No workflow files
 - No tasks or releases in spec
-- No mixing technical content into `product-guide.md`
+- No mixing technical content into `brief/business/product-guide.md`
 - No duplicating full templates from sdd-spec inside generated domain files — use correct section structure

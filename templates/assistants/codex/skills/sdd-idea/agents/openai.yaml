@@ -1,3 +1,3 @@
 display_name: SDD Idea
-short_description: Discover the product and write product-principles.md, product-guide.md, and project.md for a new SDD project.
-default_prompt: Run the sdd-idea skill to discover the product and define .workspace/project.md and .workspace/product-guide.md.
+short_description: Discover the product and write the Brief under .workspace/brief/ for a new SDD project.
+default_prompt: Run the sdd-idea skill to discover the product and complete the Brief under .workspace/brief/.

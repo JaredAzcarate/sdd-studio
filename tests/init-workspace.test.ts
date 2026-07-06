@@ -21,19 +21,27 @@ function createContext(
 }
 
 const BASE_PATHS = [
-  ".workspace/product-principles.md",
-  ".workspace/product-guide.md",
-  ".workspace/project.md",
-  ".workspace/spec/domain/.gitkeep",
-  ".workspace/spec/relations/.gitkeep",
-  ".workspace/spec/capabilities/.gitkeep",
-  ".workspace/spec/flows/.gitkeep",
-  ".workspace/spec/rules/.gitkeep",
-  ".workspace/spec/security/.gitkeep",
-  ".workspace/spec/events/.gitkeep",
-  ".workspace/spec/api/.gitkeep",
-  ".workspace/spec/ui/.gitkeep",
-  ".workspace/spec/testing/.gitkeep",
+  ".workspace/brief/business/product-principles.md",
+  ".workspace/brief/business/product-guide.md",
+  ".workspace/brief/technical/development.md",
+  ".workspace/brief/technical/modeling.md",
+  ".workspace/brief/technical/stack/frontend.md",
+  ".workspace/brief/technical/stack/backend.md",
+  ".workspace/brief/technical/stack/database.md",
+  ".workspace/brief/technical/stack/infrastructure.md",
+  ".workspace/brief/technical/stack/ai.md",
+  ".workspace/spec/business/domain/.gitkeep",
+  ".workspace/spec/business/relations/.gitkeep",
+  ".workspace/spec/business/capabilities/.gitkeep",
+  ".workspace/spec/business/flows/.gitkeep",
+  ".workspace/spec/business/rules/.gitkeep",
+  ".workspace/spec/business/security/.gitkeep",
+  ".workspace/spec/business/events/.gitkeep",
+  ".workspace/spec/technical/api/.gitkeep",
+  ".workspace/spec/technical/ui/.gitkeep",
+  ".workspace/spec/technical/testing/.gitkeep",
+  ".workspace/spec/technical/architecture/.gitkeep",
+  ".workspace/spec/technical/database/.gitkeep",
 ];
 
 const WORKFLOW_PATHS = [
@@ -80,21 +88,24 @@ describe("initWorkspace", () => {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(false);
     }
 
-    const projectMd = readFileSync(
-      join(tempDir, ".workspace/project.md"),
+    const developmentMd = readFileSync(
+      join(tempDir, ".workspace/brief/technical/development.md"),
       "utf8",
     );
     const productGuideMd = readFileSync(
-      join(tempDir, ".workspace/product-guide.md"),
+      join(tempDir, ".workspace/brief/business/product-guide.md"),
       "utf8",
     );
 
-    expect(projectMd).toContain("# Project");
-    expect(projectMd).toContain("sdd-idea");
+    expect(developmentMd).toContain("# Development");
+    expect(developmentMd).toContain("sdd-idea");
     expect(productGuideMd).toContain("# Product Guide");
     expect(productGuideMd).toContain("sdd-idea");
     expect(
-      readFileSync(join(tempDir, ".workspace/product-principles.md"), "utf8"),
+      readFileSync(
+        join(tempDir, ".workspace/brief/business/product-principles.md"),
+        "utf8",
+      ),
     ).toContain("# Product Principles");
     expect(result.assistant.installed).toBe(true);
     expect(result.modules.workflow).toBe(false);

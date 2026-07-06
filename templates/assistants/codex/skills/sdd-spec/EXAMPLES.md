@@ -1,8 +1,8 @@
 # EXAMPLES — sdd-spec
 
-Reference domain: `task`. Generate the 10 spec files per domain (`product-guide.md` and `project.md` come from **sdd-idea**).
+Reference domain: `task`. Generate the 12 spec files per domain (Brief files come from **sdd-idea** or **sdd-generate**).
 
-## spec/domain/task-domain.md
+## spec/business/domain/task-domain.md
 
 ```markdown
 # Task
@@ -54,7 +54,7 @@ A task has a title, description, owner, status, and dates. It is the core of the
 See `task-relations.md` for links to User and Team.
 ```
 
-## spec/relations/task-relations.md
+## spec/business/relations/task-relations.md
 
 ```markdown
 # Task Relationships
@@ -89,7 +89,7 @@ See `task-relations.md` for links to User and Team.
 ## Notes
 ```
 
-## spec/capabilities/task-capabilities.md
+## spec/business/capabilities/task-capabilities.md
 
 ```markdown
 # Task Capabilities
@@ -143,7 +143,7 @@ Result
 Status done; Task Completed event emitted.
 ```
 
-## spec/flows/task-flows.md
+## spec/business/flows/task-flows.md
 
 ```markdown
 # Task Flows
@@ -191,7 +191,7 @@ Task assigned to user; active state.
 Task closed; metrics updated.
 ```
 
-## spec/rules/task-rules.md
+## spec/business/rules/task-rules.md
 
 ```markdown
 # Task Rules
@@ -223,7 +223,7 @@ Task closed; metrics updated.
 - Maximum 500 active tasks per team in MVP
 ```
 
-## spec/security/task-security.md
+## spec/business/security/task-security.md
 
 ```markdown
 # Task Security
@@ -259,7 +259,7 @@ Task closed; metrics updated.
 - OAuth authentication required for all operations
 ```
 
-## spec/events/task-events.md
+## spec/business/events/task-events.md
 
 ```markdown
 # Task Events
@@ -297,7 +297,7 @@ Consumers
 Notification, Analytics
 ```
 
-## spec/api/task-api.md
+## spec/technical/api/task-api.md
 
 ```markdown
 # Task API
@@ -343,7 +343,7 @@ Errors
 404 not found, 403 forbidden
 ```
 
-## spec/ui/task-ui.md
+## spec/technical/ui/task-ui.md
 
 ```markdown
 # Task UI
@@ -390,7 +390,7 @@ Errors
 Board → Task Detail → back to Board
 ```
 
-## spec/testing/task-testing.md
+## spec/technical/testing/task-testing.md
 
 ```markdown
 # Task Testing
@@ -427,4 +427,90 @@ Board → Task Detail → back to Board
 
 - Create task without assignee
 - 500 active tasks in team (MVP limit)
+```
+
+## spec/technical/architecture/task-architecture.md
+
+```markdown
+# Task Architecture
+
+## Module Structure
+
+- `src/modules/task/` — domain logic, use cases, repository interface
+- `src/modules/task/infrastructure/` — persistence adapter, event publisher
+
+---
+
+## Layer Responsibilities
+
+- Domain: Task entity, state transitions, invariants
+- Application: CreateTask, UpdateTask, CompleteTask use cases
+- Infrastructure: PostgreSQL repository, message bus
+
+---
+
+## Integration Points
+
+- User module (assignee validation)
+- Team module (ownership)
+- Notification service (event consumers)
+
+---
+
+## Dependencies
+
+- `brief/technical/modeling.md` — DDD aggregate boundaries
+- `brief/technical/stack/backend.md` — Clean Architecture layout
+
+---
+
+## Notes
+```
+
+## spec/technical/database/task-database.md
+
+```markdown
+# Task Database
+
+## Tables
+
+### tasks
+
+| Column      | Type        | Required | Description           |
+| ----------- | ----------- | -------- | --------------------- |
+| id          | uuid        | yes      | Primary key           |
+| title       | varchar(255)| yes      | Short title           |
+| description | text        | no       | Optional detail       |
+| status      | varchar(20) | yes      | pending, active, done |
+| assignee_id | uuid        | no       | FK to users           |
+| team_id     | uuid        | yes      | FK to teams           |
+| due_date    | timestamptz | no       | Due date              |
+| created_at  | timestamptz | yes      | Creation timestamp    |
+| updated_at  | timestamptz | yes      | Last update           |
+
+---
+
+## Indexes
+
+- `idx_tasks_team_status` on (team_id, status)
+- `idx_tasks_assignee` on (assignee_id)
+
+---
+
+## Constraints
+
+- status CHECK in ('pending', 'active', 'done', 'cancelled')
+- title NOT NULL and length > 0
+
+---
+
+## Migrations
+
+- `001_create_tasks_table.sql`
+
+---
+
+## Notes
+
+See `brief/technical/stack/database.md` for PostgreSQL conventions.
 ```

@@ -1,13 +1,14 @@
 ---
 name: sdd-spec
-description: Reads .workspace/product-guide.md and .workspace/project.md, discovers domains through questions, and generates the full specification tree under .workspace/spec/ using SDD Studio naming conventions. Use when specifying domains, APIs, flows, or when the user invokes /sdd-spec.
+description: Reads the entire .workspace/brief/ (business and technical), discovers domains through questions, and generates the full specification tree under .workspace/spec/business/ and .workspace/spec/technical/ using SDD Studio naming conventions. Use when specifying domains, APIs, flows, or when the user invokes /sdd-spec.
+disable-model-invocation: true
 ---
 
 # SDD Spec
 
-Read the Product Guide and project configuration, discover domains, and generate the full technical specification under `.workspace/spec/`.
+Read the Brief (business and technical perspectives), discover domains, and generate the full specification under `.workspace/spec/business/` and `.workspace/spec/technical/`.
 
-The Product Guide is the **primary and sole source** of functional knowledge. Transform its narrative into structured spec files. **Never invent functionality** not described in the Product Guide.
+The Business Brief (`brief/business/product-guide.md`) is the **primary and sole source** of functional knowledge. Transform its narrative into structured spec files. Use the Technical Brief (`brief/technical/`) for modeling, development, and stack context only. **Never invent functionality** not described in the Product Guide.
 
 ## Required documents
 
@@ -20,8 +21,8 @@ Before generating, read:
 
 | Allowed | Forbidden |
 |---------|-----------|
-| Read `.workspace/product-guide.md` and `.workspace/project.md` | Modify `.workspace/workflow/` |
-| Create/update domain files in `.workspace/spec/` | Modify `product-guide.md` or `project.md` without explicit permission |
+| Read all files under `.workspace/brief/` | Modify `.workspace/brief/` |
+| Create/update domain files in `.workspace/spec/business/` and `.workspace/spec/technical/` | Modify `.workspace/workflow/` |
 | Ask the user questions | Write code in `src/` |
 | Run validation script | Generate tasks, releases, or roadmap |
 | | Invent features not in the Product Guide |
@@ -29,49 +30,54 @@ Before generating, read:
 
 ## Pre-execution
 
-1. Read `.workspace/product-guide.md` (primary source).
-2. Read `.workspace/project.md` (technical context only).
-3. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
-4. Verify both files exist; if not, stop and suggest **sdd-idea** (greenfield) or **sdd-generate** (existing codebase).
-5. Inventory existing files in `.workspace/spec/`.
-6. Use `project.md` for technical context (architecture, DDD, stack). Derive all functional behavior from `product-guide.md` only.
+1. Read `.workspace/brief/business/product-principles.md` (conceptual context).
+2. Read `.workspace/brief/business/product-guide.md` (primary functional source).
+3. Read `.workspace/brief/technical/development.md`, `modeling.md`, and `stack/*.md` (technical context only).
+4. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
+5. Verify the Brief exists; if not, stop and suggest **sdd-idea** (greenfield) or **sdd-generate** (existing codebase).
+6. Inventory existing files in `.workspace/spec/business/` and `.workspace/spec/technical/`.
+7. Use the Technical Brief for modeling, architecture, and stack context. Derive all functional behavior from `product-guide.md` only.
 
 ## Flow
 
 ### Phase 1 — Domain discovery
 
-From `product-guide.md` (user journeys and experiences) and `project.md` (modeling context), propose candidate domains. Ask:
+From `product-guide.md` (user journeys and experiences) and `brief/technical/modeling.md` (modeling context), propose candidate domains. Ask:
 
 1. Are the domains correct? Is anything missing or extra?
 2. Per domain: purpose, entities, boundaries — grounded in the Product Guide
 3. Relationships between domains
-4. If `project.md` indicates DDD: aggregates, invariants, ubiquitous language
+4. If `modeling.md` indicates DDD: aggregates, invariants, ubiquitous language
 
 Present the domain map for **approval** before writing files.
 
 ### Phase 2 — Per-domain discovery
 
-For each approved domain, discover content for the 10 domain documents:
+For each approved domain, discover content for the 12 domain documents:
 
-- domain, relations, capabilities, flows, rules, security, events, api, ui, testing
+**Business** — domain, relations, capabilities, flows, rules, security, events
+
+**Technical** — api, ui, testing, architecture, database
 
 Every capability, flow, and rule must trace back to the Product Guide. Ask only what is necessary.
 
 ### Phase 3 — Generation
 
-For each `<domain>`, create exactly 10 files:
+For each `<domain>`, create exactly 12 files:
 
 ```text
-spec/domain/<domain>-domain.md
-spec/relations/<domain>-relations.md
-spec/capabilities/<domain>-capabilities.md
-spec/flows/<domain>-flows.md
-spec/rules/<domain>-rules.md
-spec/security/<domain>-security.md
-spec/events/<domain>-events.md
-spec/api/<domain>-api.md
-spec/ui/<domain>-ui.md
-spec/testing/<domain>-testing.md
+spec/business/domain/<domain>-domain.md
+spec/business/relations/<domain>-relations.md
+spec/business/capabilities/<domain>-capabilities.md
+spec/business/flows/<domain>-flows.md
+spec/business/rules/<domain>-rules.md
+spec/business/security/<domain>-security.md
+spec/business/events/<domain>-events.md
+spec/technical/api/<domain>-api.md
+spec/technical/ui/<domain>-ui.md
+spec/technical/testing/<domain>-testing.md
+spec/technical/architecture/<domain>-architecture.md
+spec/technical/database/<domain>-database.md
 ```
 
 Use the exact templates from [STANDARDS.md](STANDARDS.md). See [EXAMPLES.md](EXAMPLES.md) for the `task` domain.
@@ -81,7 +87,7 @@ Use the exact templates from [STANDARDS.md](STANDARDS.md). See [EXAMPLES.md](EXA
 Run the validator from the project root:
 
 ```bash
-node .agents/skills/sdd-spec/scripts/validate-spec.mjs .workspace/spec
+node .cursor/skills/sdd-spec/scripts/validate-spec.mjs .workspace/spec
 ```
 
 If it fails:
@@ -96,10 +102,10 @@ Do not report completion until the script exits with code 0.
 
 ```
 - [ ] STANDARDS.md and EXAMPLES.md read
-- [ ] product-guide.md and project.md read
+- [ ] Entire brief/ read (not modified)
 - [ ] All spec content traceable to Product Guide
 - [ ] Domains approved by the user
-- [ ] 10 files per domain generated
+- [ ] 12 files per domain generated (7 business + 5 technical)
 - [ ] validate-spec.mjs passes with no errors
 ```
 

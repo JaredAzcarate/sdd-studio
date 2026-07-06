@@ -1,3 +1,3 @@
 display_name: SDD Review
-short_description: Analyze spec changes, detect impacts, and update product-guide.md and .workspace/spec/.
-default_prompt: Run the sdd-review skill to review and update the SDD specification.
+short_description: Analyze changes and update the Brief and Specification while keeping both consistent.
+default_prompt: Run the sdd-review skill to review and update the Brief and SDD specification.

@@ -1,8 +1,8 @@
 # EXAMPLES — sdd-idea
 
-Valid examples of `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md`.
+Valid examples of the Brief under `.workspace/brief/`.
 
-## .workspace/product-principles.md
+## .workspace/brief/business/product-principles.md
 
 ```markdown
 # Product Principles
@@ -53,7 +53,7 @@ El valor está en la claridad operativa: menos reuniones de sincronización, men
 Antes de diseñar o implementar, asumir: "Los usuarios organizan trabajo en tableros; el progreso real se mide en tareas que avanzan de estado; las notificaciones informan cambios en tareas, no conversaciones genéricas."
 ```
 
-## .workspace/product-guide.md
+## .workspace/brief/business/product-guide.md
 
 ```markdown
 # Product Guide
@@ -115,22 +115,12 @@ El usuario mueve tarjetas entre columnas (Por hacer, En progreso, Hecho) y asign
 Cuando cambia el estado de una tarea, los involucrados reciben una notificación.
 ```
 
-## .workspace/project.md
+## .workspace/brief/technical/development.md
 
 ```markdown
-# Project
+# Development
 
-## Name
-
-TaskFlow
-
----
-
-## Description
-
-Web task management API and board UI for small teams.
-
----
+> ¿Cómo desarrollaremos este producto?
 
 ## Development Model
 
@@ -144,15 +134,9 @@ Kanban
 
 ---
 
-## Architecture
+## Repository Strategy
 
-Clean Architecture
-
----
-
-## Modeling
-
-Domain Driven Design
+Monorepo
 
 ---
 
@@ -162,39 +146,63 @@ Feature First
 
 ---
 
-## Language
+## Development Conventions
 
-TypeScript
+Conventional commits; SDD review before merge
+```
 
----
+## .workspace/brief/technical/modeling.md
 
-## Framework
+```markdown
+# Modeling
 
-Next.js
+> ¿Cómo modelaremos el negocio?
 
----
+## Domain Driven Design
 
-## Backend
-
-Node.js API routes
-
----
-
-## Frontend
-
-React
+Tactical DDD
 
 ---
 
-## Database
+## Bounded Context
 
-PostgreSQL
+Task management
 
 ---
 
-## Assistant
+## Aggregates
 
-Cursor
+Board, Task
+
+---
+
+## Ubiquitous Language
+
+Board, Task, Column, Member
+
+---
+
+## Modeling Principles
+
+Clean Architecture as structural guide
+```
+
+## .workspace/brief/technical/stack/backend.md
+
+```markdown
+# Backend Stack
+
+> ¿Qué tecnologías utilizaremos para construir el backend?
+
+## Technologies
+
+Node.js API routes, TypeScript
+
+---
+
+## Rationale
+
+Aligns with Next.js full-stack choice
 ```
 
 ## Anti-examples
@@ -207,7 +215,7 @@ Cursor
 El usuario crea una cuenta y luego ve el dashboard.
 ```
 
-Belongs in `.workspace/product-guide.md`.
+Belongs in `.workspace/brief/business/product-guide.md`.
 
 **Incorrect — principles duplicated as narrative in product-guide.md:**
 
@@ -217,7 +225,7 @@ Belongs in `.workspace/product-guide.md`.
 TaskFlow es un espacio de trabajo compartido donde los equipos convierten intención en trabajo visible.
 ```
 
-Belongs in `.workspace/product-principles.md` (conceptual); the guide should describe what the user sees and does.
+Belongs in `.workspace/brief/business/product-principles.md` (conceptual); the guide should describe what the user sees and does.
 
 **Incorrect — technical content in product-principles.md:**
 
@@ -227,7 +235,7 @@ Belongs in `.workspace/product-principles.md` (conceptual); the guide should des
 Las tareas se persisten en PostgreSQL.
 ```
 
-Belongs in `.workspace/project.md`.
+Belongs in `.workspace/brief/technical/stack/database.md`.
 
 **Incorrect — technical content in product-guide.md:**
 
@@ -237,9 +245,9 @@ Belongs in `.workspace/project.md`.
 Los datos se almacenan en PostgreSQL y se sirven vía API REST.
 ```
 
-Belongs in `.workspace/project.md`.
+Belongs in `.workspace/brief/technical/stack/database.md`.
 
-**Incorrect — product journey in project.md:**
+**Incorrect — product journey in development.md:**
 
 ```markdown
 ## Architecture
@@ -247,7 +255,7 @@ Belongs in `.workspace/project.md`.
 Users move tasks between columns on the board.
 ```
 
-Belongs in `.workspace/product-guide.md`.
+Belongs in `.workspace/brief/business/product-guide.md`.
 
 **Incorrect — domains in product-guide.md:**
 

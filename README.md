@@ -12,10 +12,9 @@ npx sdd-studio init
 
 `sdd-studio init` scaffolds by default:
 
-- `.workspace/project.md` — technical and development configuration
-- `.workspace/product-principles.md` — conceptual product principles
-- `.workspace/product-guide.md` — narrative product guide (user journey)
-- `.workspace/spec/` — structured technical and functional specification (domain files)
+- `.workspace/brief/business/` — product principles and narrative product guide
+- `.workspace/brief/technical/` — development, modeling, and stack decisions
+- `.workspace/spec/business/` and `.workspace/spec/technical/` — specification scaffold (empty until **sdd-spec**)
 - Assistant files — skills, rules, or commands for your chosen AI tool
 
 Optionally, with `--workflow`:
@@ -29,18 +28,18 @@ It does **not** generate application code (`src/`, `tests/`, etc.). You implemen
 ## Official cycle
 
 ```text
-Idea → Product Principles → Product Guide → Specification → Planning → Implementation
+Idea → Brief → Specification → Planning → Implementation → Code
 ```
 
 ## Document map
 
 | Location | Question |
 | -------- | -------- |
-| `.workspace/product-principles.md` | What conceptual principles is the product built on? |
-| `.workspace/product-guide.md` | How does the product work for a user? |
-| `.workspace/project.md` | How will we develop this product? |
-| `.workspace/spec/` | How is the product specified? |
-| `.workspace/workflow/` | How do we organize the work? (optional SDD planning module) |
+| `.workspace/brief/business/` | What product do we want to build? |
+| `.workspace/brief/technical/` | How do we decide to build it? |
+| `.workspace/spec/business/` | How does the business work? |
+| `.workspace/spec/technical/` | How must it be implemented? |
+| `.workspace/workflow/` | How do we organize the work? (optional) |
 
 The Product Guide is the root of functional knowledge. Specification derives entirely from it.
 
@@ -63,7 +62,15 @@ Include the SDD workflow module:
 npx sdd-studio init --yes --assistant cursor --workflow
 ```
 
-Then run the **sdd-idea** skill (or `/sdd-idea` in OpenCode) to complete `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md`.
+Then run the **sdd-idea** skill (or `/sdd-idea` in OpenCode) to complete the Brief under `.workspace/brief/`.
+
+### Migrating an existing workspace
+
+If your project was created with sdd-studio 0.4.x (flat `project.md` and `spec/` layout):
+
+```bash
+npx sdd-studio migrate
+```
 
 ## Updating assistant files
 
@@ -79,7 +86,7 @@ Sync only skills (keep your rules or project instructions as-is):
 npx sdd-studio sync --skills
 ```
 
-Requires an existing SDD project (`.workspace/project.md` or installed assistant skills from a prior `init`).
+Requires an existing SDD project (`.workspace/brief/technical/development.md`, legacy `.workspace/project.md`, or installed assistant skills from a prior `init`).
 
 ## Assistant-specific layout
 
@@ -113,20 +120,34 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
 ```
 ./
 ├── .workspace/
-│   ├── project.md
-│   ├── product-principles.md
-│   ├── product-guide.md
+│   ├── brief/
+│   │   ├── business/
+│   │   │   ├── product-principles.md
+│   │   │   └── product-guide.md
+│   │   └── technical/
+│   │       ├── development.md
+│   │       ├── modeling.md
+│   │       └── stack/
+│   │           ├── frontend.md
+│   │           ├── backend.md
+│   │           ├── database.md
+│   │           ├── infrastructure.md
+│   │           └── ai.md
 │   ├── spec/
-│   │   ├── domain/
-│   │   ├── relations/
-│   │   ├── capabilities/
-│   │   ├── flows/
-│   │   ├── rules/
-│   │   ├── security/
-│   │   ├── events/
-│   │   ├── api/
-│   │   ├── ui/
-│   │   └── testing/
+│   │   ├── business/
+│   │   │   ├── domain/
+│   │   │   ├── relations/
+│   │   │   ├── capabilities/
+│   │   │   ├── flows/
+│   │   │   ├── rules/
+│   │   │   ├── security/
+│   │   │   └── events/
+│   │   └── technical/
+│   │       ├── api/
+│   │       ├── ui/
+│   │       ├── testing/
+│   │       ├── architecture/
+│   │       └── database/
 │   └── workflow/               # only with --workflow
 │       ├── roadmap/
 │       ├── milestones/
@@ -197,16 +218,16 @@ Invoke with `/sdd-idea`, `/sdd-spec`, etc.
 
 | Skill | Purpose |
 | ----- | ------- |
-| **sdd-idea** | Discover product; write `product-principles.md`, `product-guide.md`, and `project.md` |
-| **sdd-spec** | Read product guide + project; generate domain files under `.workspace/spec/` |
-| **sdd-review** | Analyze changes; update `product-guide.md` and/or `.workspace/spec/` |
-| **sdd-plan** | Read project + product guide + spec; generate `.workspace/workflow/` |
+| **sdd-idea** | Discover product; write the Brief under `.workspace/brief/` |
+| **sdd-spec** | Read Brief; generate `.workspace/spec/business/` and `.workspace/spec/technical/` |
+| **sdd-review** | Analyze changes; update Brief and/or Specification |
+| **sdd-plan** | Read Brief + spec; generate `.workspace/workflow/` |
 
 ### Existing codebase
 
 | Skill | Purpose |
 | ----- | ------- |
-| **sdd-generate** | Explore code, compare with spec, propose gaps; generate or align spec (conservative) |
+| **sdd-generate** | Explore code, compare with Brief/spec, propose gaps; align workspace (conservative) |
 | **sdd-review** / **sdd-plan** | After spec is aligned |
 
 Invoke skills explicitly in your AI assistant. Do not implement without a specification.
@@ -215,12 +236,14 @@ Invoke skills explicitly in your AI assistant. Do not implement without a specif
 
 ```bash
 sdd-studio init [options]
+sdd-studio migrate
 sdd-studio sync [options]
 ```
 
 | Command | Description |
 | ------- | ----------- |
 | `init` | Scaffold a new SDD workspace |
+| `migrate` | Migrate a legacy flat workspace to Brief / Specification structure |
 | `sync` | Update assistant files from the installed package |
 
 | Option | Description |
@@ -241,11 +264,14 @@ All assistants install the same five SDD skills with provider-native paths.
 
 | Layer | Responsibility |
 | ----- | -------------- |
+| **Brief** | Project context — business and technical decisions |
+| **Specification** | Formal product definition — business and technical |
+| **Workflow** | Work organization only |
 | **CLI** | Scaffold folders, templates, and assistant setup |
-| **Skills** | Discovery, product guide, specification, review, and planning |
+| **Skills** | Discovery, specification, review, and planning |
 | **You** | Implementation in your codebase |
 
-The product guide explains the product. The specification is the technical source of truth. The workflow is the plan.
+The Brief explains what we build and how we decide to build it. The Specification is the formal source of truth. The Workflow is the plan.
 
 ## License
 

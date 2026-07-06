@@ -4,11 +4,21 @@ import { stdin } from "node:process";
 import { getAssistantLayout, getAssistantSkillMarkers } from "../assistants/assistant-layout.js";
 import {
   SDD_WORKSPACE_DIR,
+  SDD_WORKSPACE_LEGACY_MARKER_PATH,
   SDD_WORKSPACE_MARKER_PATH,
 } from "../constants/sdd-workspace-path.js";
 import type { AssistantId } from "../types/init-context.js";
 
-const WORKSPACE_MARKER_PATH = SDD_WORKSPACE_MARKER_PATH;
+const WORKSPACE_MARKER_PATHS = [
+  SDD_WORKSPACE_MARKER_PATH,
+  SDD_WORKSPACE_LEGACY_MARKER_PATH,
+];
+
+function hasSddWorkspace(targetDir: string): boolean {
+  return WORKSPACE_MARKER_PATHS.some((markerPath) =>
+    existsSync(join(targetDir, markerPath)),
+  );
+}
 
 export function assertInteractiveTerminal(): void {
   if (!stdin.isTTY) {
@@ -19,9 +29,7 @@ export function assertInteractiveTerminal(): void {
 }
 
 export function assertTargetDirectoryAvailable(targetDir: string): void {
-  const markerPath = join(targetDir, WORKSPACE_MARKER_PATH);
-
-  if (existsSync(markerPath)) {
+  if (hasSddWorkspace(targetDir)) {
     throw new Error(
       `An SDD project already exists in ${targetDir}. Remove ${SDD_WORKSPACE_DIR}/ or use another directory.`,
     );
@@ -32,9 +40,7 @@ export function assertSyncTargetEligible(
   targetDir: string,
   assistantId?: AssistantId,
 ): void {
-  const hasWorkspace = existsSync(join(targetDir, WORKSPACE_MARKER_PATH));
-
-  if (hasWorkspace) {
+  if (hasSddWorkspace(targetDir)) {
     return;
   }
 

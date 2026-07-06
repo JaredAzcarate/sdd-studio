@@ -2,7 +2,7 @@
 
 ## Example 1 — Empty spec, existing Express API
 
-**Context:** `src/routes/tasks.ts`, `package.json` shows TypeScript + Express + PostgreSQL. `.workspace/product-guide.md` and `project.md` are stubs.
+**Context:** `src/routes/tasks.ts`, `package.json` shows TypeScript + Express + PostgreSQL. `.workspace/brief/` files are stubs.
 
 ### Analysis (excerpt)
 
@@ -17,9 +17,10 @@ Task CRUD API exists; workspace has no domain spec. Product intent partially vis
 
 | Item | Severity | Notes |
 | ---- | -------- | ----- |
-| project.md | high | Stub only |
-| product-guide.md | high | Stub only |
-| task domain (×10) | high | No domain files |
+| brief/business/product-guide.md | high | Stub only |
+| brief/technical/development.md | high | Stub only |
+| brief/technical/stack/backend.md | high | Stub only |
+| task domain (×12) | high | No domain files |
 
 ## Open questions
 
@@ -32,13 +33,22 @@ Task CRUD API exists; workspace has no domain spec. Product intent partially vis
 ```markdown
 # SDD Generate — Proposal
 
+## Brief files
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| .workspace/brief/business/product-guide.md | update | Task management for small teams (narrative, confirm scope) |
+| .workspace/brief/technical/development.md | update | SDD, Clean Architecture conventions inferred |
+| .workspace/brief/technical/modeling.md | update | DDD with Task aggregate inferred |
+| .workspace/brief/technical/stack/backend.md | update | TypeScript, Express inferred |
+| .workspace/brief/technical/stack/database.md | update | PostgreSQL inferred |
+
 ## Spec files
 
 | File | Action | Summary |
 | ---- | ------ | ------- |
-| .workspace/project.md | update | TypeScript, Express, PostgreSQL, Clean Architecture inferred |
-| .workspace/product-guide.md | update | Task management for small teams (narrative, confirm scope) |
-| .workspace/spec/domain/task-*.md | create | 10 files from code analysis |
+| .workspace/spec/business/domain/task-*.md | create | 7 business files from code analysis |
+| .workspace/spec/technical/api/task-*.md | create | 5 technical files from code analysis |
 
 ## Implementation alignment (recommendation only)
 
@@ -55,7 +65,7 @@ Task CRUD API exists; workspace has no domain spec. Product intent partially vis
 
 ## Example 2 — Drift: spec vs code
 
-**Context:** `spec/api/task-api.md` documents `DELETE /tasks/:id`. Code has no delete handler.
+**Context:** `spec/technical/api/task-api.md` documents `DELETE /tasks/:id`. Code has no delete handler.
 
 ### Analysis inconsistency row
 
@@ -81,7 +91,7 @@ Task CRUD API exists; workspace has no domain spec. Product intent partially vis
 Built with TypeScript and PostgreSQL.
 ```
 
-**Correct** — move to `project.md` under Language / Database sections.
+**Correct** — move to `brief/technical/stack/backend.md` and `brief/technical/stack/database.md`.
 
 ---
 

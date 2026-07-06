@@ -1,15 +1,16 @@
 # STANDARDS — sdd-review
 
-Mandatory rules when reviewing and updating `.workspace/product-guide.md`, `.workspace/project.md`, and `.workspace/spec/`.
+Mandatory rules when reviewing and updating `.workspace/brief/` and `.workspace/spec/`.
 
 ## Edit scope
 
-- May modify `.workspace/product-guide.md` for functional or user-facing changes
-- May modify `.workspace/project.md` for technical configuration changes
-- May modify files under `.workspace/spec/` for specification changes
+- May modify `.workspace/brief/business/product-guide.md` for functional or user-facing changes
+- May modify `.workspace/brief/business/product-principles.md` for conceptual changes
+- May modify `.workspace/brief/technical/` for technical configuration changes (development, modeling, stack/*)
+- May modify files under `.workspace/spec/business/` and `.workspace/spec/technical/` for specification changes
 - **Never** modify `.workspace/workflow/`
 - **Never** write code in `src/`
-- **Never** place `product-guide.md` inside `.workspace/spec/`
+- **Never** place Brief content inside `.workspace/spec/`
 
 If the change requires replanning, suggest **sdd-plan**. Do not create tasks or releases.
 
@@ -17,32 +18,37 @@ If the change requires replanning, suggest **sdd-plan**. Do not create tasks or 
 
 | File | Changes when |
 | ---- | ------------ |
-| `.workspace/product-guide.md` | User journey, experiences, scope, or product narrative change |
-| `.workspace/project.md` | Stack, architecture, modeling, or development configuration change |
-| `.workspace/spec/<domain>-*.md` | Domain-level specification change |
+| `.workspace/brief/business/product-principles.md` | Conceptual principles or product foundations change |
+| `.workspace/brief/business/product-guide.md` | User journey, experiences, scope, or product narrative change |
+| `.workspace/brief/technical/development.md` | Development model, workflow methodology, or conventions change |
+| `.workspace/brief/technical/modeling.md` | Modeling approach, DDD, or domain boundaries change |
+| `.workspace/brief/technical/stack/*.md` | Stack, architecture, or technology choices change |
+| `.workspace/spec/<business\|technical>/<category>/<domain>-*.md` | Domain-level specification change |
 
-Do not put technical details in `product-guide.md`. Do not put product behavior in `project.md`.
+Do not put technical details in `product-guide.md`. Do not put product behavior in the Technical Brief.
 
-## Nomenclature (unchanged)
+## Nomenclature
 
 Keep the per-domain pattern:
 
 | Folder | File |
 | ------ | ---- |
-| `domain/` | `<domain>-domain.md` |
-| `relations/` | `<domain>-relations.md` |
-| `capabilities/` | `<domain>-capabilities.md` |
-| `flows/` | `<domain>-flows.md` |
-| `rules/` | `<domain>-rules.md` |
-| `security/` | `<domain>-security.md` |
-| `events/` | `<domain>-events.md` |
-| `api/` | `<domain>-api.md` |
-| `ui/` | `<domain>-ui.md` |
-| `testing/` | `<domain>-testing.md` |
+| `business/domain/` | `<domain>-domain.md` |
+| `business/relations/` | `<domain>-relations.md` |
+| `business/capabilities/` | `<domain>-capabilities.md` |
+| `business/flows/` | `<domain>-flows.md` |
+| `business/rules/` | `<domain>-rules.md` |
+| `business/security/` | `<domain>-security.md` |
+| `business/events/` | `<domain>-events.md` |
+| `technical/api/` | `<domain>-api.md` |
+| `technical/ui/` | `<domain>-ui.md` |
+| `technical/testing/` | `<domain>-testing.md` |
+| `technical/architecture/` | `<domain>-architecture.md` |
+| `technical/database/` | `<domain>-database.md` |
 
-Forbidden in `spec/`: `index.md`, `README.md`, `map.md`, per-domain folders, and any loose file at the top level (narrative docs belong in `.workspace/product-guide.md`).
+Forbidden in `spec/`: `index.md`, `README.md`, `map.md`, per-domain folders, and any loose file at the top level (only `business/` and `technical/` allowed; narrative docs belong in `.workspace/brief/`).
 
-## product-guide.md
+## brief/business/product-guide.md
 
 - Modify only for **user-facing** changes (journeys, experiences, alternative paths)
 - Preserve the mandatory opening blockquote from **sdd-idea** STANDARDS
@@ -50,9 +56,12 @@ Forbidden in `spec/`: `index.md`, `README.md`, `map.md`, per-domain folders, and
 - Requires explicit approval for scope changes that contradict existing domain specs
 - After functional changes, ensure `.workspace/spec/` stays aligned
 
-## project.md
+## brief/technical/
 
 - Modify only for **technical** changes
+- `development.md` — development model and conventions (no specific technologies)
+- `modeling.md` — modeling approach and DDD context
+- `stack/*.md` — technology choices per layer (frontend, backend, database, infrastructure, ai)
 - Keep section structure from **sdd-idea** STANDARDS
 
 ## One question per document
@@ -65,20 +74,25 @@ Do not move business rules to `*-ui.md`. Do not put UI states in `*-flows.md`.
 
 | Type | Typical files |
 | ---- | ------------- |
-| User-facing scope change | `product-guide.md`; may require domain updates via **sdd-spec** |
-| Technical stack change | `project.md` |
-| New domain | 10 domain files |
+| User-facing scope change | `brief/business/product-guide.md`; may require domain updates via **sdd-spec** |
+| Conceptual change | `brief/business/product-principles.md` |
+| Development model change | `brief/technical/development.md` |
+| Modeling change | `brief/technical/modeling.md` |
+| Technical stack change | `brief/technical/stack/*.md` |
+| New domain | 12 domain files (7 business + 5 technical) |
 | New capability | `*-capabilities.md`, possibly `*-flows.md`, `*-api.md` |
 | Rule change | `*-rules.md`; verify `*-flows.md`, `*-testing.md` |
 | API change | `*-api.md`; verify `*-capabilities.md`, `*-security.md` |
 | UI change | `*-ui.md` for interface only |
+| Architecture change | `*-architecture.md`; verify `brief/technical/modeling.md` |
+| Database change | `*-database.md`; verify `brief/technical/stack/database.md` |
 | New relationship | `*-relations.md` in both affected domains |
 | New event | `*-events.md`; verify consumers in relations |
 | Security change | `*-security.md`; verify `*-api.md` |
 
 ## Remove domain
 
-Delete all 10 `<domain>-*.md` files in every folder. Clean references in other `*-relations.md` files.
+Delete all 12 `<domain>-*.md` files in every folder (business and technical). Clean references in other `*-relations.md` files.
 
 ## Format
 
@@ -93,7 +107,7 @@ Delete all 10 `<domain>-*.md` files in every folder. Clean references in other `
 Require explicit user confirmation when:
 
 - High impact (new domain, deletion, scope change)
-- Contradiction between `product-guide.md`, `project.md`, or domain files
+- Contradiction between Brief and domain files
 - Unresolved open questions
 
 ## Post-edit validation

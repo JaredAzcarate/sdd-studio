@@ -1,40 +1,35 @@
 # STANDARDS — sdd-idea
 
-Mandatory rules for generating `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md`.
+Mandatory rules for generating the Brief under `.workspace/brief/`.
 
-## Separation of concerns
+## Four-layer model
 
-| File | Question it answers | Contains |
-| ---- | ------------------- | -------- |
-| `.workspace/product-principles.md` | What conceptual principles is the product built on? | Durable product principles only |
-| `.workspace/product-guide.md` | How does the product work for a user? | Narrative product guide only |
-| `.workspace/project.md` | How will we develop this product? | Technical and development configuration |
+| Layer | Question |
+| ----- | -------- |
+| Brief — Business | What product do we want to build? |
+| Brief — Technical | How do we decide to build it? |
+| Specification | (not written by sdd-idea) |
+| Workflow | (not written by sdd-idea) |
 
-Never mix content between these files. Never create files under `.workspace/spec/`.
+**sdd-idea writes only the Brief.** Never create or modify `.workspace/spec/` or `.workspace/workflow/`.
 
-**Generation order:** `product-principles.md` → `product-guide.md` → `project.md`.
+**Generation order:**
+
+1. `brief/business/product-principles.md`
+2. `brief/business/product-guide.md`
+3. `brief/technical/development.md`
+4. `brief/technical/modeling.md`
+5. `brief/technical/stack/frontend.md` → `backend.md` → `database.md` → `infrastructure.md` → `ai.md`
 
 ---
 
-## .workspace/product-principles.md
+## Business Brief
 
-### Location
+### `.workspace/brief/business/product-principles.md`
 
-- Exact path: `.workspace/product-principles.md`
-- One principles document per project
-- Do not place it inside `.workspace/spec/`
+**Question:** What conceptual principles is the product built on?
 
-### Purpose
-
-Product Principles define the **conceptual foundation** of the product.
-
-It answers what the product **is** at an abstract level — not how a user moves through screens, not how it is built, and not how it is specified.
-
-Any designer, developer, or AI should read this document before proposing features, journeys, or architecture.
-
-### Mandatory opening
-
-The file must begin **exactly** with:
+**Mandatory opening:**
 
 ```markdown
 # Product Principles
@@ -46,9 +41,7 @@ The file must begin **exactly** with:
 > Este documento no describe pantallas, recorridos ni implementación técnica.
 ```
 
-### Required sections
-
-Use exactly these H2 sections in this order:
+**Required H2 sections (in order):**
 
 ```text
 ## Qué representa el producto
@@ -59,68 +52,15 @@ Use exactly these H2 sections in this order:
 ## Modelo mental compartido
 ```
 
-Separate main sections with `---`.
-
-### Allowed content
-
-- What the product represents in the problem space
-- The primary unit or concept everything revolves around
-- Concepts that must remain stable across versions
-- How the product interprets the business, customers, and value
-- Rules that every future feature must respect
-- The shared mental model for contributors and AI
-
-### Forbidden content
-
-Never mention:
-
-- Screens, pages, UI layouts, or wireframes
-- User journeys, onboarding steps, or click-by-click flows
-- Detailed features or capability lists
-- Domain specifications, entities, or APIs
-- Architecture, stack, databases, or frameworks
-- Tasks, releases, roadmap, or planning
-- Narrative "the user sees…" language (belongs in product-guide)
-
-### Writing style
-
-- Clear, durable, conceptual language
-- Present tense; principles should age well
-- Short paragraphs or bullet lists where appropriate
-- No `TODO:` left without documenting open questions
-
-### Format rules
-
-1. Single H1: `# Product Principles` (mandatory opening only)
-2. Mandatory blockquote immediately after H1
-3. Six required H2 sections in the order above
-4. Separate sections with `---`
+**Forbidden:** screens, journeys, APIs, stack, domains, tasks.
 
 ---
 
-## .workspace/product-guide.md
+### `.workspace/brief/business/product-guide.md`
 
-### Location
+**Question:** How does the product work for a user?
 
-- Exact path: `.workspace/product-guide.md`
-- One product guide per project
-- Do not place product-guide inside `.workspace/spec/`
-
-### Purpose
-
-The Product Guide is the **entry point** for understanding the product **from the user's perspective**.
-
-It explains the complete product using a **continuous narrative** organized by the **real user journey** — not by domains, features, or technical structure.
-
-Any person should understand the full product by reading this document alone, from start to finish, as if it were a book.
-
-It is **not** a specification. It can be delivered with the product as official user documentation.
-
-It must **not** repeat the abstract principles from `product-principles.md`; it must **instantiate** them as lived user experiences.
-
-### Mandatory opening
-
-The file must begin **exactly** with:
+**Mandatory opening:**
 
 ```markdown
 # Product Guide
@@ -134,176 +74,104 @@ The file must begin **exactly** with:
 > Cada modificación funcional realizada sobre el producto deberá actualizar también este documento.
 ```
 
-### Organization
+**Organization:** continuous user journey; one H2 per experience; separate with `---`.
 
-Organize by **user experiences** in journey order:
+**Forbidden:** APIs, stack, architecture, DDD internals, principles (belongs in product-principles), specification content.
+
+---
+
+## Technical Brief
+
+### `.workspace/brief/technical/development.md`
+
+**Question:** How will we develop this product?
+
+**Mandatory opening:**
+
+```markdown
+# Development
+
+> ¿Cómo desarrollaremos este producto?
+>
+> Este documento define el modelo de desarrollo y las convenciones del proyecto.
+> No describe tecnologías específicas ni decisiones de implementación.
+```
+
+**Required H2 sections:**
 
 ```text
-Crear cuenta → Verificar correo → Pantalla de bienvenida → Onboarding → ...
-```
-
-- Each experience is one H2 section (`## Experience name`)
-- Do **not** organize by domains, APIs, or feature lists
-- Do **not** use generic sections like "Introduction", "Features", or "Glossary" as the primary structure
-- Describe **all alternative paths** narratively when they exist (e.g. manual signup vs Google, individual vs team, admin vs guest)
-
-### Narrative structure per experience
-
-Each experience section must read like a usage guide:
-
-```markdown
-## Crear cuenta
-
-[What is the goal of this screen/experience]
-
-[What the user sees]
-
-[What actions the user can take]
-
-[What happens when the process completes successfully]
-
-[Alternative paths or error flows, if any]
-
-[What experience comes next]
-```
-
-### Writing style
-
-- Clear, professional, natural language
-- Narrative and continuous — not a technical spec
-- Oriented exclusively to product usage
-
-### Forbidden content
-
-Never mention:
-
-- APIs, endpoints, or contracts
-- frameworks, languages, or stacks
-- architecture or code organization
-- databases or persistence
-- DDD, Clean Architecture, microservices
-- internal models, entities, or domain structure
-- development methodology or AI assistant configuration
-- tasks, releases, roadmap, or planning
-- abstract product principles (belongs in `product-principles.md`)
-
-### Format rules
-
-1. Single H1: `# Product Guide` (mandatory opening only)
-2. Mandatory blockquote immediately after H1
-3. User experiences as H2 (`##`)
-4. Separate experiences with `---`
-5. No `TODO:` left without documenting open questions
-
----
-
-## .workspace/project.md
-
-### Location
-
-- Exact path: `.workspace/project.md`
-- One project configuration file per workspace
-
-### Allowed content
-
-Technical and development configuration:
-
-- project name and description
-- development model
-- workflow methodology
-- architecture
-- modeling approach
-- code organization
-- language, framework, backend, frontend, database
-- AI assistant
-- any other technical setting used by SDD skills
-
-### Forbidden content
-
-- product behavior, user journeys, or experiences
-- product principles or conceptual foundations
-- product guide content
-- domain specifications
-- tasks, releases, roadmap, or milestones
-
-### Document structure
-
-```markdown
-# Project
-
-## Name
-
----
-
-## Description
-
----
-
 ## Development Model
-
-Specification Driven Development
-
----
-
 ## Workflow Methodology
-
----
-
-## Architecture
-
----
-
-## Modeling
-
----
-
+## Repository Strategy
 ## Code Organization
-
----
-
-## Language
-
----
-
-## Framework
-
----
-
-## Backend
-
----
-
-## Frontend
-
----
-
-## Database
-
----
-
-## Assistant
+## Development Conventions
 ```
 
-### Format rules
+**Allowed:** SDD, Kanban/Scrum, monorepo/polyrepo, feature-first/layer-first, linting conventions.
 
-1. Single H1: `# Project`
-2. Main sections with H2 (`##`)
-3. Separate main sections with `---`
-4. Reflect user answers; do not invent values
-5. `Development Model` defaults to `Specification Driven Development` unless the user says otherwise
+**Forbidden:** specific languages, frameworks, databases, cloud providers, user journeys, product behavior.
+
+`Development Model` defaults to `Specification Driven Development` unless the user says otherwise.
 
 ---
 
-## Writing rules (all three files)
+### `.workspace/brief/technical/modeling.md`
+
+**Question:** How will we model the business?
+
+**Mandatory opening:**
+
+```markdown
+# Modeling
+
+> ¿Cómo modelaremos el negocio?
+>
+> Este documento define cómo el equipo interpreta y estructura el dominio del producto.
+> No describe APIs, bases de datos ni detalles de implementación.
+```
+
+**Required H2 sections:**
+
+```text
+## Domain Driven Design
+## Bounded Context
+## Aggregates
+## Ubiquitous Language
+## Modeling Principles
+```
+
+**Forbidden:** specific technologies, API contracts, UI specs, user journeys.
+
+---
+
+### `.workspace/brief/technical/stack/`
+
+Each file answers **one question only**:
+
+| File | Question |
+| ---- | -------- |
+| `frontend.md` | What technologies will we use to build the frontend? |
+| `backend.md` | What technologies will we use to build the backend? |
+| `database.md` | What technologies will we use for persistence? |
+| `infrastructure.md` | How will we deploy, monitor, and operate the solution? |
+| `ai.md` | What AI tools participate in development? |
+
+Each file must start with `# <Title>` and a blockquote stating its single question.
+
+**Forbidden in stack files:** user journeys, domain rules, development methodology (belongs in `development.md`), DDD structure (belongs in `modeling.md`).
+
+---
+
+## Writing rules (all Brief files)
 
 - Be explicit and verifiable
 - Mark uncertainty with `TODO:` and ask the user
-- If the user did not define a required field, ask before writing
+- Separate sections with `---` where specified
+- Single H1 per file
 
 ## Prohibitions
 
-- Do not create files outside the three output files
-- Do not modify `.workspace/workflow/` or any file under `.workspace/spec/`
-- Do not duplicate principles in `product-guide.md` or technical content in `product-principles.md`
-- Do not duplicate product-guide content in `project.md` or technical content in `product-guide.md`
-- Do not create files under `.workspace/spec/`
+- Do not create files outside `.workspace/brief/`
+- Do not modify `.workspace/spec/` or `.workspace/workflow/`
+- Do not mix Business Brief content into Technical Brief or vice versa
+- Do not duplicate principles as narratives or stack choices as modeling decisions

@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { createInitCommand } from "./commands/init.command.js";
+import { createMigrateCommand } from "./commands/migrate.command.js";
 import { createSyncCommand } from "./commands/sync.command.js";
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
@@ -19,6 +20,7 @@ program
   .version(pkg.version);
 
 program.addCommand(createInitCommand());
+program.addCommand(createMigrateCommand());
 program.addCommand(createSyncCommand());
 
 program.parseAsync(process.argv).catch((error: unknown) => {

@@ -1,6 +1,6 @@
 # STANDARDS — sdd-spec
 
-Mandatory rules for generating files in `.workspace/spec/`.
+Mandatory rules for generating files in `.workspace/spec/business/` and `.workspace/spec/technical/`.
 
 ## Principle
 
@@ -11,31 +11,40 @@ Do not create:
 - per-domain folders inside `spec/`
 - `index.md`, `README.md`, `map.md`, or alternate names
 - tasks, releases, roadmap, milestones, or estimates in `spec/`
+- files at the top level of `spec/` (only `business/` and `technical/` allowed)
 
 ## Folder structure
 
 ```text
 .workspace/spec/
 
-    domain/
+    business/
 
-    relations/
+        domain/
 
-    capabilities/
+        relations/
 
-    flows/
+        capabilities/
 
-    rules/
+        flows/
 
-    security/
+        rules/
 
-    events/
+        security/
 
-    api/
+        events/
 
-    ui/
+    technical/
 
-    testing/
+        api/
+
+        ui/
+
+        testing/
+
+        architecture/
+
+        database/
 ```
 
 ## Naming convention
@@ -44,24 +53,29 @@ For each `<domain>` (kebab-case, lowercase):
 
 | Folder | File |
 | ------ | ---- |
-| `domain/` | `<domain>-domain.md` |
-| `relations/` | `<domain>-relations.md` |
-| `capabilities/` | `<domain>-capabilities.md` |
-| `flows/` | `<domain>-flows.md` |
-| `rules/` | `<domain>-rules.md` |
-| `security/` | `<domain>-security.md` |
-| `events/` | `<domain>-events.md` |
-| `api/` | `<domain>-api.md` |
-| `ui/` | `<domain>-ui.md` |
-| `testing/` | `<domain>-testing.md` |
+| `business/domain/` | `<domain>-domain.md` |
+| `business/relations/` | `<domain>-relations.md` |
+| `business/capabilities/` | `<domain>-capabilities.md` |
+| `business/flows/` | `<domain>-flows.md` |
+| `business/rules/` | `<domain>-rules.md` |
+| `business/security/` | `<domain>-security.md` |
+| `business/events/` | `<domain>-events.md` |
+| `technical/api/` | `<domain>-api.md` |
+| `technical/ui/` | `<domain>-ui.md` |
+| `technical/testing/` | `<domain>-testing.md` |
+| `technical/architecture/` | `<domain>-architecture.md` |
+| `technical/database/` | `<domain>-database.md` |
 
 Example domain `task`:
 
 ```text
-task-domain.md
-task-relations.md
-task-capabilities.md
+business/domain/task-domain.md
+business/relations/task-relations.md
+business/capabilities/task-capabilities.md
 ...
+technical/api/task-api.md
+technical/architecture/task-architecture.md
+technical/database/task-database.md
 ```
 
 ## Responsibility per document
@@ -78,6 +92,8 @@ task-capabilities.md
 | api | How do other systems interact? | technical contract |
 | ui | How does a person interact? | interface behavior (no business rules) |
 | testing | How do we verify? | validation scenarios |
+| architecture | How is this domain structured? | modules, layers, boundaries, integration points |
+| database | How is this domain persisted? | tables, schemas, indexes, constraints |
 
 ## Mandatory templates
 
@@ -309,6 +325,59 @@ Do not document business rules.
 ## Edge Cases
 ```
 
+### `<domain>-architecture.md`
+
+```markdown
+# [Domain] Architecture
+
+## Module Structure
+
+---
+
+## Layer Responsibilities
+
+---
+
+## Integration Points
+
+---
+
+## Dependencies
+
+---
+
+## Notes
+```
+
+### `<domain>-database.md`
+
+```markdown
+# [Domain] Database
+
+## Tables
+
+### [Table Name]
+
+| Column | Type | Required | Description |
+| ------ | ---- | -------- | ----------- |
+
+---
+
+## Indexes
+
+---
+
+## Constraints
+
+---
+
+## Migrations
+
+---
+
+## Notes
+```
+
 ## Format rules
 
 1. Single H1 per document
@@ -329,7 +398,7 @@ Document structure **never** depends on the domain. Only the content changes.
 After generating or modifying, run:
 
 ```bash
-node .github/sdd-studio/sdd-spec/scripts/validate-spec.mjs .workspace/spec
+node .cursor/skills/sdd-spec/scripts/validate-spec.mjs .workspace/spec
 ```
 
 Fix all errors before finishing.

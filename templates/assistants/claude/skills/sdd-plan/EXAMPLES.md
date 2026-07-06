@@ -163,10 +163,10 @@ MILESTONE-001
 
 ## Spec References
 
-- `spec/domain/task-domain.md`
-- `spec/api/task-api.md`
-- `spec/ui/task-ui.md`
-- `spec/events/task-events.md`
+- `spec/business/domain/task-domain.md`
+- `spec/technical/api/task-api.md`
+- `spec/technical/ui/task-ui.md`
+- `spec/business/events/task-events.md`
 ```
 
 ## workflow/releases/release-001/reviews.md
@@ -192,7 +192,7 @@ MILESTONE-001
 
 **Decision:** Ship kanban board as primary UI.
 
-**Justification:** Matches user mental model; spec ui/task-ui.md defines columns by status.
+**Justification:** Matches user mental model; spec/technical/ui/task-ui.md defines columns by status.
 
 **Impact:** List view deferred to RELEASE-002.
 ```
@@ -200,7 +200,8 @@ MILESTONE-001
 ## Anti-example — Incorrect
 
 ```text
-workflow/roadmap/index.md          # use roadmap-001.md
-workflow/releases/release-001/T-01.md   # tasks go in tasks.md
-.workspace/spec/domain/task-domain.md    # sdd-plan does not touch spec
+workflow/roadmap/index.md                              # use roadmap-001.md
+workflow/releases/release-001/T-01.md                # tasks go in tasks.md
+.workspace/spec/business/domain/task-domain.md         # sdd-plan does not touch spec
+.workspace/brief/business/product-guide.md             # sdd-plan does not touch brief
 ```

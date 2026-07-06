@@ -18,7 +18,7 @@ export function formatInitSummary(
     const layout = getAssistantLayout(context.assistant);
     lines.push(
       "",
-      `Next step: run the **sdd-idea** skill to complete product-principles.md, product-guide.md, and project.md in ${layout.nextStepLabel}.`,
+      `Next step: run the **sdd-idea** skill to complete the Brief under .workspace/brief/ in ${layout.nextStepLabel}.`,
     );
   } else if (result?.assistant.message) {
     lines.push("", result.assistant.message);

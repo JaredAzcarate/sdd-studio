@@ -24,7 +24,7 @@ describe("formatInitSummary", () => {
     const summary = formatInitSummary(sampleContext, cursorResult);
 
     expect(summary).toContain("Cursor");
-    expect(summary).toContain("product-principles.md, product-guide.md, and project.md");
+    expect(summary).toContain("Brief under .workspace/brief/");
     expect(summary).toContain("Workflow module:   disabled");
   });
 
@@ -38,6 +38,6 @@ describe("formatInitSummary", () => {
     );
 
     expect(summary).toContain("Claude Code");
-    expect(summary).toContain("product-principles.md, product-guide.md, and project.md");
+    expect(summary).toContain("Brief under .workspace/brief/");
   });
 });

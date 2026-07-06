@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { copyTemplateFile, copyTemplateTree } from "../core/file-system.js";
+import { copyTemplateTree } from "../core/file-system.js";
 import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
 import { resolveWorkspaceTemplatePath } from "../core/template-resolver.js";
 import type { WorkspaceModules } from "../types/init-context.js";
@@ -16,6 +16,18 @@ export type GenerateWorkspaceResult = {
   modules: WorkspaceModules;
 };
 
+const REQUIRED_BRIEF_FILES = [
+  "brief/business/product-principles.md",
+  "brief/business/product-guide.md",
+  "brief/technical/development.md",
+  "brief/technical/modeling.md",
+  "brief/technical/stack/frontend.md",
+  "brief/technical/stack/backend.md",
+  "brief/technical/stack/database.md",
+  "brief/technical/stack/infrastructure.md",
+  "brief/technical/stack/ai.md",
+] as const;
+
 export async function generateWorkspace(
   options: GenerateWorkspaceOptions,
 ): Promise<GenerateWorkspaceResult> {
@@ -24,18 +36,12 @@ export async function generateWorkspace(
   const workspaceTarget = join(options.targetDir, SDD_WORKSPACE_DIR);
   const createdPaths: string[] = [];
 
-  for (const fileName of [
-    "product-principles.md",
-    "product-guide.md",
-    "project.md",
-  ] as const) {
-    const { createdPaths: filePaths } = await copyTemplateFile(
-      resolveWorkspaceTemplatePath(fileName),
-      join(workspaceTarget, fileName),
-      { overwrite, skipIfExists: !overwrite },
-    );
-    createdPaths.push(...filePaths);
-  }
+  const { createdPaths: briefPaths } = await copyTemplateTree(
+    resolveWorkspaceTemplatePath("brief"),
+    join(workspaceTarget, "brief"),
+    { overwrite },
+  );
+  createdPaths.push(...briefPaths);
 
   const { createdPaths: specPaths } = await copyTemplateTree(
     resolveWorkspaceTemplatePath("spec"),
@@ -53,20 +59,11 @@ export async function generateWorkspace(
     createdPaths.push(...workflowPaths);
   }
 
-  const projectMdPath = join(workspaceTarget, "project.md");
-  const productGuidePath = join(workspaceTarget, "product-guide.md");
-  const productPrinciplesPath = join(workspaceTarget, "product-principles.md");
-
-  if (!createdPaths.includes(projectMdPath)) {
-    throw new Error(`Failed to generate ${projectMdPath}`);
-  }
-
-  if (!createdPaths.includes(productGuidePath)) {
-    throw new Error(`Failed to generate ${productGuidePath}`);
-  }
-
-  if (!createdPaths.includes(productPrinciplesPath)) {
-    throw new Error(`Failed to generate ${productPrinciplesPath}`);
+  for (const relativePath of REQUIRED_BRIEF_FILES) {
+    const absolutePath = join(workspaceTarget, relativePath);
+    if (!createdPaths.includes(absolutePath)) {
+      throw new Error(`Failed to generate ${absolutePath}`);
+    }
   }
 
   return {

@@ -83,20 +83,20 @@ describe("npm pack e2e", () => {
       stdio: "pipe",
     });
 
-    const projectMd = readFileSync(
-      join(targetDir, ".workspace/project.md"),
+    const developmentMd = readFileSync(
+      join(targetDir, ".workspace/brief/technical/development.md"),
       "utf8",
     );
     const productPrinciplesMd = readFileSync(
-      join(targetDir, ".workspace/product-principles.md"),
+      join(targetDir, ".workspace/brief/business/product-principles.md"),
       "utf8",
     );
     const productMd = readFileSync(
-      join(targetDir, ".workspace/product-guide.md"),
+      join(targetDir, ".workspace/brief/business/product-guide.md"),
       "utf8",
     );
 
-    expect(projectMd).toContain("# Project");
+    expect(developmentMd).toContain("# Development");
     expect(productPrinciplesMd).toContain("# Product Principles");
     expect(productMd).toContain("sdd-idea");
     expect(existsSync(join(targetDir, ".cursor/skills/sdd-idea/SKILL.md"))).toBe(

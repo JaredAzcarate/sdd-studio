@@ -19,10 +19,10 @@ export function formatGenerationResult(
     "SDD project generated successfully.",
     "",
     "Main structure:",
-    `  ${SDD_WORKSPACE_DIR}/product-principles.md`,
-    `  ${SDD_WORKSPACE_DIR}/product-guide.md`,
-    `  ${SDD_WORKSPACE_DIR}/project.md`,
-    `  ${SDD_WORKSPACE_DIR}/spec/`,
+    `  ${SDD_WORKSPACE_DIR}/brief/business/`,
+    `  ${SDD_WORKSPACE_DIR}/brief/technical/`,
+    `  ${SDD_WORKSPACE_DIR}/spec/business/`,
+    `  ${SDD_WORKSPACE_DIR}/spec/technical/`,
   ];
 
   if (result.modules.workflow) {
@@ -71,7 +71,7 @@ export function formatGenerationResult(
   if (result.assistant.installed) {
     lines.push(
       "",
-      `Next step: run the **sdd-idea** skill to complete product-principles.md, product-guide.md, and project.md in ${layout.nextStepLabel}.`,
+      `Next step: run the **sdd-idea** skill to complete the Brief under ${SDD_WORKSPACE_DIR}/brief/ in ${layout.nextStepLabel}.`,
     );
 
     if (!result.modules.workflow) {
