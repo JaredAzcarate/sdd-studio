@@ -19,11 +19,15 @@ export function formatGenerationResult(
     "SDD project generated successfully.",
     "",
     "Main structure:",
-    `  ${SDD_WORKSPACE_DIR}/project.md`,
+    `  ${SDD_WORKSPACE_DIR}/product-principles.md`,
     `  ${SDD_WORKSPACE_DIR}/product-guide.md`,
+    `  ${SDD_WORKSPACE_DIR}/project.md`,
     `  ${SDD_WORKSPACE_DIR}/spec/`,
-    `  ${SDD_WORKSPACE_DIR}/workflow/releases/release-001/`,
   ];
+
+  if (result.modules.workflow) {
+    lines.push(`  ${SDD_WORKSPACE_DIR}/workflow/releases/release-001/`);
+  }
 
   if (result.assistant.installed) {
     if (layout.installedPaths.instructions) {
@@ -67,8 +71,14 @@ export function formatGenerationResult(
   if (result.assistant.installed) {
     lines.push(
       "",
-      `Next step: run the **sdd-idea** skill in ${layout.nextStepLabel}.`,
+      `Next step: run the **sdd-idea** skill to complete product-principles.md, product-guide.md, and project.md in ${layout.nextStepLabel}.`,
     );
+
+    if (!result.modules.workflow) {
+      lines.push(
+        "Workflow module: not installed. Run **sdd-plan** when you need SDD planning under `.workspace/workflow/`.",
+      );
+    }
   }
 
   return lines.join("\n");

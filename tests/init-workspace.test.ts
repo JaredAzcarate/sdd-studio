@@ -6,19 +6,24 @@ import { afterEach, describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/use-cases/init-workspace.use-case.js";
 import type { InitContextWithLabels } from "../src/types/init-context.js";
 
-function createContext(targetDir: string): InitContextWithLabels {
+function createContext(
+  targetDir: string,
+  modules: { workflow: boolean } = { workflow: false },
+): InitContextWithLabels {
   return {
     targetDir,
     assistant: "cursor",
+    modules,
     labels: {
       assistant: "Cursor",
     },
   };
 }
 
-const REQUIRED_PATHS = [
-  ".workspace/project.md",
+const BASE_PATHS = [
+  ".workspace/product-principles.md",
   ".workspace/product-guide.md",
+  ".workspace/project.md",
   ".workspace/spec/domain/.gitkeep",
   ".workspace/spec/relations/.gitkeep",
   ".workspace/spec/capabilities/.gitkeep",
@@ -29,6 +34,9 @@ const REQUIRED_PATHS = [
   ".workspace/spec/api/.gitkeep",
   ".workspace/spec/ui/.gitkeep",
   ".workspace/spec/testing/.gitkeep",
+];
+
+const WORKFLOW_PATHS = [
   ".workspace/workflow/roadmap/.gitkeep",
   ".workspace/workflow/milestones/.gitkeep",
   ".workspace/workflow/releases/release-001/release.md",
@@ -58,14 +66,18 @@ describe("initWorkspace", () => {
     }
   });
 
-  it("generates the full SDD workspace tree in the target directory", async () => {
+  it("generates the default SDD workspace tree without workflow", async () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-init-"));
     const context = createContext(tempDir);
 
     const result = await initWorkspace({ context });
 
-    for (const relativePath of REQUIRED_PATHS) {
+    for (const relativePath of BASE_PATHS) {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
+    }
+
+    for (const relativePath of WORKFLOW_PATHS) {
+      expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(false);
     }
 
     const projectMd = readFileSync(
@@ -81,15 +93,32 @@ describe("initWorkspace", () => {
     expect(projectMd).toContain("sdd-idea");
     expect(productGuideMd).toContain("# Product Guide");
     expect(productGuideMd).toContain("sdd-idea");
+    expect(
+      readFileSync(join(tempDir, ".workspace/product-principles.md"), "utf8"),
+    ).toContain("# Product Principles");
     expect(result.assistant.installed).toBe(true);
+    expect(result.modules.workflow).toBe(false);
 
     for (const relativePath of CURSOR_PATHS) {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
     }
 
     expect(result.createdPaths.length).toBeGreaterThanOrEqual(
-      REQUIRED_PATHS.length + CURSOR_PATHS.length,
+      BASE_PATHS.length + CURSOR_PATHS.length,
     );
+  });
+
+  it("generates the workflow module when enabled", async () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-init-"));
+    const context = createContext(tempDir, { workflow: true });
+
+    const result = await initWorkspace({ context });
+
+    for (const relativePath of [...BASE_PATHS, ...WORKFLOW_PATHS]) {
+      expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
+    }
+
+    expect(result.modules.workflow).toBe(true);
   });
 
   it("installs claude assistant files when assistant is claude", async () => {

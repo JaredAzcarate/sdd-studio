@@ -10,30 +10,37 @@ npx sdd-studio init
 
 ## What it does
 
-`sdd-studio init` scaffolds:
+`sdd-studio init` scaffolds by default:
 
 - `.workspace/project.md` — technical and development configuration
+- `.workspace/product-principles.md` — conceptual product principles
 - `.workspace/product-guide.md` — narrative product guide (user journey)
 - `.workspace/spec/` — structured technical and functional specification (domain files)
-- `.workspace/workflow/` — planning (roadmap, milestones, releases, tasks)
 - Assistant files — skills, rules, or commands for your chosen AI tool
+
+Optionally, with `--workflow`:
+
+- `.workspace/workflow/` — SDD planning (roadmap, milestones, releases, tasks)
+
+If you manage tasks elsewhere (Linear, GitHub Issues, etc.), skip the workflow module and use **sdd-plan** later only when you want SDD-native planning.
 
 It does **not** generate application code (`src/`, `tests/`, etc.). You implement after the spec is ready.
 
 ## Official cycle
 
 ```text
-Idea → Product Guide → Specification → Planning → Implementation
+Idea → Product Principles → Product Guide → Specification → Planning → Implementation
 ```
 
-## Four questions
+## Document map
 
 | Location | Question |
 | -------- | -------- |
-| `.workspace/project.md` | How will we develop this product? |
+| `.workspace/product-principles.md` | What conceptual principles is the product built on? |
 | `.workspace/product-guide.md` | How does the product work for a user? |
+| `.workspace/project.md` | How will we develop this product? |
 | `.workspace/spec/` | How is the product specified? |
-| `.workspace/workflow/` | How do we organize the work? |
+| `.workspace/workflow/` | How do we organize the work? (optional SDD planning module) |
 
 The Product Guide is the root of functional knowledge. Specification derives entirely from it.
 
@@ -44,13 +51,19 @@ mkdir my-product && cd my-product
 npx sdd-studio init
 ```
 
-Non-interactive (defaults to Cursor):
+Non-interactive (defaults to Cursor, without workflow):
 
 ```bash
 npx sdd-studio init --yes --assistant cursor
 ```
 
-Then run the **sdd-idea** skill (or `/sdd-idea` in OpenCode) to complete `.workspace/project.md` and `.workspace/product-guide.md`.
+Include the SDD workflow module:
+
+```bash
+npx sdd-studio init --yes --assistant cursor --workflow
+```
+
+Then run the **sdd-idea** skill (or `/sdd-idea` in OpenCode) to complete `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md`.
 
 ## Updating assistant files
 
@@ -101,6 +114,7 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
 ./
 ├── .workspace/
 │   ├── project.md
+│   ├── product-principles.md
 │   ├── product-guide.md
 │   ├── spec/
 │   │   ├── domain/
@@ -113,7 +127,7 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
 │   │   ├── api/
 │   │   ├── ui/
 │   │   └── testing/
-│   └── workflow/
+│   └── workflow/               # only with --workflow
 │       ├── roadmap/
 │       ├── milestones/
 │       └── releases/
@@ -183,7 +197,7 @@ Invoke with `/sdd-idea`, `/sdd-spec`, etc.
 
 | Skill | Purpose |
 | ----- | ------- |
-| **sdd-idea** | Discover product; write `project.md` and `product-guide.md` |
+| **sdd-idea** | Discover product; write `product-principles.md`, `product-guide.md`, and `project.md` |
 | **sdd-spec** | Read product guide + project; generate domain files under `.workspace/spec/` |
 | **sdd-review** | Analyze changes; update `product-guide.md` and/or `.workspace/spec/` |
 | **sdd-plan** | Read project + product guide + spec; generate `.workspace/workflow/` |
@@ -213,6 +227,7 @@ sdd-studio sync [options]
 | ------ | ----------- |
 | `--yes` | Skip prompts; use defaults (`init` only) |
 | `--assistant <id>` | `cursor` (default), `claude`, `codex`, `opencode`, or `copilot` |
+| `--workflow` | Include `.workspace/workflow/` scaffold (`init` only, default: off) |
 | `--skills` | Sync only skills/commands, not instructions or rules (`sync` only) |
 
 All assistants install the same five SDD skills with provider-native paths.

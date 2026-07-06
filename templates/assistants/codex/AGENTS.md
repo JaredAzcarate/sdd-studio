@@ -11,35 +11,38 @@ This project uses **Specification Driven Development (SDD)**.
 ## Official cycle
 
 ```text
-Idea → Product Guide → Specification → Planning → Implementation
+Idea → Product Principles → Product Guide → Specification → Planning → Implementation
 ```
 
-## Four questions
+## Document map
 
 | Location | Question |
 | -------- | -------- |
-| `.workspace/project.md` | How will we develop this product? |
+| `.workspace/product-principles.md` | What conceptual principles is the product built on? |
 | `.workspace/product-guide.md` | How does the product work for a user? |
+| `.workspace/project.md` | How will we develop this product? |
 | `.workspace/spec/` | How is the product specified? |
 | `.workspace/workflow/` | How do we organize the work to build it? |
 
 ## Entry points
 
+- Read `.workspace/product-principles.md` for durable conceptual foundations.
 - Read `.workspace/project.md` for technical and development configuration.
 - Read `.workspace/product-guide.md` for the complete user journey (narrative, non-technical).
 - Read `.workspace/spec/` for structured technical and functional specification.
-- Never mix technical details into `product-guide.md` or user-facing content into `project.md`.
+- Never mix principles into journeys, technical details into `product-guide.md`, or user-facing content into `project.md`.
 
 ## Source of truth
 
 | Folder / file | Content | Forbidden |
 | ------------- | ------- | --------- |
-| `.workspace/project.md` | Technical configuration | product guide content, domains, tasks |
-| `.workspace/product-guide.md` | Product guide (user journey) | APIs, stack, architecture, domains, tasks |
-| `.workspace/spec/` | Structured specification | narrative user docs, tasks, releases, roadmap |
+| `.workspace/product-principles.md` | Conceptual product principles | screens, journeys, APIs, stack |
+| `.workspace/project.md` | Technical configuration | principles, product guide, domains, tasks |
+| `.workspace/product-guide.md` | Product guide (user journey) | principles, APIs, stack, architecture, domains, tasks |
+| `.workspace/spec/` | Structured specification | narrative user docs, principles, tasks, releases, roadmap |
 | `.workspace/workflow/` | Planning and execution | business rules, domains, product guide |
 
-The Product Guide is the **root of functional knowledge**. Specification derives entirely from it.
+Product Principles ground the product. The Product Guide is the **root of functional knowledge** for user-facing behavior. Specification derives from the Product Guide.
 
 ## Skills
 
@@ -47,7 +50,7 @@ SDD skills live in `.agents/skills/` (`sdd-idea`, `sdd-generate`, `sdd-spec`, `s
 
 ### Greenfield (no code yet)
 
-1. **sdd-idea** — discover product; write `.workspace/project.md` and `.workspace/product-guide.md`
+1. **sdd-idea** — discover product; write `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md`
 2. **sdd-spec** — read product guide + project; generate domain files under `.workspace/spec/`
 3. **sdd-review** — analyze changes; update `product-guide.md` and/or `.workspace/spec/`
 4. **sdd-plan** — read project + product guide + spec; generate `.workspace/workflow/`

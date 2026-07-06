@@ -6,10 +6,12 @@ describe("initContextSchema", () => {
     const result = initContextSchema.parse({
       targetDir: "/tmp/project",
       assistant: "cursor",
+      modules: { workflow: false },
     });
 
     expect(result.assistant).toBe("cursor");
     expect(result.targetDir).toBe("/tmp/project");
+    expect(result.modules.workflow).toBe(false);
   });
 
   it("rejects invalid assistant values", () => {
@@ -17,6 +19,7 @@ describe("initContextSchema", () => {
       initContextSchema.parse({
         targetDir: "/tmp/project",
         assistant: "vscode",
+        modules: { workflow: false },
       }),
     ).toThrow();
   });
@@ -26,6 +29,7 @@ describe("initContextSchema", () => {
       initContextSchema.parse({
         targetDir: "",
         assistant: "cursor",
+        modules: { workflow: false },
       }),
     ).toThrow();
   });

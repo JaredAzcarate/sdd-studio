@@ -1,6 +1,57 @@
 # EXAMPLES — sdd-idea
 
-Valid examples of `.workspace/product-guide.md` and `.workspace/project.md`.
+Valid examples of `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md`.
+
+## .workspace/product-principles.md
+
+```markdown
+# Product Principles
+
+> Este documento define los principios conceptuales sobre los que está construido el producto.
+>
+> Su objetivo es que cualquier diseñador, desarrollador o IA comprenda qué representa el producto, cuál es su unidad central y qué ideas no deben romperse al evolucionar el producto.
+>
+> Este documento no describe pantallas, recorridos ni implementación técnica.
+
+## Qué representa el producto
+
+TaskFlow es un espacio de trabajo compartido donde los equipos convierten intención en trabajo visible y terminado. No es un gestor de documentos ni un chat de equipo: su propósito es hacer explícito qué hay que hacer, quién lo hace y en qué estado está.
+
+---
+
+## Unidad principal
+
+La **tarea** es la unidad central. Todo lo demás — tableros, columnas, miembros, notificaciones — existe para dar contexto, orden o visibilidad a las tareas.
+
+---
+
+## Conceptos inmutables
+
+- **Tablero:** contenedor de trabajo de un equipo o proyecto; no se mezcla trabajo de contextos distintos en el mismo tablero sin decisión explícita del usuario.
+- **Tarea:** unidad atómica de trabajo con responsable, estado y historial.
+- **Miembro:** persona con acceso a un tablero; los permisos siempre se expresan en términos de tablero y tarea.
+
+---
+
+## Cómo entiende el producto el negocio
+
+El valor está en la claridad operativa: menos reuniones de sincronización, menos trabajo perdido en mensajes dispersos. El producto prioriza equipos pequeños que necesitan velocidad sin burocracia.
+
+---
+
+## Principios para futuras funcionalidades
+
+- Toda funcionalidad debe poder explicarse como efecto sobre tareas, tableros o miembros.
+- No introducir conceptos paralelos que compitan con la tarea como unidad de trabajo.
+- La visibilidad por defecto es del equipo del tablero; la privacidad es excepción explícita.
+- Las automatizaciones deben preservar el historial y la responsabilidad de cada tarea.
+
+---
+
+## Modelo mental compartido
+
+Antes de diseñar o implementar, asumir: "Los usuarios organizan trabajo en tableros; el progreso real se mide en tareas que avanzan de estado; las notificaciones informan cambios en tareas, no conversaciones genéricas."
+```
 
 ## .workspace/product-guide.md
 
@@ -147,6 +198,36 @@ Cursor
 ```
 
 ## Anti-examples
+
+**Incorrect — user journey in product-principles.md:**
+
+```markdown
+## Unidad principal
+
+El usuario crea una cuenta y luego ve el dashboard.
+```
+
+Belongs in `.workspace/product-guide.md`.
+
+**Incorrect — principles duplicated as narrative in product-guide.md:**
+
+```markdown
+## Dashboard
+
+TaskFlow es un espacio de trabajo compartido donde los equipos convierten intención en trabajo visible.
+```
+
+Belongs in `.workspace/product-principles.md` (conceptual); the guide should describe what the user sees and does.
+
+**Incorrect — technical content in product-principles.md:**
+
+```markdown
+## Conceptos inmutables
+
+Las tareas se persisten en PostgreSQL.
+```
+
+Belongs in `.workspace/project.md`.
 
 **Incorrect — technical content in product-guide.md:**
 

@@ -6,6 +6,7 @@ import type { InitWorkspaceResult } from "../src/use-cases/init-workspace.use-ca
 const sampleContext: InitContextWithLabels = {
   targetDir: "/tmp/demo",
   assistant: "cursor",
+  modules: { workflow: false },
   labels: {
     assistant: "Cursor",
   },
@@ -14,6 +15,7 @@ const sampleContext: InitContextWithLabels = {
 const cursorResult: InitWorkspaceResult = {
   workspaceDir: "/tmp/demo/workspace",
   createdPaths: [],
+  modules: { workflow: false },
   assistant: { assistantId: "cursor", installed: true, createdPaths: [] },
 };
 
@@ -22,8 +24,8 @@ describe("formatInitSummary", () => {
     const summary = formatInitSummary(sampleContext, cursorResult);
 
     expect(summary).toContain("Cursor");
-    expect(summary).toContain("project.md and product-guide.md");
-    expect(summary).not.toContain("Organization");
+    expect(summary).toContain("product-principles.md, product-guide.md, and project.md");
+    expect(summary).toContain("Workflow module:   disabled");
   });
 
   it("shows next step for claude when installed", () => {
@@ -36,6 +38,6 @@ describe("formatInitSummary", () => {
     );
 
     expect(summary).toContain("Claude Code");
-    expect(summary).toContain("product-guide.md");
+    expect(summary).toContain("product-principles.md, product-guide.md, and project.md");
   });
 });

@@ -1,16 +1,18 @@
 ---
 name: sdd-idea
-description: Discovers the product through structured questions and writes .workspace/project.md and .workspace/product-guide.md. Use when starting a new SDD project, defining the user journey, or when the user invokes /sdd-idea.
+description: Discovers the product through structured questions and writes .workspace/product-principles.md, .workspace/product-guide.md, and .workspace/project.md. Use when starting a new SDD project, defining product principles, the user journey, or when the user invokes /sdd-idea.
+disable-model-invocation: true
 ---
 
 # SDD Idea
 
 Discover the product and define project configuration.
 
-**Output files:**
+**Output files (in generation order):**
 
-- `.workspace/product-guide.md` — narrative product guide (user journey, non-technical)
-- `.workspace/project.md` — technical and development configuration
+1. `.workspace/product-principles.md` — conceptual product principles (what the product is, not how the user walks through it)
+2. `.workspace/product-guide.md` — narrative product guide (user journey, non-technical)
+3. `.workspace/project.md` — technical and development configuration
 
 Use **sdd-generate** when the project already has application code to analyze. Use **sdd-idea** for greenfield discovery through questions only.
 
@@ -20,27 +22,45 @@ Never generate files under `.workspace/spec/` or `.workspace/workflow/`.
 
 Before writing, read:
 
-- [STANDARDS.md](STANDARDS.md) — structure and rules for both files
+- [STANDARDS.md](STANDARDS.md) — structure and rules for all three files
 - [EXAMPLES.md](EXAMPLES.md) — valid examples
 
 ## Scope
 
 | Allowed | Forbidden |
 |---------|-----------|
-| Read `.workspace/project.md` and `.workspace/product-guide.md` (if they exist) | Create or modify files in `.workspace/spec/` |
+| Read `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md` (if they exist) | Create or modify files in `.workspace/spec/` |
 | Ask the user questions | Generate domains, APIs, workflow, or code |
-| Write `.workspace/project.md` and `.workspace/product-guide.md` | Modify `.workspace/workflow/` |
+| Write the three output files above | Modify `.workspace/workflow/` |
+| | User journeys or screens in `product-principles.md` |
+| | Technical content in `product-guide.md` or `product-principles.md` |
+| | Principles or journeys in `project.md` |
 
 ## Pre-execution
 
-1. Read existing `.workspace/project.md` and `.workspace/product-guide.md` if present.
+1. Read existing `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md` if present.
 2. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
-3. If either file exists, ask: **create from scratch** or **update**.
+3. If any output file exists, ask: **create from scratch** or **update** (per file or globally, as appropriate).
 4. Use the user's message context as the starting point.
 
 ## Flow
 
-### Phase 1 — Product discovery (Product Guide)
+### Phase 1 — Principles discovery (Product Principles)
+
+Ask in blocks (max 3–5 per turn). Conceptual product questions only:
+
+1. **What the product represents:** what problem space it owns and what it is not
+2. **Primary unit:** the central concept everything revolves around (e.g. task, order, patient, document)
+3. **Immutable concepts:** names and meanings that must stay stable across versions
+4. **Business understanding:** how the product interprets value, customers, and success
+5. **Guiding principles:** rules every future feature must respect
+6. **Shared mental model:** what every contributor should assume before designing or building
+
+Do not ask about screens, clicks, onboarding steps, APIs, or stack.
+
+Store answers **only** in `.workspace/product-principles.md`. Use clear, durable language. Never put user journeys or technical details here.
+
+### Phase 2 — Product discovery (Product Guide)
 
 Ask in blocks (max 3–5 per turn). Product and user-journey questions only:
 
@@ -50,11 +70,13 @@ Ask in blocks (max 3–5 per turn). Product and user-journey questions only:
 4. **Alternative paths:** different user types, signup methods, roles, or flows
 5. **Edge experiences:** errors, empty states, permissions, invitations
 
+Align the journey with **product-principles.md** without duplicating its conceptual content.
+
 Map answers into a **continuous user journey**. Each experience becomes one H2 section in `product-guide.md`.
 
-Store answers **only** in `.workspace/product-guide.md`. Use narrative, professional language. Never put technical details here.
+Store answers **only** in `.workspace/product-guide.md`. Use narrative, professional language. Never put technical details or abstract principles here.
 
-### Phase 2 — Project discovery
+### Phase 3 — Project discovery
 
 Ask in blocks (max 3–5 per turn). Technical and development questions only:
 
@@ -67,32 +89,39 @@ Ask in blocks (max 3–5 per turn). Technical and development questions only:
 7. **Language, framework, backend, frontend, database**
 8. **AI assistant** and SDD conventions
 
-Store answers **only** in `.workspace/project.md`. Never put product journeys or user behavior here.
+Store answers **only** in `.workspace/project.md`. Never put product journeys, principles, or user behavior here.
 
 If a business rule is unclear, **ask**; do not infer.
 
-### Phase 3 — Generation
+### Phase 4 — Generation
 
-Write both files following [STANDARDS.md](STANDARDS.md) exactly.
+Write files in this order, following [STANDARDS.md](STANDARDS.md) exactly:
 
-### Phase 4 — Validation
+1. `.workspace/product-principles.md`
+2. `.workspace/product-guide.md`
+3. `.workspace/project.md`
+
+### Phase 5 — Validation
 
 Review manually against [STANDARDS.md](STANDARDS.md):
 
+- [ ] Product Principles starts with the mandatory header blockquote
+- [ ] Principles are conceptual only (no screens, journeys, or technical content)
 - [ ] Product Guide starts with the mandatory header blockquote
-- [ ] Organized by user journey, not domains or feature lists
+- [ ] Product Guide organized by user journey, not domains or feature lists
 - [ ] Each experience follows the narrative structure
 - [ ] Alternative paths described where applicable
-- [ ] No technical content in `product-guide.md`
+- [ ] No technical content in `product-principles.md` or `product-guide.md`
 - [ ] No product content in `project.md`
-- [ ] Only `project.md` and `product-guide.md` were modified
+- [ ] Only the three output files were modified
 - [ ] User confirmed or open items documented
 
 ## Checklist
 
 ```
 - [ ] STANDARDS.md and EXAMPLES.md read
-- [ ] Product and project questions answered
+- [ ] Principles, product, and project questions answered
+- [ ] .workspace/product-principles.md written
 - [ ] .workspace/product-guide.md written
 - [ ] .workspace/project.md written
 - [ ] No other files modified
@@ -100,8 +129,9 @@ Review manually against [STANDARDS.md](STANDARDS.md):
 
 ## Report
 
-1. User journey summary (ordered experiences)
-2. Alternative paths identified
-3. Technical stack summary (from project.md)
-4. Open items
-5. Next step: **sdd-spec**
+1. Product principles summary (primary unit and immutable concepts)
+2. User journey summary (ordered experiences)
+3. Alternative paths identified
+4. Technical stack summary (from project.md)
+5. Open items
+6. Next step: **sdd-spec**

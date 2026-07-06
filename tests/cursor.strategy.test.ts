@@ -46,6 +46,7 @@ describe("CursorAssistantStrategy", () => {
       join(tempDir, ".cursor/rules/sdd-studio.mdc"),
       "utf8",
     );
+    expect(rule).toContain(".workspace/product-principles.md");
     expect(rule).toContain(".workspace/project.md");
     expect(rule).toContain(".workspace/product-guide.md");
     expect(rule).toContain("sdd-idea");

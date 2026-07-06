@@ -14,6 +14,7 @@ import { formatInitSummary } from "../utils/format-init-summary.js";
 type InitCommandOptions = {
   yes?: boolean;
   assistant?: string;
+  workflow?: boolean;
 };
 
 export function createInitCommand(): Command {
@@ -23,6 +24,10 @@ export function createInitCommand(): Command {
     .option(
       "--assistant <assistant>",
       "Assistant ID: cursor, claude, codex, opencode, copilot",
+    )
+    .option(
+      "--workflow",
+      "Include the SDD workflow module (roadmap, milestones, releases)",
     )
     .action(async (options: InitCommandOptions) => {
       const targetDir = cwd();
@@ -34,6 +39,7 @@ export function createInitCommand(): Command {
             assistant: options.assistant
               ? assistantIdSchema.parse(options.assistant)
               : undefined,
+            modules: { workflow: options.workflow ?? false },
           })
         : await (() => {
             assertInteractiveTerminal();

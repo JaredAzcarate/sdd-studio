@@ -1,11 +1,15 @@
 import { execSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import { assertPathsExist } from "./assert-paths.js";
-import { ALL_CURSOR_INIT_PATHS } from "./expected-paths.js";
+import {
+  ALL_CURSOR_INIT_PATHS,
+  ALL_CURSOR_INIT_WITH_WORKFLOW_PATHS,
+  WORKFLOW_PATHS,
+} from "./expected-paths.js";
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const cliBin = join(projectRoot, "bin/sdd-studio.js");
@@ -20,7 +24,7 @@ describe("cli init e2e", () => {
     }
   });
 
-  it("runs init --yes and generates the full Cursor SDD tree", () => {
+  it("runs init --yes and generates the default Cursor SDD tree without workflow", () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-e2e-"));
 
     const output = execSync(
@@ -34,8 +38,16 @@ describe("cli init e2e", () => {
 
     assertPathsExist(tempDir, ALL_CURSOR_INIT_PATHS);
 
+    for (const relativePath of WORKFLOW_PATHS) {
+      expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(false);
+    }
+
     const projectMd = readFileSync(
       join(tempDir, ".workspace/project.md"),
+      "utf8",
+    );
+    const productPrinciplesMd = readFileSync(
+      join(tempDir, ".workspace/product-principles.md"),
       "utf8",
     );
     const productGuideMd = readFileSync(
@@ -44,9 +56,23 @@ describe("cli init e2e", () => {
     );
 
     expect(projectMd).toContain("# Project");
+    expect(productPrinciplesMd).toContain("# Product Principles");
     expect(productGuideMd).toContain("# Product Guide");
     expect(output).toContain("SDD project generated successfully");
+    expect(output).toContain("Workflow module: not installed");
     expect(output).toContain("sdd-idea");
+  });
+
+  it("runs init --yes --workflow and includes the workflow module", () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-e2e-"));
+
+    execSync(`node "${cliBin}" init --yes --assistant cursor --workflow`, {
+      cwd: tempDir,
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+
+    assertPathsExist(tempDir, ALL_CURSOR_INIT_WITH_WORKFLOW_PATHS);
   });
 
   it("prints version", () => {

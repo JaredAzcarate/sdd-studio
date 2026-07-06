@@ -9,7 +9,17 @@ describe("buildInitContext", () => {
     const context = buildInitContext({ targetDir: "/tmp/demo" });
 
     expect(context.assistant).toBe(INIT_CONTEXT_DEFAULTS.assistant);
+    expect(context.modules.workflow).toBe(INIT_CONTEXT_DEFAULTS.modules.workflow);
     expect(context.labels.assistant).toBe("Cursor");
+  });
+
+  it("applies workflow module override", () => {
+    const context = buildInitContext({
+      targetDir: "/tmp/demo",
+      modules: { workflow: true },
+    });
+
+    expect(context.modules.workflow).toBe(true);
   });
 
   it("applies assistant override", () => {

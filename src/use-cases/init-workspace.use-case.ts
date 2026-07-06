@@ -1,6 +1,9 @@
 import type { AssistantInstallResult } from "../assistants/assistant.strategy.js";
 import { generateAssistantSetup } from "../generators/assistant.generator.js";
-import type { InitContextWithLabels } from "../types/init-context.js";
+import type {
+  InitContextWithLabels,
+  WorkspaceModules,
+} from "../types/init-context.js";
 import { generateWorkspace } from "../generators/workspace.generator.js";
 
 export type InitWorkspaceOptions = {
@@ -11,6 +14,7 @@ export type InitWorkspaceOptions = {
 export type InitWorkspaceResult = {
   workspaceDir: string;
   createdPaths: string[];
+  modules: WorkspaceModules;
   assistant: AssistantInstallResult;
 };
 
@@ -23,6 +27,7 @@ export async function initWorkspace(
   const workspace = await generateWorkspace({
     targetDir,
     overwrite,
+    modules: context.modules,
   });
 
   const assistant = await generateAssistantSetup(
@@ -34,6 +39,7 @@ export async function initWorkspace(
   return {
     workspaceDir: workspace.workspaceDir,
     createdPaths: [...workspace.createdPaths, ...assistant.createdPaths],
+    modules: workspace.modules,
     assistant,
   };
 }

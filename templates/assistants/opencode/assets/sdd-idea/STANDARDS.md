@@ -1,15 +1,100 @@
 # STANDARDS — sdd-idea
 
-Mandatory rules for generating `.workspace/project.md` and `.workspace/product-guide.md`.
+Mandatory rules for generating `.workspace/product-principles.md`, `.workspace/product-guide.md`, and `.workspace/project.md`.
 
 ## Separation of concerns
 
 | File | Question it answers | Contains |
 | ---- | ------------------- | -------- |
+| `.workspace/product-principles.md` | What conceptual principles is the product built on? | Durable product principles only |
 | `.workspace/product-guide.md` | How does the product work for a user? | Narrative product guide only |
 | `.workspace/project.md` | How will we develop this product? | Technical and development configuration |
 
 Never mix content between these files. Never create files under `.workspace/spec/`.
+
+**Generation order:** `product-principles.md` → `product-guide.md` → `project.md`.
+
+---
+
+## .workspace/product-principles.md
+
+### Location
+
+- Exact path: `.workspace/product-principles.md`
+- One principles document per project
+- Do not place it inside `.workspace/spec/`
+
+### Purpose
+
+Product Principles define the **conceptual foundation** of the product.
+
+It answers what the product **is** at an abstract level — not how a user moves through screens, not how it is built, and not how it is specified.
+
+Any designer, developer, or AI should read this document before proposing features, journeys, or architecture.
+
+### Mandatory opening
+
+The file must begin **exactly** with:
+
+```markdown
+# Product Principles
+
+> Este documento define los principios conceptuales sobre los que está construido el producto.
+>
+> Su objetivo es que cualquier diseñador, desarrollador o IA comprenda qué representa el producto, cuál es su unidad central y qué ideas no deben romperse al evolucionar el producto.
+>
+> Este documento no describe pantallas, recorridos ni implementación técnica.
+```
+
+### Required sections
+
+Use exactly these H2 sections in this order:
+
+```text
+## Qué representa el producto
+## Unidad principal
+## Conceptos inmutables
+## Cómo entiende el producto el negocio
+## Principios para futuras funcionalidades
+## Modelo mental compartido
+```
+
+Separate main sections with `---`.
+
+### Allowed content
+
+- What the product represents in the problem space
+- The primary unit or concept everything revolves around
+- Concepts that must remain stable across versions
+- How the product interprets the business, customers, and value
+- Rules that every future feature must respect
+- The shared mental model for contributors and AI
+
+### Forbidden content
+
+Never mention:
+
+- Screens, pages, UI layouts, or wireframes
+- User journeys, onboarding steps, or click-by-click flows
+- Detailed features or capability lists
+- Domain specifications, entities, or APIs
+- Architecture, stack, databases, or frameworks
+- Tasks, releases, roadmap, or planning
+- Narrative "the user sees…" language (belongs in product-guide)
+
+### Writing style
+
+- Clear, durable, conceptual language
+- Present tense; principles should age well
+- Short paragraphs or bullet lists where appropriate
+- No `TODO:` left without documenting open questions
+
+### Format rules
+
+1. Single H1: `# Product Principles` (mandatory opening only)
+2. Mandatory blockquote immediately after H1
+3. Six required H2 sections in the order above
+4. Separate sections with `---`
 
 ---
 
@@ -23,13 +108,15 @@ Never mix content between these files. Never create files under `.workspace/spec
 
 ### Purpose
 
-The Product Guide is the **entry point** for understanding the product.
+The Product Guide is the **entry point** for understanding the product **from the user's perspective**.
 
-It explains the complete product from the user's perspective using a **continuous narrative** organized by the **real user journey** — not by domains, features, or technical structure.
+It explains the complete product using a **continuous narrative** organized by the **real user journey** — not by domains, features, or technical structure.
 
 Any person should understand the full product by reading this document alone, from start to finish, as if it were a book.
 
 It is **not** a specification. It can be delivered with the product as official user documentation.
+
+It must **not** repeat the abstract principles from `product-principles.md`; it must **instantiate** them as lived user experiences.
 
 ### Mandatory opening
 
@@ -98,6 +185,7 @@ Never mention:
 - internal models, entities, or domain structure
 - development methodology or AI assistant configuration
 - tasks, releases, roadmap, or planning
+- abstract product principles (belongs in `product-principles.md`)
 
 ### Format rules
 
@@ -133,6 +221,7 @@ Technical and development configuration:
 ### Forbidden content
 
 - product behavior, user journeys, or experiences
+- product principles or conceptual foundations
 - product guide content
 - domain specifications
 - tasks, releases, roadmap, or milestones
@@ -205,7 +294,7 @@ Specification Driven Development
 
 ---
 
-## Writing rules (both files)
+## Writing rules (all three files)
 
 - Be explicit and verifiable
 - Mark uncertainty with `TODO:` and ask the user
@@ -213,7 +302,8 @@ Specification Driven Development
 
 ## Prohibitions
 
-- Do not create files outside `.workspace/project.md` and `.workspace/product-guide.md`
+- Do not create files outside the three output files
 - Do not modify `.workspace/workflow/` or any file under `.workspace/spec/`
+- Do not duplicate principles in `product-guide.md` or technical content in `product-principles.md`
 - Do not duplicate product-guide content in `project.md` or technical content in `product-guide.md`
 - Do not create files under `.workspace/spec/`

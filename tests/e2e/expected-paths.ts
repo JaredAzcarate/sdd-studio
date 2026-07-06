@@ -1,6 +1,7 @@
-export const WORKSPACE_PATHS = [
-  ".workspace/project.md",
+export const WORKSPACE_BASE_PATHS = [
+  ".workspace/product-principles.md",
   ".workspace/product-guide.md",
+  ".workspace/project.md",
   ".workspace/spec/domain/.gitkeep",
   ".workspace/spec/relations/.gitkeep",
   ".workspace/spec/capabilities/.gitkeep",
@@ -11,12 +12,20 @@ export const WORKSPACE_PATHS = [
   ".workspace/spec/api/.gitkeep",
   ".workspace/spec/ui/.gitkeep",
   ".workspace/spec/testing/.gitkeep",
+] as const;
+
+export const WORKFLOW_PATHS = [
   ".workspace/workflow/roadmap/.gitkeep",
   ".workspace/workflow/milestones/.gitkeep",
   ".workspace/workflow/releases/release-001/release.md",
   ".workspace/workflow/releases/release-001/tasks.md",
   ".workspace/workflow/releases/release-001/reviews.md",
   ".workspace/workflow/releases/release-001/decisions.md",
+] as const;
+
+export const WORKSPACE_PATHS = [
+  ...WORKSPACE_BASE_PATHS,
+  ...WORKFLOW_PATHS,
 ] as const;
 
 export const CURSOR_PATHS = [
@@ -42,6 +51,11 @@ export const CURSOR_PATHS = [
 ] as const;
 
 export const ALL_CURSOR_INIT_PATHS = [
+  ...WORKSPACE_BASE_PATHS,
+  ...CURSOR_PATHS,
+] as const;
+
+export const ALL_CURSOR_INIT_WITH_WORKFLOW_PATHS = [
   ...WORKSPACE_PATHS,
   ...CURSOR_PATHS,
 ] as const;
@@ -51,6 +65,7 @@ export const NPM_PACK_REQUIRED_PATHS = [
   "bin/sdd-studio.js",
   "dist/cli.js",
   "templates/.workspace/project.md",
+  "templates/.workspace/product-principles.md",
   "templates/.workspace/product-guide.md",
   "templates/assistants/cursor/rules/sdd-studio.mdc",
   "templates/assistants/cursor/skills/sdd-idea/SKILL.md",
