@@ -302,45 +302,61 @@ Notification, Analytics
 ```markdown
 # Task API
 
-## Endpoints
+> Technical contract implemented in the product repo. Primary surface: **Server Actions**. **Route Handlers** only when an HTTP endpoint is required.
 
-### POST /tasks
+## Server Actions
+
+Module: `<resolved-code-root>/domains/task/application/actions/task-actions.ts`
+
+### createTask
 
 Purpose
 
-Create task.
+Create a task in the user's board.
 
-Request
+Input
 
-    { "title": "string", "assigneeId": "uuid?", "dueDate": "iso8601?" }
+    { title: string; assigneeId?: string; dueDate?: string }
 
-Response
+Output
 
-201 + Task object
+    { taskId: string; status: "pending" }
 
 Errors
 
-400 validation, 401 unauthorized
+ValidationError, UnauthorizedError
 
 ---
 
-### PATCH /tasks/:id
+### completeTask
 
 Purpose
 
-Update task.
+Mark task as done.
 
-Request
+Input
 
-Partial Task fields
+    { taskId: string }
 
-Response
+Output
 
-200 + Task object
+    { status: "done" }
 
 Errors
 
-404 not found, 403 forbidden
+NotFoundError, ForbiddenError
+
+---
+
+## Route Handlers
+
+None required for this domain in the current scope.
+
+---
+
+## Notes
+
+See `brief/technical/stack/backend.md`. Module path follows `brief/technical/development.md` Code Organization.
 ```
 
 ## spec/technical/ui/task-ui.md
@@ -436,8 +452,9 @@ Board → Task Detail → back to Board
 
 ## Module Structure
 
-- `src/modules/task/` — domain logic, use cases, repository interface
-- `src/modules/task/infrastructure/` — persistence adapter, event publisher
+- `<resolved-code-root>/domains/task/domain/` — Task entity, state transitions, invariants
+- `<resolved-code-root>/domains/task/application/` — CreateTask, CompleteTask use cases, Server Actions
+- `<resolved-code-root>/domains/task/infrastructure/` — PostgreSQL repository, event publisher
 
 ---
 
@@ -459,12 +476,15 @@ Board → Task Detail → back to Board
 
 ## Dependencies
 
+- `brief/technical/development.md` — Code Organization (domain folder layout)
 - `brief/technical/modeling.md` — DDD aggregate boundaries
-- `brief/technical/stack/backend.md` — Clean Architecture layout
+- `brief/technical/stack/backend.md` — Server Actions surface
 
 ---
 
 ## Notes
+
+Replace `<resolved-code-root>` per Repository Strategy in `development.md` (e.g. repo root or `numo-app/`).
 ```
 
 ## spec/technical/database/task-database.md

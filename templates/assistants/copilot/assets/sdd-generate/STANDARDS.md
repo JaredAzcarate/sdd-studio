@@ -57,17 +57,48 @@ Triggers: spec and code both exist.
 
 ## Read scope (codebase)
 
-Explore as applicable:
+### Step 1 — Resolve code root from the Brief (mandatory)
 
-- `package.json`, lockfile, README
-- `src/`, `app/`, `lib/`, `packages/` (monorepos)
-- API routes, controllers, handlers
+Before exploring application code, read `.workspace/brief/technical/development.md`:
+
+1. **Repository Strategy** — same repo, monorepo, polyrepo, Git submodule, relative path to product repo
+2. **Code Organization** — domain/module folder convention (e.g. `src/domains/<domain>/`, `packages/app/src/`, not assumed defaults)
+
+Derive from that document:
+
+- **Product code root** — where application source lives (repo root, submodule path, monorepo package)
+- **Domain path pattern** — how domains map to folders (e.g. `<code-root>/domains/<domain>/`)
+
+> Before exploring application code, read `brief/technical/development.md` (Repository Strategy, Code Organization). Resolve the product code root from that document (e.g. submodule path, monorepo app package, or repo root). Do not invent `packages/` or `src/modules/` unless documented there.
+
+**Polyrepo / orchestrator repos:** the workspace root may contain only `.workspace/`, skills, and workflow — **zero product code at root**. Do not fail or assume missing `src/`; follow the Brief to locate the product repo or submodule.
+
+If the Brief does not define layout, use generic heuristics (`src/`, `app/`, `lib/`) and mark `TODO:` — **never** assume monorepo or `packages/` by default.
+
+Also read `brief/technical/stack/backend.md` for API surface conventions (Server Actions vs REST Route Handlers).
+
+### Step 2 — Explore resolved paths
+
+Explore as applicable under the **resolved product code root**:
+
+- `package.json`, lockfile, README (product repo or package)
+- Domain folders per **Code Organization** in the Brief
+- Server Actions, route handlers, controllers (per stack/backend.md)
 - Domain models, entities, schemas, migrations
 - Tests (acceptance signals)
 - Frontend routes and components
 - Environment examples (not secrets)
 
 Do not read `.env` or credential files.
+
+## Brief-driven principles
+
+| Principle | Rule |
+| --------- | ---- |
+| Brief over convention | `brief/technical/development.md` wins over default folder names |
+| Stack over REST default | Read `brief/technical/stack/backend.md` for API surface (Server Actions vs REST) |
+| Polyrepo-aware | Orchestrator repos may have zero product code at root |
+| Evidence label | Inferred paths must cite resolved code root from Brief, not generic templates |
 
 ## Write scope (workspace)
 
@@ -108,13 +139,15 @@ Follow **sdd-spec** STANDARDS exactly:
 - Naming: `<domain>-<category>.md`
 - One question per document
 
-Infer domain content from code but **label inference**:
+Infer domain content from code but **label inference** with the resolved path from the Brief:
 
 ```markdown
 ## Notes
 
-Inferred from `src/modules/task/` — confirm with product owner.
+Inferred from `<resolved-code-root>/domains/task/` — confirm with product owner.
 ```
+
+Never cite `src/modules/` or `packages/` unless that path appears in `brief/technical/development.md`.
 
 ## Analysis report format
 

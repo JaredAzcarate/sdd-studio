@@ -13,6 +13,22 @@ Do not create:
 - tasks, releases, roadmap, milestones, or estimates in `spec/`
 - files at the top level of `spec/` (only `business/` and `technical/` allowed)
 
+## Brief-driven technical conventions
+
+Before generating `technical/api/` or `technical/architecture/` files, read:
+
+- `.workspace/brief/technical/development.md` — **Repository Strategy**, **Code Organization** (resolve product code root and domain folder pattern)
+- `.workspace/brief/technical/stack/backend.md` — API surface (Server Actions vs Route Handlers vs REST)
+
+| Principle | Rule |
+| --------- | ---- |
+| Brief over convention | `development.md` wins over default folder names (`src/modules/`, `packages/`) |
+| Stack over REST default | API spec format follows `stack/backend.md`, not REST-by-default |
+| Polyrepo-aware | Paths in architecture/api docs use resolved code root from Brief |
+| Evidence label | Module paths in architecture must match Code Organization in Brief |
+
+Skills **sdd-generate** and **sdd-review** must apply the same rules when inferring or updating technical spec.
+
 ## Folder structure
 
 ```text
@@ -253,23 +269,51 @@ Consumers
 
 ### `<domain>-api.md`
 
+Use the API surface defined in `brief/technical/stack/backend.md`. Default template below assumes **Server Actions** as primary surface and **Route Handlers** only when HTTP is required (e.g. OAuth, webhooks, external signatures). If the Brief specifies REST-only or another model, follow the Brief instead.
+
 ```markdown
 # [Domain] API
 
-## Endpoints
+> Technical contract implemented in the product repo. Primary surface: **Server Actions**. **Route Handlers** only when an HTTP endpoint is required.
 
-### [METHOD] [path]
+## Server Actions
+
+Module: `<resolved-code-root>/domains/<domain>/application/actions/<domain>-actions.ts`
+
+### actionNameInCamelCase
 
 Purpose
 
-Request
+Input
 
-Response
+Output
 
 Errors
 
 ---
+
+## Route Handlers
+
+(Only if needed; otherwise: "None required for this domain in the current scope.")
+
+### METHOD /api/...
+
+Purpose
+
+Input
+
+Output
+
+Errors
+
+---
+
+## Notes
+
+Reference `*-architecture.md`, business capabilities, and `brief/technical/stack/backend.md`.
 ```
+
+Replace `<resolved-code-root>` with the path from `brief/technical/development.md` (e.g. repo root, `numo-app/`, or monorepo package path). Do not hardcode `src/modules/`.
 
 ### `<domain>-ui.md`
 
@@ -327,10 +371,16 @@ Do not document business rules.
 
 ### `<domain>-architecture.md`
 
+Paths in **Module Structure** must match `brief/technical/development.md` (Code Organization). Use `<resolved-code-root>` and the domain folder pattern documented there.
+
 ```markdown
 # [Domain] Architecture
 
 ## Module Structure
+
+- `<resolved-code-root>/domains/<domain>/domain/` — entities, value objects, invariants
+- `<resolved-code-root>/domains/<domain>/application/` — use cases, Server Actions
+- `<resolved-code-root>/domains/<domain>/infrastructure/` — persistence, external adapters
 
 ---
 

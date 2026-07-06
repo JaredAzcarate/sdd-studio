@@ -20,9 +20,11 @@ Review scenarios and affected files.
 | create | `technical/api/comment-api.md` |
 | create | `technical/ui/comment-ui.md` |
 | create | `technical/testing/comment-testing.md` |
-| create | `technical/architecture/comment-architecture.md` |
+| create | `technical/architecture/comment-architecture.md` (paths per `development.md` Code Organization) |
 | create | `technical/database/comment-database.md` |
 | update | `business/relations/task-relations.md` (Task → Comment) |
+
+New `comment-api.md` must follow **sdd-spec** Server Actions template and `stack/backend.md`.
 
 **Proposal to user:**
 
@@ -52,18 +54,22 @@ Add Comment domain linked to Task.
 
 Do not touch `workflow/`.
 
-## Scenario 3 — Endpoint change
+## Scenario 3 — Server Action change
 
-**Request:** "POST /tasks now accepts priority."
+**Request:** "`createTask` now accepts `priority`."
 
 **Impact:**
 
 | Action | File |
 | ------ | ------- |
-| update | `technical/api/task-api.md` |
+| update | `technical/api/task-api.md` (Server Actions section, not REST endpoints) |
 | update | `business/domain/task-domain.md` (priority attribute) |
 | update | `technical/ui/task-ui.md` (form field) |
 | update | `technical/testing/task-testing.md` |
+
+Verify `task-api.md` still matches `brief/technical/stack/backend.md` (Server Actions primary).
+
+**Incorrect:** documenting `POST /tasks` if the Brief defines Server Actions as the primary surface.
 
 ## Scenario 4 — Scope change (requires product-guide.md)
 
@@ -83,7 +89,20 @@ Do not touch `workflow/`.
 
 1. Update `brief/technical/stack/database.md`
 2. Update affected `technical/database/<domain>-database.md` files
-3. Verify `technical/architecture/<domain>-architecture.md` consistency
+3. Verify `technical/architecture/<domain>-architecture.md` paths still match `development.md` Code Organization
+
+## Scenario 6 — Code Organization change (Brief + spec paths)
+
+**Request:** "Product code moved to submodule `numo-app/`; domains live under `numo-app/src/domains/<domain>/`."
+
+**Action:**
+
+1. Update `brief/technical/development.md` (Repository Strategy, Code Organization)
+2. Update **all** `technical/architecture/<domain>-architecture.md` — replace stale paths (e.g. `src/modules/`) with `<resolved-code-root>/domains/<domain>/`
+3. Update **all** `technical/api/<domain>-api.md` — Server Actions module paths per new layout
+4. Run `validate-spec.mjs`
+
+Do not search for product code at orchestrator root if Brief says code lives in the submodule.
 
 ## Anti-example — Incorrect
 

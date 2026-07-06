@@ -28,13 +28,13 @@ Before any write, read:
 - .github/sdd-studio/sdd-generate/STANDARDS.md — conservative rules and output structure
 - .github/sdd-studio/sdd-generate/EXAMPLES.md — analysis and proposal examples
 - `.github/sdd-studio/sdd-idea/STANDARDS.md` — Brief templates (business + technical)
-- `../sdd-spec/STANDARDS.md` — domain file templates and naming
+- `.github/sdd-studio/sdd-spec/STANDARDS.md` — domain file templates and naming
 
 ## Scope
 
 | Allowed | Forbidden |
 | --------- | ----------- |
-| Read application code (`src/`, `app/`, `lib/`, tests, configs) | Modify `.workspace/workflow/` |
+| Read application code at the **resolved product code root** (from `brief/technical/development.md`) | Modify `.workspace/workflow/` |
 | Read and write files under `.workspace/brief/` | Write or modify application code |
 | Create/update domain files in `.workspace/spec/business/` and `.workspace/spec/technical/` | Implement features in `src/` |
 | Ask the user; propose implementation plans | Generate tasks, releases, or roadmap |
@@ -54,10 +54,11 @@ Before any write, read:
 ## Pre-execution
 
 1. Read .github/sdd-studio/sdd-generate/STANDARDS.md and .github/sdd-studio/sdd-generate/EXAMPLES.md.
-2. Inventory `.workspace/brief/`, `.workspace/spec/`, and `.workspace/workflow/` (read-only).
-3. Inventory codebase: `package.json`, README, `src/` (or equivalent), tests, API routes, DB schemas if present.
-4. Determine mode: empty spec, partial spec, or compare/drift.
-5. If `.workspace/` is missing, stop and suggest `npx sdd-studio init`.
+2. Read `.workspace/brief/technical/development.md` and resolve the **product code root** (Repository Strategy, Code Organization). Read `brief/technical/stack/backend.md` for API conventions.
+3. Inventory `.workspace/brief/`, `.workspace/spec/`, and `.workspace/workflow/` (read-only).
+4. Inventory codebase under the resolved code root: `package.json`, README, domain folders, tests, handlers/actions per stack/backend.md.
+5. Determine mode: empty spec, partial spec, or compare/drift.
+6. If `.workspace/` is missing, stop and suggest `npx sdd-studio init`.
 
 ## Flow
 
@@ -65,10 +66,12 @@ Before any write, read:
 
 Document:
 
+- Resolved product code root and domain path pattern (from `brief/technical/development.md`)
 - Stack and structure from code and `brief/technical/`
+- API surface per `brief/technical/stack/backend.md` (Server Actions, Route Handlers, etc.)
 - User-facing signals from README, UI copy, help text (for `product-guide.md` draft)
 - Existing spec files and their completeness
-- Domains inferred from modules, folders, entities, or bounded contexts
+- Domains inferred from Brief Code Organization, modules, folders, entities, or bounded contexts
 
 Do not write any workspace files in this phase.
 

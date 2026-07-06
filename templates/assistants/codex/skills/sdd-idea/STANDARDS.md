@@ -175,3 +175,7 @@ Each file must start with `# <Title>` and a blockquote stating its single questi
 - Do not modify `.workspace/spec/` or `.workspace/workflow/`
 - Do not mix Business Brief content into Technical Brief or vice versa
 - Do not duplicate principles as narratives or stack choices as modeling decisions
+
+## Cross-skill contract
+
+Skills **sdd-spec** and **sdd-generate** must consume **Repository Strategy** and **Code Organization** from this file (and API surface from `brief/technical/stack/backend.md`). They must not contradict paths or conventions documented here.

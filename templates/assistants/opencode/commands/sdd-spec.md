@@ -31,10 +31,11 @@ Before generating, read:
 1. Read `.workspace/brief/business/product-principles.md` (conceptual context).
 2. Read `.workspace/brief/business/product-guide.md` (primary functional source).
 3. Read `.workspace/brief/technical/development.md`, `modeling.md`, and `stack/*.md` (technical context only).
-4. Read @.opencode/sdd-studio/sdd-spec/STANDARDS.md and @.opencode/sdd-studio/sdd-spec/EXAMPLES.md.
-5. Verify the Brief exists; if not, stop and suggest **sdd-idea** (greenfield) or **sdd-generate** (existing codebase).
-6. Inventory existing files in `.workspace/spec/business/` and `.workspace/spec/technical/`.
-7. Use the Technical Brief for modeling, architecture, and stack context. Derive all functional behavior from `product-guide.md` only.
+4. Resolve `<resolved-code-root>` and domain folder pattern from `development.md` before writing `technical/api/` or `technical/architecture/` files.
+5. Read @.opencode/sdd-studio/sdd-spec/STANDARDS.md and @.opencode/sdd-studio/sdd-spec/EXAMPLES.md.
+6. Verify the Brief exists; if not, stop and suggest **sdd-idea** (greenfield) or **sdd-generate** (existing codebase).
+7. Inventory existing files in `.workspace/spec/business/` and `.workspace/spec/technical/`.
+8. Use the Technical Brief for modeling, architecture paths, and stack/API context. Derive all functional behavior from `product-guide.md` only.
 
 ## Flow
 

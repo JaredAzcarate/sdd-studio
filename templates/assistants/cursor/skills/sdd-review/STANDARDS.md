@@ -27,7 +27,24 @@ If the change requires replanning, suggest **sdd-plan**. Do not create tasks or 
 
 Do not put technical details in `product-guide.md`. Do not put product behavior in the Technical Brief.
 
-## Nomenclature
+## Brief-driven technical conventions
+
+Before creating or editing `technical/api/` or `technical/architecture/` files, read:
+
+- `.workspace/brief/technical/development.md` — **Repository Strategy**, **Code Organization** (resolve `<resolved-code-root>` and domain folder pattern)
+- `.workspace/brief/technical/stack/backend.md` — API surface (Server Actions vs Route Handlers)
+
+| Principle | Rule |
+| --------- | ---- |
+| Brief over convention | `development.md` wins over default folder names (`src/modules/`, `packages/`) |
+| Stack over REST default | `*-api.md` follows `stack/backend.md`; do not revert to REST-by-default |
+| Polyrepo-aware | Module paths must match Code Organization; orchestrator root may have no product code |
+| Template fidelity | Use **sdd-spec** STANDARDS templates for `*-api.md` and `*-architecture.md` |
+| Evidence label | Paths cited in spec must match Brief, not generic examples |
+
+When **Repository Strategy** or **Code Organization** changes in `development.md`, propagate path updates to all affected `*-api.md` and `*-architecture.md` files.
+
+When **stack/backend.md** changes, verify all `*-api.md` files still match the documented API surface.
 
 Keep the per-domain pattern:
 
@@ -70,6 +87,13 @@ Each domain file answers only its question (see **sdd-spec** STANDARDS for templ
 
 Do not move business rules to `*-ui.md`. Do not put UI states in `*-flows.md`.
 
+### Editing `*-api.md` and `*-architecture.md`
+
+1. Resolve `<resolved-code-root>` from `brief/technical/development.md` before writing paths.
+2. Follow the **sdd-spec** template for Server Actions + Route Handlers (unless `stack/backend.md` says otherwise).
+3. **Module Structure** in `*-architecture.md` must use the domain folder pattern from Code Organization (e.g. `<resolved-code-root>/domains/<domain>/`).
+4. Never introduce `src/modules/` or `packages/` paths unless documented in the Brief.
+
 ## Actions by change type
 
 | Type | Typical files |
@@ -82,9 +106,10 @@ Do not move business rules to `*-ui.md`. Do not put UI states in `*-flows.md`.
 | New domain | 12 domain files (7 business + 5 technical) |
 | New capability | `*-capabilities.md`, possibly `*-flows.md`, `*-api.md` |
 | Rule change | `*-rules.md`; verify `*-flows.md`, `*-testing.md` |
-| API change | `*-api.md`; verify `*-capabilities.md`, `*-security.md` |
+| API change | `*-api.md` per **sdd-spec** + `stack/backend.md`; verify `*-capabilities.md`, `*-security.md` |
 | UI change | `*-ui.md` for interface only |
-| Architecture change | `*-architecture.md`; verify `brief/technical/modeling.md` |
+| Architecture change | `*-architecture.md` per **sdd-spec** + `development.md` Code Organization; verify `modeling.md` |
+| Repository / layout change | `brief/technical/development.md`; then update paths in all `*-api.md` and `*-architecture.md` |
 | Database change | `*-database.md`; verify `brief/technical/stack/database.md` |
 | New relationship | `*-relations.md` in both affected domains |
 | New event | `*-events.md`; verify consumers in relations |

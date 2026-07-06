@@ -12,6 +12,7 @@ Before editing, read:
 
 - @.opencode/sdd-studio/sdd-review/STANDARDS.md — review rules and naming
 - @.opencode/sdd-studio/sdd-review/EXAMPLES.md — reference change scenarios
+- `@.opencode/sdd-studio/sdd-spec/STANDARDS.md` — templates for `*-api.md` and `*-architecture.md` (mandatory when editing technical spec)
 
 ## Scope
 
@@ -29,10 +30,11 @@ Before editing, read:
 1. Read `.workspace/brief/business/product-principles.md`.
 2. Read `.workspace/brief/business/product-guide.md`.
 3. Read `.workspace/brief/technical/development.md`, `modeling.md`, and `stack/*.md`.
-4. Read all of `.workspace/spec/business/` and `.workspace/spec/technical/`.
-5. Read @.opencode/sdd-studio/sdd-review/STANDARDS.md and @.opencode/sdd-studio/sdd-review/EXAMPLES.md.
-6. Inventory spec files and note current state of all Brief and Specification documents.
-7. Identify the change request; if ambiguous, ask before analyzing.
+4. Resolve `<resolved-code-root>` and domain folder pattern from `development.md` (for any technical spec edit).
+5. Read all of `.workspace/spec/business/` and `.workspace/spec/technical/`.
+6. Read @.opencode/sdd-studio/sdd-review/STANDARDS.md, @.opencode/sdd-studio/sdd-review/EXAMPLES.md, and `@.opencode/sdd-studio/sdd-spec/STANDARDS.md` when API or architecture files are in scope.
+7. Inventory spec files and note current state of all Brief and Specification documents.
+8. Identify the change request; if ambiguous, ask before analyzing.
 
 ## Flow
 
@@ -69,7 +71,8 @@ Follow @.opencode/sdd-studio/sdd-review/STANDARDS.md:
 - Conceptual changes → `.workspace/brief/business/product-principles.md`
 - Technical context changes → `.workspace/brief/technical/` (development, modeling, stack/*)
 - Domain changes → files under `.workspace/spec/business/` and `.workspace/spec/technical/`
-- Keep `<domain>-<category>.md` naming and section templates
+- Keep `<domain>-<category>.md` naming and section templates from **sdd-spec** STANDARDS
+- For `*-api.md` and `*-architecture.md`: use paths from `development.md` and format from `stack/backend.md`
 - When adding a domain: create all 12 files (7 business + 5 technical)
 - When removing a domain: delete all 12 files
 - Propagate changes to `relations`, `rules`, `api`, `ui`, `architecture`, `database` as needed
@@ -86,7 +89,8 @@ Fix errors and re-run until `OK`.
 ## Checklist
 
 ```
-- [ ] STANDARDS.md and EXAMPLES.md read
+- [ ] STANDARDS.md, EXAMPLES.md, and sdd-spec STANDARDS (if technical spec) read
+- [ ] development.md and stack/backend.md consulted for api/architecture edits
 - [ ] brief/ and spec/ reviewed
 - [ ] Impact documented and confirmed if applicable
 - [ ] Only brief/ and/or spec/ modified

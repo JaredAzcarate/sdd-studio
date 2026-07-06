@@ -100,3 +100,36 @@ Built with TypeScript and PostgreSQL.
 **Incorrect:** generating `task-domain.md` immediately after reading `src/`.
 
 **Correct:** complete Phases 1–3, wait for **approved**, then Phase 4.
+
+---
+
+## Example 5 — Orchestrator repo + product submodule (polyrepo)
+
+**Context:** Workspace root is `numo-orchestrator` (only `.workspace/`, skills, workflow). `brief/technical/development.md` documents:
+
+- **Repository Strategy:** two repos; product code in Git submodule `numo-app/`
+- **Code Organization:** `numo-app/src/domains/<domain>/` with `domain/`, `application/`, `infrastructure/` layers
+
+### Pre-execution (excerpt)
+
+1. Read `development.md` → product code root = `numo-app/`
+2. Explore `numo-app/src/domains/`, not `./src/` at orchestrator root
+3. Read `stack/backend.md` → Server Actions primary; Route Handlers for OAuth/webhooks only
+
+### Analysis (excerpt)
+
+```markdown
+## Summary
+
+Orchestrator has no product code at root; domains found under `numo-app/src/domains/task/`. Spec stubs exist; API files should follow Server Actions model per stack/backend.md.
+
+## Gaps
+
+| Item | Severity | Notes |
+| ---- | -------- | ----- |
+| task-api.md | medium | Still REST template; needs Server Actions alignment |
+```
+
+**Incorrect:** searching `src/modules/task/` at orchestrator root because a generic template said so.
+
+**Correct:** `Inferred from numo-app/src/domains/task/` per Brief Code Organization.
