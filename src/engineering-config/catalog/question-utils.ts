@@ -76,7 +76,7 @@ export function formatAnswerValue(
   if (question.selectionMode === "multi") {
     const labels = parseMultiAnswer(answerValue).map((optionId) => {
       if (optionId === "custom") {
-        return customNote ? `Otra — ${customNote}` : "Otra";
+        return customNote ? `Custom — ${customNote}` : "Custom";
       }
 
       return (
@@ -94,7 +94,7 @@ export function formatAnswerValue(
   }
 
   if (selected.id === "custom" && customNote) {
-    return `Otra — ${customNote}`;
+    return `Custom — ${customNote}`;
   }
 
   return selected.label;

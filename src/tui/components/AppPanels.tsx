@@ -47,16 +47,16 @@ const EngineeringSectionNavigation = memo(function EngineeringSectionNavigation(
     return (
       <Box flexDirection="column" overflow="hidden">
         <Text bold color={theme.brand}>
-          Respuesta personalizada
+          Custom answer
         </Text>
         <Box marginTop={1} flexDirection="column">
           <Text bold>{question.title}</Text>
           <Text wrap="wrap" color={theme.muted}>
-            Describe tu opción en tus propias palabras.
+            Describe your approach in your own words.
           </Text>
         </Box>
         <Box marginTop={1} flexDirection="column">
-          <Text bold>Tu respuesta</Text>
+          <Text bold>Your answer</Text>
           <Text>
             {customEntry.text}
             <Text color={theme.accent}>|</Text>
@@ -69,7 +69,7 @@ const EngineeringSectionNavigation = memo(function EngineeringSectionNavigation(
   return (
     <Box flexDirection="column" overflow="hidden">
       <Text bold color={theme.brand}>
-        Pregunta {visibleQuestionIndex + 1} / {visibleQuestions.length}
+        Question {visibleQuestionIndex + 1} / {visibleQuestions.length}
       </Text>
       <Box marginTop={1} flexDirection="column">
         <Text bold>{question.title}</Text>
@@ -83,13 +83,13 @@ const EngineeringSectionNavigation = memo(function EngineeringSectionNavigation(
       {question.selectionMode === "multi" ? (
         <Box marginTop={1}>
           <Text color={theme.muted} wrap="wrap">
-            Space para marcar o desmarcar. Enter para confirmar.
+            Space to toggle. Enter to confirm.
           </Text>
         </Box>
       ) : null}
       <Box marginTop={1} overflow="hidden">
         <SelectableList
-          title="Opciones"
+          title="Options"
           selectedIndex={optionIndex}
           selectionMode={question.selectionMode}
           selectedOptionIds={selectedOptionIds}

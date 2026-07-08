@@ -9,66 +9,66 @@ export const engineeringDecisionsSection: EngineeringSection = {
   questions: [
     {
       id: "repository-organization",
-      title: "Organización de repositorios",
+      title: "Repository Organization",
       description:
-        "Define cómo se organiza el código a nivel de repositorios, no la estructura interna de carpetas.",
-      question: "¿Cómo quieres organizar el código?",
+        "Defines how code is organized across repositories, not the internal folder structure within a repo.",
+      question: "How should code be organized across repositories?",
       options: [
-        defineOption("single-monorepo", "Monorepo único", {
+        defineOption("single-monorepo", "Single monorepo", {
           whatIsIt:
-            "Todo el código vive en un solo repositorio con una o varias aplicaciones o paquetes internos.",
+            "All code lives in one repository with one or more internal applications or packages.",
           example:
-            "Un único repo con apps web, API y librerías compartidas en carpetas o paquetes internos.",
+            "One repo containing web apps, API, and shared libraries in folders or internal packages.",
           bestFor:
-            "Equipos pequeños o medianos que priorizan cambios atómicos y visibilidad completa del sistema.",
+            "Small or medium teams that prioritize atomic changes and full-system visibility.",
           considerations:
-            "El repo puede crecer; necesitas límites claros entre módulos y CI que escale con el tamaño.",
+            "The repo can grow large; you need clear module boundaries and CI that scales with size.",
           recommendation:
-            "Elige Monorepo único cuando la coordinación entre componentes es más crítica que el aislamiento por repo.",
+            "Choose Single monorepo when coordination across components matters more than repo isolation.",
           learnMore:
-            "Un monorepo no prescribe la herramienta; solo define que el código comparte un mismo repositorio.",
+            "A monorepo does not prescribe a tool; it only means code shares one repository.",
         }),
-        defineOption("independent-repos", "Repositorios independientes por app/servicio", {
+        defineOption("independent-repos", "Independent repos per app/service", {
           whatIsIt:
-            "Cada aplicación o servicio mantiene su propio repositorio con ciclos de release independientes.",
+            "Each application or service maintains its own repository with independent release cycles.",
           example:
-            "Repos separados para la app web, la API, el worker y la app móvil.",
+            "Separate repos for the web app, API, worker, and mobile app.",
           bestFor:
-            "Equipos autónomos, despliegues independientes y límites de propiedad claros por servicio.",
+            "Autonomous teams, independent deployments, and clear ownership boundaries per service.",
           considerations:
-            "Contratos entre repos, versionado de APIs y coordinación cross-repo requieren disciplina explícita.",
+            "Cross-repo contracts, API versioning, and coordination require explicit discipline.",
           recommendation:
-            "Elige repos independientes cuando cada superficie evoluciona con ritmos y equipos distintos.",
+            "Choose independent repos when each surface evolves at different pace with different teams.",
           learnMore:
-            "Polyrepo facilita autonomía; compensa con contratos estables y documentación de integración.",
+            "Polyrepo enables autonomy; compensate with stable contracts and integration documentation.",
         }),
-        defineOption("orchestrator-independent", "Repo orquestador + repos independientes", {
+        defineOption("orchestrator-independent", "Orchestrator repo + independent repos", {
           whatIsIt:
-            "Un repositorio orquestador coordina despliegue, documentación o tooling mientras el código vive en repos separados.",
+            "An orchestrator repository coordinates deployment, documentation, or tooling while code lives in separate repos.",
           example:
-            "Un repo platform con scripts de CI/CD y docs que referencia repos de web, API y mobile.",
+            "A platform repo with CI/CD scripts and docs referencing web, API, and mobile repos.",
           bestFor:
-            "Organizaciones que necesitan autonomía por servicio pero un punto central de coordinación operativa.",
+            "Organizations that need service autonomy but a central operational coordination point.",
           considerations:
-            "El orquestador debe tener dueño claro; evita convertirlo en un monorepo disfrazado sin código.",
+            "The orchestrator needs a clear owner; avoid turning it into a disguised monorepo without code.",
           recommendation:
-            "Elige orquestador + repos independientes cuando quieres autonomía con un hub de coordinación.",
+            "Choose orchestrator + independent repos when you want autonomy with a coordination hub.",
           learnMore:
-            "Este patrón separa topología de repos de layout interno dentro de cada repo.",
+            "This pattern separates repository topology from internal layout within each repo.",
         }),
-        defineOption("custom", "Otra — especifica", {
+        defineOption("custom", "Custom", {
           whatIsIt:
-            "Un esquema de organización distinto, definido por restricciones internas, legado o política de la organización.",
+            "A bespoke organization scheme defined by internal constraints, legacy, or organizational policy.",
           example:
-            "Repos por unidad de negocio con submódulos, o un modelo híbrido documentado en un RFC interno.",
+            "Repos per business unit with submodules, or a hybrid model documented in an internal RFC.",
           bestFor:
-            "Organizaciones con restricciones regulatorias, legado o monorepos parciales ya establecidos.",
+            "Organizations with regulatory constraints, legacy boundaries, or partial monorepos already in place.",
           considerations:
-            "Sin documentación escrita, los esquemas personalizados se degradan rápido para nuevos contribuidores.",
+            "Without written standards, custom schemes degrade quickly for new contributors.",
           recommendation:
-            "Elige Otra solo si puedes describir reglas claras de dónde debe vivir el código nuevo.",
+            "Choose Custom only if you can describe clear rules for where new code must live.",
           learnMore:
-            "Los esquemas custom necesitan ejemplos y enforcement para mantenerse coherentes.",
+            "Custom schemes need examples and enforcement to stay coherent over time.",
         }),
       ],
     },

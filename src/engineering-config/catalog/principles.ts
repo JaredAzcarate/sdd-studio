@@ -45,106 +45,106 @@ export const engineeringPrinciplesSection: EngineeringSection = {
     },
     {
       id: "target-platforms",
-      title: "Plataformas objetivo",
+      title: "Target Platforms",
       description:
-        "Define en qué superficies debe estar disponible el producto. Puedes elegir varias.",
-      question: "¿En qué superficies debe correr el producto?",
+        "Defines which surfaces the product must be available on. You may select multiple options.",
+      question: "Which surfaces must the product run on?",
       selectionMode: "multi",
       options: [
         defineOption("web", "Web", {
           whatIsIt:
-            "El producto se entrega en navegadores y es accesible por URL sin instalación.",
+            "The product is delivered through browsers and is reachable via URL without installation.",
           example:
-            "Un panel SaaS, un portal de clientes o una aplicación web responsive.",
+            "A SaaS dashboard, a customer portal, or a responsive web application.",
           bestFor:
-            "Alcance amplio, despliegues centralizados y usuarios que acceden desde distintos dispositivos con navegador.",
+            "Broad reach, centralized deployments, and users who access from different devices with a browser.",
           considerations:
-            "Capacidades offline, rendimiento en móvil y permisos del navegador deben evaluarse explícitamente.",
+            "Offline capabilities, mobile performance, and browser permissions must be evaluated explicitly.",
           recommendation:
-            "Incluye Web cuando el acceso inmediato sin instalación es un requisito central.",
+            "Include Web when instant access without installation is a central requirement.",
           learnMore:
-            "Web suele ser la superficie con menor fricción de distribución y actualización.",
+            "Web is often the lowest-friction surface for distribution and updates.",
         }),
-        defineOption("mobile-native", "Mobile nativo (iOS/Android)", {
+        defineOption("mobile-native", "Mobile native (iOS/Android)", {
           whatIsIt:
-            "El producto requiere aplicaciones nativas o casi nativas en dispositivos móviles.",
+            "The product requires native or near-native applications on mobile devices.",
           example:
-            "Una app de campo para técnicos, una app de fidelización o captura de gastos en movimiento.",
+            "A field-service app for technicians, a loyalty app, or on-the-go expense capture.",
           bestFor:
-            "Experiencias móviles con notificaciones push, sensores, cámara o uso frecuente fuera del escritorio.",
+            "Mobile experiences with push notifications, sensors, camera, or frequent use away from a desk.",
           considerations:
-            "Si eliges esta opción, confirmarás iOS y/o Android en la siguiente pregunta.",
+            "If you select this option, you will confirm iOS and/or Android in the next question.",
           recommendation:
-            "Incluye Mobile nativo cuando el valor principal ocurre en movimiento y necesitas capacidades del dispositivo.",
+            "Include Mobile native when core value happens on the move and you need device capabilities.",
           learnMore:
-            "Mobile nativo implica tiendas, permisos, ciclo de vida en background y conectividad variable.",
+            "Mobile native implies app stores, permissions, background lifecycle, and variable connectivity.",
         }),
         defineOption("desktop", "Desktop", {
           whatIsIt:
-            "El producto se distribuye como aplicación de escritorio instalada en el equipo del usuario.",
+            "The product is distributed as a desktop application installed on the user's machine.",
           example:
-            "Un editor, una herramienta de diseño o un cliente offline para análisis de datos.",
+            "An editor, a design tool, or an offline-capable data analysis client.",
           bestFor:
-            "Flujos que requieren archivos locales, alto rendimiento sostenido o integración profunda con el SO.",
+            "Workflows that need local files, sustained performance, or deep operating-system integration.",
           considerations:
-            "Empaquetado, actualizaciones automáticas y pruebas por sistema operativo añaden complejidad operativa.",
+            "Packaging, auto-updates, and per-OS testing add operational complexity.",
           recommendation:
-            "Incluye Desktop cuando el flujo principal depende del entorno local del usuario.",
+            "Include Desktop when the primary workflow depends on the user's local environment.",
           learnMore:
-            "Desktop intercambia alcance universal por integración profunda con el sistema operativo.",
+            "Desktop trades universal reach for deeper integration with the operating system.",
         }),
-        defineOption("custom", "Otra — especifica", {
+        defineOption("custom", "Custom", {
           whatIsIt:
-            "El producto debe correr en una superficie no listada, como TV, embedded, CLI-only u otro canal.",
+            "The product must run on a surface not listed here, such as TV, embedded, CLI-only, or another channel.",
           example:
-            "Una app para kioscos, un cliente CLI o una experiencia en smart TV.",
+            "A kiosk app, a CLI client, or a smart TV experience.",
           bestFor:
-            "Productos con restricciones de canal o hardware que no encajan en web, mobile o desktop estándar.",
+            "Products with channel or hardware constraints that do not fit standard web, mobile, or desktop.",
           considerations:
-            "Describe la superficie con precisión para que las decisiones de stack no asuman web por defecto.",
+            "Describe the surface precisely so stack decisions do not default to web.",
           recommendation:
-            "Elige Otra solo cuando ninguna de las superficies anteriores describe el canal principal.",
+            "Choose Custom only when none of the surfaces above describe your primary channel.",
           learnMore:
-            "Superficies atípicas suelen condicionar despliegue, distribución y stack cliente de forma única.",
+            "Atypical surfaces often constrain deployment, distribution, and client stack choices.",
         }),
       ],
     },
     {
       id: "mobile-platforms",
-      title: "Plataformas móviles",
+      title: "Mobile Platforms",
       description:
-        "Confirma qué plataformas móviles nativas deben cubrirse cuando Mobile nativo está seleccionado.",
-      question: "¿Qué plataformas móviles deben incluirse?",
+        "Confirms which native mobile platforms must be supported when Mobile native is selected.",
+      question: "Which mobile platforms should be included?",
       selectionMode: "multi",
       showWhen: { questionId: "target-platforms", includes: "mobile-native" },
       options: [
         defineOption("ios", "iOS", {
           whatIsIt:
-            "El producto debe publicarse y mantenerse en el ecosistema Apple (iPhone/iPad).",
+            "The product must be published and maintained in the Apple ecosystem (iPhone/iPad).",
           example:
-            "Una app App Store para técnicos de campo con acceso a cámara y GPS.",
+            "An App Store app for field technicians with camera and GPS access.",
           bestFor:
-            "Audiencias con predominancia iOS o requisitos de integración con servicios Apple.",
+            "Audiences dominated by iOS or integrations with Apple services.",
           considerations:
-            "Requiere cuenta de desarrollador, revisión de App Store y ciclo de releases por versión de OS.",
+            "Requires a developer account, App Store review, and release cycles per OS version.",
           recommendation:
-            "Incluye iOS cuando tu audiencia móvil principal usa dispositivos Apple.",
+            "Include iOS when your primary mobile audience uses Apple devices.",
           learnMore:
-            "iOS impone políticas de permisos, background y distribución distintas a Android.",
+            "iOS enforces distinct permission, background, and distribution policies compared to Android.",
         }),
         defineOption("android", "Android", {
           whatIsIt:
-            "El producto debe publicarse y mantenerse en el ecosistema Android.",
+            "The product must be published and maintained in the Android ecosystem.",
           example:
-            "Una app Play Store para repartidores con escaneo y notificaciones.",
+            "A Play Store app for couriers with scanning and notifications.",
           bestFor:
-            "Alcance amplio en dispositivos Android o integración con servicios Google.",
+            "Broad reach on Android devices or integration with Google services.",
           considerations:
-            "Fragmentación de dispositivos y versiones de OS aumenta la superficie de pruebas.",
+            "Device and OS fragmentation increases the testing surface.",
           recommendation:
-            "Incluye Android cuando necesitas cobertura amplia en dispositivos no Apple.",
+            "Include Android when you need broad coverage on non-Apple devices.",
           learnMore:
-            "Android permite más variación de hardware; define un mínimo de API level temprano.",
+            "Android allows more hardware variation; define a minimum API level early.",
         }),
       ],
     },
