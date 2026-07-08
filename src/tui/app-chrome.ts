@@ -2,6 +2,7 @@ import type { AppScreen, AppState, FooterShortcut } from "./types.js";
 import { defaultFooterShortcuts } from "./data/menu-items.js";
 import { countCompletedSections } from "../engineering-config/state/engineering-section-status.js";
 import { ENGINEERING_SECTIONS } from "../engineering-config/catalog/index.js";
+import type { EngineeringSession } from "./use-app-input.js";
 
 export function getSectionTitle(screen: AppScreen): string {
   switch (screen.name) {
@@ -38,6 +39,7 @@ export function getSectionTitle(screen: AppScreen): string {
 export function getFooterShortcuts(
   screen: AppScreen,
   engineeringAnswers: AppState["engineeringAnswers"],
+  engineeringSession?: EngineeringSession | null,
 ): FooterShortcut[] {
   if (screen.name === "action-running") {
     return [];
@@ -57,17 +59,30 @@ export function getFooterShortcuts(
   }
 
   if (screen.name === "engineering-section") {
-    return [
+    if (engineeringSession?.customEntry) {
+      return [
+        { keys: "Enter", label: "Save" },
+        { keys: "Esc", label: "Cancel" },
+      ];
+    }
+
+    const shortcuts: FooterShortcut[] = [
       { keys: "↑↓", label: "Navigate" },
       { keys: "Enter", label: "Confirm" },
-      { keys: "Esc", label: "Back" },
+      { keys: "Esc", label: "Dashboard" },
     ];
+
+    if (engineeringSession && engineeringSession.questionIndex > 0) {
+      shortcuts.unshift({ keys: "←", label: "Previous" });
+    }
+
+    return shortcuts;
   }
 
   if (screen.name === "engineering-summary") {
     return [
-      { keys: "Enter", label: "Done" },
-      { keys: "Esc", label: "Back to dashboard" },
+      { keys: "Enter", label: "Main menu" },
+      { keys: "Esc", label: "Dashboard" },
     ];
   }
 

@@ -23,14 +23,39 @@ const EngineeringSectionNavigation = memo(function EngineeringSectionNavigation(
   questionIndex,
   optionIndex,
   saving,
+  customEntry,
 }: {
   sectionId: EngineeringSectionId;
   questionIndex: number;
   optionIndex: number;
   saving: boolean;
+  customEntry: EngineeringSession["customEntry"];
 }) {
   const section = ENGINEERING_SECTIONS.find((item) => item.id === sectionId)!;
   const question = section.questions[questionIndex];
+
+  if (customEntry) {
+    return (
+      <Box flexDirection="column" overflow="hidden">
+        <Text bold color={theme.brand}>
+          Custom answer
+        </Text>
+        <Box marginTop={1} flexDirection="column">
+          <Text bold>{question.title}</Text>
+          <Text wrap="wrap" color={theme.muted}>
+            Describe your approach in your own words.
+          </Text>
+        </Box>
+        <Box marginTop={1} flexDirection="column">
+          <Text bold>Your answer</Text>
+          <Text>
+            {customEntry.text}
+            <Text color={theme.accent}>|</Text>
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box flexDirection="column" overflow="hidden">
@@ -216,6 +241,7 @@ export const NavigationPanel = memo(function NavigationPanel({
         questionIndex={engineeringSession.questionIndex}
         optionIndex={engineeringSession.optionIndex}
         saving={engineeringSession.saving}
+        customEntry={engineeringSession.customEntry}
       />
     );
   }
@@ -232,8 +258,13 @@ export const NavigationPanel = memo(function NavigationPanel({
     return (
       <Box flexDirection="column">
         <Text bold color={theme.accent}>
-          Engineering Brief
+          Engineering Brief complete
         </Text>
+        <Box marginTop={1}>
+          <Text wrap="wrap">
+            All three sections were saved to your workspace.
+          </Text>
+        </Box>
         {sections.map((section) => (
           <Text key={section.label}>
             {statusIcon(section.status)} {section.label}
@@ -369,14 +400,19 @@ export const ContentPanel = memo(function ContentPanel({
 
     return (
       <Box flexDirection="column">
-        <Text bold>Generated</Text>
-        {sections.map((section) => (
-          <Text key={section.file}>• {section.file}</Text>
-        ))}
+        <Text bold color={theme.accent}>
+          Success
+        </Text>
+        <Text wrap="wrap">
+          Your Engineering Brief is ready. The following files were generated:
+        </Text>
+        <Box marginTop={1} flexDirection="column">
+          {sections.map((section) => (
+            <Text key={section.file}>• {section.file}</Text>
+          ))}
+        </Box>
         <Box marginTop={2} flexDirection="column">
-          <Text bold color={theme.accent}>
-            Next step
-          </Text>
+          <Text bold>Next step</Text>
           <Text wrap="wrap">
             Run the sdd-technical skill to generate engineering-stack.md.
           </Text>

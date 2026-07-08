@@ -4,6 +4,7 @@ import { existsSync } from "node:fs";
 import { ENGINEERING_SECTIONS } from "../catalog/index.js";
 import type {
   EngineeringConfigAnswers,
+  EngineeringCustomNotes,
   EngineeringSectionId,
 } from "../types.js";
 
@@ -15,8 +16,12 @@ const SECTION_FILES: Record<EngineeringSectionId, string> = {
   conventions: "engineering-conventions.md",
 };
 
-function parseAnswersFromMarkdown(content: string): EngineeringConfigAnswers {
+function parseAnswersFromMarkdown(content: string): {
+  answers: EngineeringConfigAnswers;
+  customNotes: EngineeringCustomNotes;
+} {
   const answers: EngineeringConfigAnswers = {};
+  const customNotes: EngineeringCustomNotes = {};
   const answerPattern = /\*\*Answer:\*\*\s*(.+)/g;
   const questionPattern = /\*\*Question:\*\*\s*(.+)/g;
 
@@ -39,6 +44,12 @@ function parseAnswersFromMarkdown(content: string): EngineeringConfigAnswers {
         continue;
       }
 
+      if (label.startsWith("Custom — ")) {
+        answers[question.id] = "custom";
+        customNotes[question.id] = label.slice("Custom — ".length);
+        continue;
+      }
+
       const option = question.options.find((item) => item.label === label);
       if (option) {
         answers[question.id] = option.id;
@@ -46,13 +57,17 @@ function parseAnswersFromMarkdown(content: string): EngineeringConfigAnswers {
     }
   }
 
-  return answers;
+  return { answers, customNotes };
 }
 
 export async function loadEngineeringAnswersFromWorkspace(
   workspaceTechnicalDir: string,
-): Promise<EngineeringConfigAnswers> {
-  const merged: EngineeringConfigAnswers = {};
+): Promise<{
+  answers: EngineeringConfigAnswers;
+  customNotes: EngineeringCustomNotes;
+}> {
+  const mergedAnswers: EngineeringConfigAnswers = {};
+  const mergedCustomNotes: EngineeringCustomNotes = {};
 
   for (const fileName of Object.values(SECTION_FILES)) {
     const filePath = join(workspaceTechnicalDir, fileName);
@@ -61,10 +76,12 @@ export async function loadEngineeringAnswersFromWorkspace(
     }
 
     const content = await readFile(filePath, "utf8");
-    Object.assign(merged, parseAnswersFromMarkdown(content));
+    const { answers, customNotes } = parseAnswersFromMarkdown(content);
+    Object.assign(mergedAnswers, answers);
+    Object.assign(mergedCustomNotes, customNotes);
   }
 
-  return merged;
+  return { answers: mergedAnswers, customNotes: mergedCustomNotes };
 }
 
 export function getSectionStatus(

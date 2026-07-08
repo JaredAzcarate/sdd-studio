@@ -18,6 +18,12 @@ export const engineeringDecisionsSection: EngineeringSection = {
             "Code is grouped by product features or user-facing capabilities, with shared utilities extracted only when duplication proves necessary.",
           example:
             "Folders for onboarding, billing, and settings each containing their UI, hooks, and local helpers together.",
+          structureExample: `src/
+├── features/
+│   ├── onboarding/
+│   ├── billing/
+│   └── settings/
+└── shared/`,
           bestFor:
             "Product teams optimizing for vertical delivery and engineers who think in user journeys.",
           considerations:
@@ -32,6 +38,12 @@ export const engineeringDecisionsSection: EngineeringSection = {
             "A layered slice methodology separates app, pages, features, entities, and shared modules with explicit import rules between layers.",
           example:
             "An entities layer for user models consumed by feature modules, which pages compose without reaching across unrelated features.",
+          structureExample: `src/
+├── app/
+├── pages/
+├── features/
+├── entities/
+└── shared/`,
           bestFor:
             "Growing front-end codebases that need scalable boundaries and enforceable dependency direction.",
           considerations:
@@ -46,6 +58,11 @@ export const engineeringDecisionsSection: EngineeringSection = {
             "Code is organized by technical role—presentation, application, domain, infrastructure—regardless of which feature owns a change.",
           example:
             "Separate directories for all controllers, all services, and all repositories across the entire product.",
+          structureExample: `src/
+├── controllers/
+├── services/
+├── domain/
+└── infrastructure/`,
           bestFor:
             "Backend-heavy systems, framework conventions, and teams accustomed to classic enterprise layering.",
           considerations:
@@ -60,6 +77,10 @@ export const engineeringDecisionsSection: EngineeringSection = {
             "Each increment is a thin end-to-end path through all layers for one capability, minimizing cross-cutting work in progress.",
           example:
             "Implementing 'export report' from UI through API to persistence in one cohesive change set.",
+          structureExample: `src/
+└── slices/
+    ├── export-report/
+    └── invite-user/`,
           bestFor:
             "Iterative delivery, training new contributors, and architectures that reward demonstrable working increments.",
           considerations:
@@ -74,6 +95,11 @@ export const engineeringDecisionsSection: EngineeringSection = {
             "The team defines a bespoke folder and ownership model tailored to organizational constraints, monorepo tooling, or legacy boundaries.",
           example:
             "A monorepo with packages per business unit and an internal RFC describing where new code must land.",
+          structureExample: `(your RFC defines layout)
+packages/
+├── billing/
+├── shipping/
+└── platform/`,
           bestFor:
             "Mature organizations merging codebases, regulated partitions, or unique monorepo constraints.",
           considerations:
@@ -96,6 +122,12 @@ export const engineeringDecisionsSection: EngineeringSection = {
             "The model centers on ubiquitous language, bounded contexts, aggregates, and explicit domain events reflecting how the business actually operates.",
           example:
             "Separate contexts for shipping and billing with an anti-corruption layer translating between their vocabularies.",
+          structureExample: `contexts/
+├── shipping/
+│   ├── domain/
+│   └── application/
+├── billing/
+└── shared-kernel/`,
           bestFor:
             "Complex domains with evolving rules, multiple stakeholders, and long-lived products where language drift causes defects.",
           considerations:
@@ -110,6 +142,10 @@ export const engineeringDecisionsSection: EngineeringSection = {
             "Entities map closely to database tables with create, read, update, and delete operations as the primary interaction model.",
           example:
             "An admin panel managing products, categories, and users with forms mirroring table columns.",
+          structureExample: `modules/
+├── products/
+├── categories/
+└── users/`,
           bestFor:
             "Data administration tools, simple internal apps, and domains where tables accurately capture business truth.",
           considerations:
@@ -124,6 +160,10 @@ export const engineeringDecisionsSection: EngineeringSection = {
             "State changes propagate as events that downstream handlers process asynchronously, enabling loose coupling and temporal decoupling.",
           example:
             "An order-placed event triggers inventory reservation, email notifications, and analytics without a single orchestrating transaction.",
+          structureExample: `domain/
+├── aggregates/
+events/
+└── handlers/`,
           bestFor:
             "Integrations, audit trails, scalable side effects, and systems where reactions to change matter as much as the change itself.",
           considerations:
@@ -138,6 +178,11 @@ export const engineeringDecisionsSection: EngineeringSection = {
             "A pragmatic mix of layered services, transactional scripts, and incremental modeling without strict DDD or event-native patterns.",
           example:
             "Service classes coordinating repository calls with occasional background jobs for slow side effects.",
+          structureExample: `services/
+├── OrderService
+└── UserService
+repositories/
+models/`,
           bestFor:
             "Teams delivering business value quickly with familiar patterns and moderate domain complexity.",
           considerations:

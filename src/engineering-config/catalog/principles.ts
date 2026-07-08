@@ -331,51 +331,66 @@ export const engineeringPrinciplesSection: EngineeringSection = {
     },
     {
       id: "database-model",
-      title: "Database Model",
-      description: "Defines the conceptual database model.",
-      question: "Which data model best represents your business?",
+      title: "Domain Relationships",
+      description:
+        "Defines how business concepts connect and where consistency boundaries lie in the domain.",
+      question: "How do business entities relate in your domain?",
       options: [
-        defineOption("relational", "Relational", {
+        defineOption("interconnected-entities", "Interconnected Entities", {
           whatIsIt:
-            "Data is structured in tables with explicit relationships, constraints, and transactional integrity across entities.",
+            "Many entities participate in explicit relationships, and business rules often span multiple entities at once.",
           example:
-            "Orders linked to customers and line items with foreign keys enforcing referential integrity.",
+            "An order must reference a valid customer, line items, tax rules, and inventory reservations before it can be confirmed.",
           bestFor:
-            "Domains with strong invariants, reporting needs, and entities that relate predictably to one another.",
+            "Domains where correctness depends on cross-entity invariants and reporting across relationships.",
           considerations:
-            "Rigid schemas can slow iteration unless you plan migrations and boundary contexts carefully.",
+            "Changes ripple across models; teams need clear ownership when rules touch several entities.",
           recommendation:
-            "Choose Relational when consistency, joins, and enforceable relationships are central to correct business outcomes.",
+            "Choose Interconnected Entities when the business story is inherently relational and rules rarely fit a single record.",
           learnMore:
-            "Relational modeling shines when rules span multiple entities; normalize for integrity, denormalize deliberately for read paths.",
+            "Document entity relationships and invariants early; persistence choices come later in Engineering Decisions.",
         }),
-        defineOption("document", "Document", {
+        defineOption("aggregate-boundaries", "Aggregate Boundaries", {
           whatIsIt:
-            "Records are stored as self-contained documents, often nested, with schema flexibility within each document boundary.",
+            "The domain is grouped into consistency boundaries with a clear root entity and explicit rules about what may change together.",
           example:
-            "A user profile embedding preferences and notification settings as nested objects updated together.",
+            "A shopping cart aggregate owns its line items; external code references the cart by id instead of mutating items directly.",
           bestFor:
-            "Rapidly evolving structures, content-heavy entities, and read patterns that fetch whole aggregates at once.",
+            "Workflow-heavy domains, transactional commands, and teams modeling around business operations rather than tables.",
           considerations:
-            "Cross-document consistency and ad hoc relational queries may require additional design or secondary stores.",
+            "Boundary design takes facilitation; poorly drawn aggregates create either oversized blobs or fragmented rules.",
           recommendation:
-            "Choose Document when aggregate-shaped reads dominate and schema evolution speed outweighs multi-entity transactions.",
+            "Choose Aggregate Boundaries when each business action should commit as one coherent unit of change.",
           learnMore:
-            "Document models align with aggregate design; define document boundaries around natural consistency units in your domain.",
+            "Aggregates express domain language; name roots after business operations, not storage shapes.",
         }),
-        defineOption("hybrid", "Hybrid", {
+        defineOption("independent-records", "Independent Records", {
           whatIsIt:
-            "Different persistence styles coexist—relational stores for transactional cores and document or specialized stores for flexible or high-volume slices.",
+            "Business truth is captured as largely independent records with loose coupling and few cross-entity invariants.",
           example:
-            "Transactional billing in a relational core with a document store for user-generated content metadata.",
+            "User profiles, settings, and audit logs evolve separately with minimal coupling between lifecycles.",
           bestFor:
-            "Products with mixed access patterns that no single model serves optimally without compromise.",
+            "Administrative tools, content catalogs, and products where entities are managed on their own.",
           considerations:
-            "Operational complexity, data duplication, and cross-store consistency require clear ownership and integration patterns.",
+            "Cross-record workflows may need explicit orchestration layers as complexity grows.",
           recommendation:
-            "Choose Hybrid when proven subdomains have genuinely different shape, scale, or evolution needs.",
+            "Choose Independent Records when most operations affect a single concept and relationships are informational, not rule-bearing.",
           learnMore:
-            "Hybrid persistence succeeds with explicit boundaries: which store is canonical for each entity and how eventual consistency is handled.",
+            "Start simple; introduce stronger boundaries only when multi-entity rules become a recurring source of defects.",
+        }),
+        defineOption("mixed-by-subdomain", "Mixed by Subdomain", {
+          whatIsIt:
+            "Different areas of the business use different relationship styles depending on complexity and change rate.",
+          example:
+            "Billing uses strict aggregates while marketing content stays record-oriented with flexible metadata.",
+          bestFor:
+            "Products combining mature transactional cores with fast-moving peripheral domains.",
+          considerations:
+            "Teams must document which style applies where to avoid inconsistent modeling within the same context.",
+          recommendation:
+            "Choose Mixed by Subdomain when no single relationship style fits every part of the business equally well.",
+          learnMore:
+            "Split by bounded context first, then pick relationship style per context instead of one global rule.",
         }),
       ],
     },

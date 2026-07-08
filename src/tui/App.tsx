@@ -20,6 +20,7 @@ import { useStableInput } from "./hooks/use-stable-input.js";
 import type { EngineeringSession } from "./use-app-input.js";
 import { useAppInput } from "./use-app-input.js";
 import type { AppScreen, AppState, TuiExitResult } from "./types.js";
+import type { EngineeringCustomNotes } from "../engineering-config/types.js";
 import type { AssistantId } from "../types/init-context.js";
 
 type SddAppProps = {
@@ -48,6 +49,9 @@ export function SddApp({
   const [engineeringAnswers, setEngineeringAnswers] = useState(
     () => ({} as AppState["engineeringAnswers"]),
   );
+  const [engineeringCustomNotes, setEngineeringCustomNotes] = useState(
+    () => ({} as EngineeringCustomNotes),
+  );
   const [engineeringSession, setEngineeringSession] =
     useState<EngineeringSession | null>(null);
   const [assistant, setAssistant] = useState<AssistantId | undefined>();
@@ -73,6 +77,7 @@ export function SddApp({
       assistant,
       workflow,
       engineeringAnswers,
+      engineeringCustomNotes,
       installEngineering,
       history,
     }),
@@ -84,6 +89,7 @@ export function SddApp({
       assistant,
       workflow,
       engineeringAnswers,
+      engineeringCustomNotes,
       installEngineering,
       history,
     ],
@@ -120,10 +126,11 @@ export function SddApp({
     }
 
     if (existsSync(workspaceTechnicalDir)) {
-      const answers = await loadEngineeringAnswersFromWorkspace(
+      const { answers, customNotes } = await loadEngineeringAnswersFromWorkspace(
         workspaceTechnicalDir,
       );
       setEngineeringAnswers(answers);
+      setEngineeringCustomNotes(customNotes);
     }
 
     setLoadedAnswers(true);
@@ -274,6 +281,7 @@ export function SddApp({
       setInstallEngineering,
       setWorkflow,
       setEngineeringAnswers,
+      setEngineeringCustomNotes,
       setEngineeringSession,
       resetToMainMenu,
       continueInstallAfterEngineering,
@@ -302,7 +310,11 @@ export function SddApp({
   useStableInput(handleInput);
 
   const sectionTitle = getSectionTitle(screen);
-  const shortcuts = getFooterShortcuts(screen, engineeringAnswers);
+  const shortcuts = getFooterShortcuts(
+    screen,
+    engineeringAnswers,
+    engineeringSession,
+  );
 
   return (
     <AppLayout

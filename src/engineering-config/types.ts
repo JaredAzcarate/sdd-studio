@@ -1,11 +1,14 @@
 export type OptionDetail = {
   whatIsIt: string;
   example: string;
+  structureExample?: string;
   bestFor: string;
   considerations: string;
   recommendation: string;
   learnMore: string;
 };
+
+export type EngineeringCustomNotes = Record<string, string>;
 
 export type EngineeringOption = {
   id: string;

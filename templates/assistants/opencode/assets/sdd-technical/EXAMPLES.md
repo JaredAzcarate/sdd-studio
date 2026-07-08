@@ -1,75 +1,189 @@
 # EXAMPLES — sdd-technical
 
-Reference output for `.workspace/brief/technical/engineering-stack.md`.
+## Chat — section prompt (excerpt)
 
-## engineering-stack.md (excerpt)
+```markdown
+## Database — choose one
+
+**Requirement:** Relational storage with ACID (Engineering Principle §8, Decision §10 — *from Brief digest*).
+
+**Recommendation:** PostgreSQL — …
+
+**Brief basis:** Engineering Decision §10 (Relational); Principle §8 (Relational data model).
+
+| Option | Technology |
+| ------ | ---------- |
+| 1 | PostgreSQL *(recommended)* |
+| 2 | MySQL 8 |
+| 3 | SQLite (single-node / embedded) |
+| 4 | **Other** — specify your choice |
+
+Reply with the option number, technology name, or custom text for **Other**.
+```
+
+Rejected alternatives and longer reasoning stay in chat, not in the file.
+
+---
+
+## Chat — Phase 1b dimension elicitation (excerpt)
+
+```markdown
+## Dimensiones arquitectónicas
+
+El Brief define capacidades del producto, no cómo organizar los repositorios ni todas las plataformas. Necesito confirmar contigo:
+
+1. **Plataformas objetivo** — ¿Qué superficies debe cubrir el producto?
+2. **Organización de repositorios** — ¿Un solo repo, repos independientes, repo orquestador + repos independientes, u otro?
+3. **Preferencias existentes** — ¿Hay decisiones de stack ya tomadas fuera del Brief?
+4. **Restricciones operativas** — (opcional) ¿Algo que deba condicionar la selección?
+
+No propongo tecnologías en este paso — solo dimensiones.
+```
+
+---
+
+## Chat — Brief digest format (excerpt)
+
+```markdown
+### Del Brief (explícito)
+- Backend integrado, fuente de verdad en servidor (Principle §4–§5)
+- App Router (Decision §4)
+- Autenticación social, autorización por roles (Decision §8–§9)
+- …
+
+### Inferido por el agente (requiere confirmación)
+- ~~Organización multi-paquete en un solo repositorio~~ → **retirado; no confirmado**
+
+### Confirmado por el usuario
+- Plataformas: web + iOS + Android + desktop
+- Repositorios: orquestador + repos independientes
+- Preferencia cliente: (registrar lo que el usuario diga)
+```
+
+---
+
+## Chat — user preference already stated (excerpt)
+
+When the user already chose a technology in Phase 1b or earlier, do NOT re-open with a competing recommendation unless they ask.
+
+```markdown
+## Frontend — confirmar
+
+**Etiqueta:** [User-elicited] — preferencia declarada en Phase 1b
+
+**Requisito:** App Router (Decision §4); plataformas confirmadas: web + mobile + desktop
+
+**Tu elección:** `<user stated choice>`
+
+**Compatibilidad con el Brief:** … (2–3 frases)
+
+¿Confirmas `<user stated choice>` para esta sección? (sí / quiero ver alternativas)
+```
+
+---
+
+## engineering-stack.md (excerpt — after user confirms)
+
+> **Note:** `engineering-stack.md` may include a **Repository Organization** section (technology-agnostic description of single repo / polyrepo / orchestrator pattern) when the user confirmed it in Phase 1b — written as **Selected:** pattern name, not tool name, unless the user selected a specific tool in Phase 3.
 
 ```markdown
 # Engineering Stack
 
 ## Overview
 
-This stack targets a multi-tenant B2B SaaS web application with real-time collaboration, strong typing end-to-end, and a single deployable unit for the MVP. It aligns with the Engineering Brief's emphasis on developer experience, long-term maintainability, and a modular monolith that can evolve without premature microservices.
+TypeScript monolith: SvelteKit UI and server routes, PostgreSQL, Drizzle ORM. Chosen for integrated deployment, explicit data layer, and alignment with Feature First + Clean Architecture in the Engineering Brief.
 
-Traceability: Engineering Principles §2 (Primary Platform: web-first), Engineering Decisions §1 (Modular monolith).
+Traceability: Engineering Principles §2 (web-first), Engineering Decisions §1 (Feature First), §3 (Clean Architecture).
+
+---
+
+## Repository Organization
+
+**Selected:** Single repository with feature-first folders
+
+Confirmed in Phase 1b; one deployable unit matches integrated backend and small-team iteration goals.
+
+Traceability: Confirmado por el usuario (Phase 1b).
 
 ---
 
 ## Frontend
 
-**Recommended:** SvelteKit
+**Selected:** SvelteKit with TypeScript
 
-SvelteKit provides file-based routing, SSR, and a compiler-driven reactivity model that keeps bundle size small — matching the brief's performance and simplicity priorities. TypeScript is assumed throughout per Engineering Conventions.
+Compiler-driven UI with file-based routing and SSR; matches web-first scope and keeps bundles small per Engineering Principles.
 
-**Not selected:** React — viable, but the brief prioritizes minimal runtime overhead and does not require React's ecosystem breadth for MVP scope.
+Traceability: Engineering Principles §2, Engineering Conventions (TypeScript end-to-end).
 
 ---
 
 ## Backend
 
-**Recommended:** SvelteKit server routes (same runtime)
+**Selected:** SvelteKit server routes (same application)
 
-Co-locating frontend and backend in one framework reduces operational surface area for the modular monolith decision. Server logic stays in route modules and dedicated server libraries per Engineering Conventions (feature folders).
+Integrated server runtime reduces operational surface for the modular monolith; domain logic stays in application/domain layers per Clean Architecture.
+
+Traceability: Engineering Decisions §3, Engineering Principles §4 (integrated backend).
 
 ---
 
 ## Database
 
-**Recommended:** PostgreSQL
+**Selected:** PostgreSQL
 
-Relational model fits the domain aggregates documented in Engineering Modeling. JSONB columns cover flexible metadata without abandoning relational integrity — consistent with Engineering Decision §3 (relational core with selective document fields).
+Relational core for aggregates and billing; JSONB for flexible metadata without abandoning constraints.
 
----
-
-## ORM / Data Layer
-
-**Recommended:** Drizzle ORM
-
-Type-safe SQL with minimal abstraction overhead. Aligns with Engineering Conventions (explicit SQL visibility) and pairs naturally with PostgreSQL. Migrations stay version-controlled alongside application code.
+Traceability: Engineering Principle §8, Engineering Decision §10.
 
 ---
 
 ## Architecture Summary
 
-The stack forms a single TypeScript codebase deployed as one SvelteKit application against PostgreSQL. SvelteKit handles both UI and server routes, eliminating cross-service coordination for the MVP while preserving clear module boundaries inside the monolith. Drizzle keeps the data layer explicit and type-safe, supporting the DDD-style aggregates in Engineering Modeling without ORM magic. This ecosystem satisfies the brief's goals: fast iteration for a small team, strong typing, a path to scale reads via PostgreSQL replicas, and the option to extract services later without rewriting the domain model.
+The selected stack is a single SvelteKit application on PostgreSQL with Drizzle. UI and API share one TypeScript codebase and deployment unit, preserving feature-first module boundaries inside the monolith. This matches the brief's maintainability and small-team iteration goals while leaving room to extract services later.
 ```
 
-## Anti-example — Incorrect
+## Anti-example — Inferring structure from broad principles
 
-```text
-.workspace/brief/technical/engineering-principles.md   # sdd-technical does not modify inputs
-.workspace/brief/technical/engineering-decisions.md    # sdd-technical does not modify inputs
-.workspace/spec/technical/api/task-api.md              # sdd-technical does not write spec
+**Incorrect:** After reading "multi-platform" + "maximum code sharing", the agent adds "Monorepo" or any multi-package tool as section #1 in Phase 3 without asking repository organization.
+
+**Correct:** Phase 1b asks repository organization → user answers → section list includes `[User-elicited] Repository Organization` (already resolved) or omits tool-specific section until a dependent choice requires it.
+
+---
+
+## Anti-example — Mixed digest
+
+**Incorrect:** Brief digest bullet: "Monorepo for code sharing across platforms" presented as fact.
+
+**Correct:** Same idea under **Inferido por el agente** until user confirms, or under **Confirmado por el usuario** after Phase 1b.
+
+---
+
+## Anti-example — Phase 1 section list without labels
+
+**Incorrect:** Flat numbered list of 21 stack sections with no source or type.
+
+**Correct:**
+
+```markdown
+| # | Sección | Tipo | Base |
+|---|---------|------|------|
+| 1 | Repository Organization | [User-elicited] | Confirmado: orquestador + repos independientes |
+| 2 | Frontend | [Brief-locked] + [Dependent] | Decision §4 App Router; plataformas confirmadas |
+| … | Monorepo tool | **Omitida** | No requerida; repos independientes confirmados |
 ```
 
-**Incorrect — hardcoded default without brief justification:**
+## Anti-example — Incorrect file content
 
 ```markdown
 ## Frontend
 
-React + Next.js
+**Recommended:** Next.js 15
 
-Industry standard choice.
+**Not selected:** Vite + React — viable but …
 ```
 
-Every recommendation must emerge from the Engineering Brief, not from popularity or defaults.
+Recommendations and rejections belong in **chat**. The file must use **Selected:** only.
+
+## Anti-example — Incorrect workflow
+
+Writing `engineering-stack.md` in one shot without per-section user confirmation.

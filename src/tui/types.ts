@@ -1,5 +1,5 @@
 import type { AssistantId } from "../types/init-context.js";
-import type { EngineeringConfigAnswers } from "../engineering-config/types.js";
+import type { EngineeringConfigAnswers, EngineeringCustomNotes } from "../engineering-config/types.js";
 import type { InitContextWithLabels } from "../types/init-context.js";
 import type { EngineeringSectionId } from "../engineering-config/types.js";
 
@@ -32,6 +32,7 @@ export type AppState = {
   assistant?: AssistantId;
   workflow?: boolean;
   engineeringAnswers: EngineeringConfigAnswers;
+  engineeringCustomNotes: EngineeringCustomNotes;
   installEngineering: boolean;
   history: AppScreen[];
 };

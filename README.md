@@ -237,7 +237,7 @@ Invoke with `/sdd-idea`, `/sdd-spec`, etc.
 | Skill | Purpose |
 | ----- | ------- |
 | **sdd-idea** | Discover product; write Business Brief and `engineering-modeling.md` |
-| **sdd-technical** | Analyze Engineering Brief; generate `engineering-stack.md` |
+| **sdd-technical** | Interactive stack selection per layer; writes confirmed choices to `engineering-stack.md` |
 | **sdd-spec** | Read Brief; generate `.workspace/spec/business/` and `.workspace/spec/technical/` |
 | **sdd-review** | Analyze changes; update Brief and/or Specification |
 | **sdd-plan** | Read Brief + spec; generate `.workspace/workflow/` |

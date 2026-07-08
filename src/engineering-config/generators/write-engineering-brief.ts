@@ -6,6 +6,7 @@ import {
 } from "../catalog/index.js";
 import type {
   EngineeringConfigAnswers,
+  EngineeringCustomNotes,
   EngineeringSectionId,
 } from "../types.js";
 
@@ -15,9 +16,21 @@ const OUTPUT_FILES: Record<EngineeringSectionId, string> = {
   conventions: "engineering-conventions.md",
 };
 
+function formatAnswerLabel(
+  optionLabel: string,
+  customNote?: string,
+): string {
+  if (optionLabel === "Custom" && customNote) {
+    return `Custom — ${customNote}`;
+  }
+
+  return optionLabel;
+}
+
 function renderSectionDocument(
   sectionId: EngineeringSectionId,
   answers: EngineeringConfigAnswers,
+  customNotes: EngineeringCustomNotes = {},
 ): string {
   const section = ENGINEERING_SECTIONS.find((item) => item.id === sectionId);
 
@@ -42,11 +55,16 @@ function renderSectionDocument(
       );
     }
 
+    const answerLabel = formatAnswerLabel(
+      selected.label,
+      customNotes[question.id],
+    );
+
     lines.push(`## ${index + 1}. ${question.title}`);
     lines.push("");
     lines.push(`**Question:** ${question.question}`);
     lines.push("");
-    lines.push(`**Answer:** ${selected.label}`);
+    lines.push(`**Answer:** ${answerLabel}`);
     lines.push("");
     lines.push(question.description);
     lines.push("");
@@ -60,40 +78,52 @@ function renderSectionDocument(
 export type WriteEngineeringBriefOptions = {
   workspaceTechnicalDir: string;
   answers?: EngineeringConfigAnswers;
+  customNotes?: EngineeringCustomNotes;
 };
 
 export type WriteEngineeringBriefResult = {
   writtenPaths: string[];
   answers: EngineeringConfigAnswers;
+  customNotes: EngineeringCustomNotes;
 };
 
 export async function writeEngineeringSection(
   options: WriteEngineeringBriefOptions & { sectionId: EngineeringSectionId },
-): Promise<{ filePath: string; answers: EngineeringConfigAnswers }> {
+): Promise<{
+  filePath: string;
+  answers: EngineeringConfigAnswers;
+  customNotes: EngineeringCustomNotes;
+}> {
   const answers = options.answers ?? getDefaultEngineeringAnswers();
+  const customNotes = options.customNotes ?? {};
   const fileName = OUTPUT_FILES[options.sectionId];
   const filePath = join(options.workspaceTechnicalDir, fileName);
-  const content = renderSectionDocument(options.sectionId, answers);
+  const content = renderSectionDocument(
+    options.sectionId,
+    answers,
+    customNotes,
+  );
 
   await writeFile(filePath, content, "utf8");
 
-  return { filePath, answers };
+  return { filePath, answers, customNotes };
 }
 
 export async function writeEngineeringBrief(
   options: WriteEngineeringBriefOptions,
 ): Promise<WriteEngineeringBriefResult> {
   const answers = options.answers ?? getDefaultEngineeringAnswers();
+  const customNotes = options.customNotes ?? {};
   const writtenPaths: string[] = [];
 
   for (const sectionId of Object.keys(OUTPUT_FILES) as EngineeringSectionId[]) {
     const fileName = OUTPUT_FILES[sectionId];
     const filePath = join(options.workspaceTechnicalDir, fileName);
-    const content = renderSectionDocument(sectionId, answers);
+    const content = renderSectionDocument(sectionId, answers, customNotes);
 
     await writeFile(filePath, content, "utf8");
     writtenPaths.push(filePath);
   }
 
-  return { writtenPaths, answers };
+  return { writtenPaths, answers, customNotes };
 }

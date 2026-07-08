@@ -11,7 +11,12 @@ import {
 } from "./data/menu-items.js";
 import { countCompletedSections } from "../engineering-config/state/engineering-section-status.js";
 import type { AppScreen, AppState, TuiExitResult } from "./types.js";
-import type { EngineeringSectionId } from "../engineering-config/types.js";
+import type {
+  EngineeringConfigAnswers,
+  EngineeringCustomNotes,
+  EngineeringSection,
+  EngineeringSectionId,
+} from "../engineering-config/types.js";
 import type { AssistantId } from "../types/init-context.js";
 
 export type EngineeringSession = {
@@ -19,6 +24,8 @@ export type EngineeringSession = {
   questionIndex: number;
   optionIndex: number;
   answers: AppState["engineeringAnswers"];
+  customNotes: EngineeringCustomNotes;
+  customEntry: { questionId: string; text: string } | null;
   saving: boolean;
 };
 
@@ -39,6 +46,7 @@ export type AppInputActions = {
   setInstallEngineering: (value: boolean) => void;
   setWorkflow: (value: boolean) => void;
   setEngineeringAnswers: (answers: AppState["engineeringAnswers"]) => void;
+  setEngineeringCustomNotes: (notes: EngineeringCustomNotes) => void;
   setEngineeringSession: (session: EngineeringSession | null) => void;
   resetToMainMenu: () => void;
   continueInstallAfterEngineering: () => void;
@@ -51,6 +59,87 @@ export type AppInputContext = {
   engineeringSession: EngineeringSession | null;
   actions: AppInputActions;
 };
+
+function saveEngineeringSection(
+  engineeringSession: EngineeringSession,
+  nextAnswers: EngineeringConfigAnswers,
+  nextCustomNotes: EngineeringCustomNotes,
+  targetDir: string,
+  actions: AppInputActions,
+): void {
+  actions.setEngineeringSession({
+    ...engineeringSession,
+    answers: nextAnswers,
+    customNotes: nextCustomNotes,
+    customEntry: null,
+    saving: true,
+  });
+
+  void writeEngineeringSection({
+    workspaceTechnicalDir: join(
+      targetDir,
+      SDD_WORKSPACE_DIR,
+      "brief",
+      "technical",
+    ),
+    sectionId: engineeringSession.sectionId,
+    answers: nextAnswers,
+    customNotes: nextCustomNotes,
+  }).then(() => {
+    actions.setEngineeringAnswers(nextAnswers);
+    actions.setEngineeringCustomNotes(nextCustomNotes);
+    actions.setEngineeringSession(null);
+
+    if (countCompletedSections(nextAnswers) === 3) {
+      actions.navigate({ name: "engineering-summary" });
+      return;
+    }
+
+    actions.goBack();
+  });
+}
+
+function advanceEngineeringAnswer(
+  engineeringSession: EngineeringSession,
+  section: EngineeringSection,
+  questionId: string,
+  answerId: string,
+  nextCustomNotes: EngineeringCustomNotes,
+  targetDir: string,
+  actions: AppInputActions,
+): void {
+  const nextAnswers = {
+    ...engineeringSession.answers,
+    [questionId]: answerId,
+  };
+
+  if (engineeringSession.questionIndex < section.questions.length - 1) {
+    const nextQuestion =
+      section.questions[engineeringSession.questionIndex + 1];
+    const nextOptionIndex = nextQuestion.options.findIndex(
+      (option) => option.id === nextAnswers[nextQuestion.id],
+    );
+
+    actions.setEngineeringSession({
+      sectionId: engineeringSession.sectionId,
+      questionIndex: engineeringSession.questionIndex + 1,
+      optionIndex: nextOptionIndex === -1 ? 0 : nextOptionIndex,
+      answers: nextAnswers,
+      customNotes: nextCustomNotes,
+      customEntry: null,
+      saving: false,
+    });
+    return;
+  }
+
+  saveEngineeringSection(
+    engineeringSession,
+    nextAnswers,
+    nextCustomNotes,
+    targetDir,
+    actions,
+  );
+}
 
 export function useAppInput(context: AppInputContext): (input: string, key: Key) => void {
   const contextRef = useRef(context);
@@ -276,6 +365,8 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         questionIndex,
         optionIndex: optionIndex === -1 ? 0 : optionIndex,
         answers: { ...state.engineeringAnswers },
+        customNotes: { ...state.engineeringCustomNotes },
+        customEntry: null,
         saving: false,
       });
       actions.navigate({ name: "engineering-section", sectionId });
@@ -287,6 +378,82 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         (item) => item.id === engineeringSession.sectionId,
       )!;
       const question = section.questions[engineeringSession.questionIndex];
+
+      if (engineeringSession.customEntry) {
+        if (key.escape || key.leftArrow) {
+          actions.setEngineeringSession({
+            ...engineeringSession,
+            customEntry: null,
+          });
+          return;
+        }
+        if (key.backspace || key.delete) {
+          actions.setEngineeringSession({
+            ...engineeringSession,
+            customEntry: {
+              ...engineeringSession.customEntry,
+              text: engineeringSession.customEntry.text.slice(0, -1),
+            },
+          });
+          return;
+        }
+        if (key.return) {
+          const text = engineeringSession.customEntry.text.trim();
+          if (!text) {
+            return;
+          }
+
+          const nextCustomNotes = {
+            ...engineeringSession.customNotes,
+            [question.id]: text,
+          };
+
+          advanceEngineeringAnswer(
+            engineeringSession,
+            section,
+            question.id,
+            "custom",
+            nextCustomNotes,
+            state.targetDir,
+            actions,
+          );
+          return;
+        }
+        if (input && !key.ctrl && !key.meta) {
+          actions.setEngineeringSession({
+            ...engineeringSession,
+            customEntry: {
+              ...engineeringSession.customEntry,
+              text: engineeringSession.customEntry.text + input,
+            },
+          });
+        }
+        return;
+      }
+
+      if (key.leftArrow) {
+        if (engineeringSession.questionIndex > 0) {
+          const previousIndex = engineeringSession.questionIndex - 1;
+          const previousQuestion = section.questions[previousIndex];
+          const previousAnswerId = engineeringSession.answers[previousQuestion.id];
+          const previousOptionIndex = previousAnswerId
+            ? Math.max(
+                0,
+                previousQuestion.options.findIndex(
+                  (option) => option.id === previousAnswerId,
+                ),
+              )
+            : 0;
+
+          actions.setEngineeringSession({
+            ...engineeringSession,
+            questionIndex: previousIndex,
+            optionIndex: previousOptionIndex,
+            customEntry: null,
+          });
+        }
+        return;
+      }
 
       if (key.upArrow) {
         actions.setEngineeringSession({
@@ -313,48 +480,28 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         return;
       }
 
-      const nextAnswers = {
-        ...engineeringSession.answers,
-        [question.id]: question.options[engineeringSession.optionIndex].id,
-      };
+      const selectedOption = question.options[engineeringSession.optionIndex];
 
-      if (engineeringSession.questionIndex < section.questions.length - 1) {
-        const nextQuestion =
-          section.questions[engineeringSession.questionIndex + 1];
-        const nextOptionIndex = nextQuestion.options.findIndex(
-          (option) => option.id === nextAnswers[nextQuestion.id],
-        );
-
+      if (selectedOption.id === "custom") {
         actions.setEngineeringSession({
-          sectionId: engineeringSession.sectionId,
-          questionIndex: engineeringSession.questionIndex + 1,
-          optionIndex: nextOptionIndex === -1 ? 0 : nextOptionIndex,
-          answers: nextAnswers,
-          saving: false,
+          ...engineeringSession,
+          customEntry: {
+            questionId: question.id,
+            text: engineeringSession.customNotes[question.id] ?? "",
+          },
         });
         return;
       }
 
-      actions.setEngineeringSession({
-        ...engineeringSession,
-        answers: nextAnswers,
-        saving: true,
-      });
-
-      void writeEngineeringSection({
-        workspaceTechnicalDir: join(
-          state.targetDir,
-          SDD_WORKSPACE_DIR,
-          "brief",
-          "technical",
-        ),
-        sectionId: engineeringSession.sectionId,
-        answers: nextAnswers,
-      }).then(() => {
-        actions.setEngineeringAnswers(nextAnswers);
-        actions.setEngineeringSession(null);
-        actions.goBack();
-      });
+      advanceEngineeringAnswer(
+        engineeringSession,
+        section,
+        question.id,
+        selectedOption.id,
+        engineeringSession.customNotes,
+        state.targetDir,
+        actions,
+      );
       return;
     }
 
@@ -364,7 +511,16 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         return;
       }
       if (key.return) {
-        actions.continueInstallAfterEngineering();
+        const inInstallFlow =
+          state.installEngineering ||
+          state.history.some((item) => item.name === "install-sdd-engineering");
+
+        if (inInstallFlow) {
+          actions.continueInstallAfterEngineering();
+          return;
+        }
+
+        actions.resetToMainMenu();
       }
       return;
     }

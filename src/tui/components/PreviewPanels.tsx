@@ -8,16 +8,6 @@ type OptionPreviewProps = {
   title?: string;
 };
 
-const DETAIL_FIELDS: Array<{ key: keyof OptionDetail; icon: string; label: string }> =
-  [
-    { key: "whatIsIt", icon: "📖", label: "What is it?" },
-    { key: "example", icon: "📁", label: "Example" },
-    { key: "bestFor", icon: "✅", label: "Best for" },
-    { key: "considerations", icon: "⚠", label: "Considerations" },
-    { key: "recommendation", icon: "💡", label: "SDD Studio Recommendation" },
-    { key: "learnMore", icon: "📚", label: "Learn more" },
-  ];
-
 export const OptionPreview = memo(function OptionPreview({
   detail,
   title = "Preview",
@@ -31,14 +21,27 @@ export const OptionPreview = memo(function OptionPreview({
         {!detail ? (
           <Text color={theme.muted}>Select an option to see details.</Text>
         ) : (
-          DETAIL_FIELDS.map((field) => (
-            <Box key={field.key} flexDirection="column" marginBottom={1}>
-              <Text color={theme.selected}>
-                {field.icon} {field.label}
-              </Text>
-              <Text wrap="wrap">{detail[field.key]}</Text>
+          <>
+            <Box flexDirection="column" marginBottom={1}>
+              <Text bold>What is it?</Text>
+              <Text wrap="wrap">{detail.whatIsIt}</Text>
             </Box>
-          ))
+            {detail.structureExample ? (
+              <Box flexDirection="column" marginBottom={1}>
+                <Text bold>Structure</Text>
+                <Text>{detail.structureExample}</Text>
+              </Box>
+            ) : (
+              <Box flexDirection="column" marginBottom={1}>
+                <Text bold>Example</Text>
+                <Text wrap="wrap">{detail.example}</Text>
+              </Box>
+            )}
+            <Box flexDirection="column">
+              <Text bold>Recommendation</Text>
+              <Text wrap="wrap">{detail.recommendation}</Text>
+            </Box>
+          </>
         )}
       </Box>
     </Box>
