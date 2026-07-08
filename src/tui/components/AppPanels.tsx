@@ -15,6 +15,7 @@ import {
   statusIcon,
 } from "../../engineering-config/state/engineering-section-status.js";
 import { ENGINEERING_SECTIONS } from "../../engineering-config/catalog/index.js";
+import { getVisibleQuestions } from "../../engineering-config/catalog/question-utils.js";
 import { ASSISTANTS } from "../../registries/assistants.registry.js";
 import type { EngineeringSectionId } from "../../engineering-config/types.js";
 
@@ -22,32 +23,40 @@ const EngineeringSectionNavigation = memo(function EngineeringSectionNavigation(
   sectionId,
   questionIndex,
   optionIndex,
+  selectedOptionIds,
+  answers,
   saving,
   customEntry,
 }: {
   sectionId: EngineeringSectionId;
   questionIndex: number;
   optionIndex: number;
+  selectedOptionIds: string[];
+  answers: AppState["engineeringAnswers"];
   saving: boolean;
   customEntry: EngineeringSession["customEntry"];
 }) {
   const section = ENGINEERING_SECTIONS.find((item) => item.id === sectionId)!;
   const question = section.questions[questionIndex];
+  const visibleQuestions = getVisibleQuestions(section, answers);
+  const visibleQuestionIndex = visibleQuestions.findIndex(
+    (item) => item.id === question.id,
+  );
 
   if (customEntry) {
     return (
       <Box flexDirection="column" overflow="hidden">
         <Text bold color={theme.brand}>
-          Custom answer
+          Respuesta personalizada
         </Text>
         <Box marginTop={1} flexDirection="column">
           <Text bold>{question.title}</Text>
           <Text wrap="wrap" color={theme.muted}>
-            Describe your approach in your own words.
+            Describe tu opción en tus propias palabras.
           </Text>
         </Box>
         <Box marginTop={1} flexDirection="column">
-          <Text bold>Your answer</Text>
+          <Text bold>Tu respuesta</Text>
           <Text>
             {customEntry.text}
             <Text color={theme.accent}>|</Text>
@@ -60,7 +69,7 @@ const EngineeringSectionNavigation = memo(function EngineeringSectionNavigation(
   return (
     <Box flexDirection="column" overflow="hidden">
       <Text bold color={theme.brand}>
-        Question {questionIndex + 1} / {section.questions.length}
+        Pregunta {visibleQuestionIndex + 1} / {visibleQuestions.length}
       </Text>
       <Box marginTop={1} flexDirection="column">
         <Text bold>{question.title}</Text>
@@ -71,10 +80,19 @@ const EngineeringSectionNavigation = memo(function EngineeringSectionNavigation(
       <Box marginTop={1}>
         <Text bold>{question.question}</Text>
       </Box>
+      {question.selectionMode === "multi" ? (
+        <Box marginTop={1}>
+          <Text color={theme.muted} wrap="wrap">
+            Space para marcar o desmarcar. Enter para confirmar.
+          </Text>
+        </Box>
+      ) : null}
       <Box marginTop={1} overflow="hidden">
         <SelectableList
-          title="Options"
+          title="Opciones"
           selectedIndex={optionIndex}
+          selectionMode={question.selectionMode}
+          selectedOptionIds={selectedOptionIds}
           items={question.options.map((option) => ({
             id: option.id,
             label: option.label,
@@ -240,6 +258,8 @@ export const NavigationPanel = memo(function NavigationPanel({
         sectionId={engineeringSession.sectionId}
         questionIndex={engineeringSession.questionIndex}
         optionIndex={engineeringSession.optionIndex}
+        selectedOptionIds={engineeringSession.selectedOptionIds}
+        answers={engineeringSession.answers}
         saving={engineeringSession.saving}
         customEntry={engineeringSession.customEntry}
       />

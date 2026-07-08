@@ -15,10 +15,14 @@ export const ENGINEERING_SECTIONS: EngineeringSection[] = [
 export const DEFAULT_ENGINEERING_ANSWERS: EngineeringConfigAnswers =
   Object.fromEntries(
     ENGINEERING_SECTIONS.flatMap((section) =>
-      section.questions.map((question) => [
-        question.id,
-        question.options[0]!.id,
-      ]),
+      section.questions
+        .filter((question) => !question.showWhen)
+        .map((question) => [
+          question.id,
+          question.selectionMode === "multi"
+            ? question.options[0]!.id
+            : question.options[0]!.id,
+        ]),
     ),
   );
 
@@ -31,3 +35,12 @@ export {
   engineeringDecisionsSection,
   engineeringPrinciplesSection,
 };
+export {
+  formatAnswerValue,
+  formatMultiAnswer,
+  findNextVisibleQuestionIndex,
+  findPreviousVisibleQuestionIndex,
+  getVisibleQuestions,
+  isQuestionVisible,
+  parseMultiAnswer,
+} from "./question-utils.js";

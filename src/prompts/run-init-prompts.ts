@@ -20,7 +20,10 @@ export async function runInitPrompts(
     assistant,
     modules: { workflow },
     engineering: engineering.enabled
-      ? { answers: engineering.answers! }
+      ? {
+          answers: engineering.answers!,
+          customNotes: engineering.customNotes,
+        }
       : undefined,
   });
 }

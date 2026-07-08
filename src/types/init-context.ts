@@ -14,6 +14,7 @@ export const workspaceModulesSchema = z.object({
 
 export const engineeringConfigSchema = z.object({
   answers: z.record(z.string(), z.string()),
+  customNotes: z.record(z.string(), z.string()).optional(),
 });
 
 export const initContextSchema = z.object({

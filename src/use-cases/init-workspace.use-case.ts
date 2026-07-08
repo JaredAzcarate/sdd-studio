@@ -52,6 +52,7 @@ export async function initWorkspace(
         "technical",
       ),
       answers: context.engineering.answers,
+      customNotes: context.engineering.customNotes,
     });
 
     engineering = { answers: engineeringResult.answers };

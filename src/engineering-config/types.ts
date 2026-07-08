@@ -16,11 +16,18 @@ export type EngineeringOption = {
   detail: OptionDetail;
 };
 
+export type EngineeringQuestionShowWhen = {
+  questionId: string;
+  includes: string;
+};
+
 export type EngineeringQuestion = {
   id: string;
   title: string;
   description: string;
   question: string;
+  selectionMode?: "single" | "multi";
+  showWhen?: EngineeringQuestionShowWhen;
   options: EngineeringOption[];
 };
 

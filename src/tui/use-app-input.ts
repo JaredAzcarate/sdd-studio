@@ -3,6 +3,13 @@ import { join } from "node:path";
 import type { Key } from "ink";
 import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
 import { ENGINEERING_SECTIONS } from "../engineering-config/catalog/index.js";
+import {
+  findNextVisibleQuestionIndex,
+  findPreviousVisibleQuestionIndex,
+  formatMultiAnswer,
+  getVisibleQuestions,
+  parseMultiAnswer,
+} from "../engineering-config/catalog/question-utils.js";
 import { writeEngineeringSection } from "../engineering-config/generators/write-engineering-brief.js";
 import { ASSISTANTS } from "../registries/assistants.registry.js";
 import {
@@ -14,6 +21,7 @@ import type { AppScreen, AppState, TuiExitResult } from "./types.js";
 import type {
   EngineeringConfigAnswers,
   EngineeringCustomNotes,
+  EngineeringQuestion,
   EngineeringSection,
   EngineeringSectionId,
 } from "../engineering-config/types.js";
@@ -23,6 +31,7 @@ export type EngineeringSession = {
   sectionId: EngineeringSectionId;
   questionIndex: number;
   optionIndex: number;
+  selectedOptionIds: string[];
   answers: AppState["engineeringAnswers"];
   customNotes: EngineeringCustomNotes;
   customEntry: { questionId: string; text: string } | null;
@@ -59,6 +68,52 @@ export type AppInputContext = {
   engineeringSession: EngineeringSession | null;
   actions: AppInputActions;
 };
+
+function sessionStateForQuestion(
+  question: EngineeringQuestion,
+  answers: EngineeringConfigAnswers,
+): Pick<EngineeringSession, "optionIndex" | "selectedOptionIds"> {
+  if (question.selectionMode === "multi") {
+    return {
+      optionIndex: 0,
+      selectedOptionIds: parseMultiAnswer(answers[question.id]),
+    };
+  }
+
+  const optionIndex = question.options.findIndex(
+    (option) => option.id === answers[question.id],
+  );
+
+  return {
+    optionIndex: optionIndex === -1 ? 0 : optionIndex,
+    selectedOptionIds: [],
+  };
+}
+
+function cleanupAnswersAfterQuestion(
+  questionId: string,
+  answers: EngineeringConfigAnswers,
+  customNotes: EngineeringCustomNotes,
+): {
+  answers: EngineeringConfigAnswers;
+  customNotes: EngineeringCustomNotes;
+} {
+  const nextAnswers = { ...answers };
+  const nextCustomNotes = { ...customNotes };
+
+  if (questionId === "target-platforms") {
+    const targets = parseMultiAnswer(nextAnswers["target-platforms"]);
+    if (!targets.includes("mobile-native")) {
+      delete nextAnswers["mobile-platforms"];
+      delete nextCustomNotes["mobile-platforms"];
+    }
+    if (!targets.includes("custom")) {
+      delete nextCustomNotes["target-platforms"];
+    }
+  }
+
+  return { answers: nextAnswers, customNotes: nextCustomNotes };
+}
 
 function saveEngineeringSection(
   engineeringSession: EngineeringSession,
@@ -112,20 +167,26 @@ function advanceEngineeringAnswer(
     ...engineeringSession.answers,
     [questionId]: answerId,
   };
+  const { answers: cleanedAnswers, customNotes: cleanedCustomNotes } =
+    cleanupAnswersAfterQuestion(questionId, nextAnswers, nextCustomNotes);
 
-  if (engineeringSession.questionIndex < section.questions.length - 1) {
-    const nextQuestion =
-      section.questions[engineeringSession.questionIndex + 1];
-    const nextOptionIndex = nextQuestion.options.findIndex(
-      (option) => option.id === nextAnswers[nextQuestion.id],
-    );
+  const nextIndex = findNextVisibleQuestionIndex(
+    section,
+    engineeringSession.questionIndex,
+    cleanedAnswers,
+  );
+
+  if (nextIndex !== -1) {
+    const nextQuestion = section.questions[nextIndex]!;
+    const nextState = sessionStateForQuestion(nextQuestion, cleanedAnswers);
 
     actions.setEngineeringSession({
       sectionId: engineeringSession.sectionId,
-      questionIndex: engineeringSession.questionIndex + 1,
-      optionIndex: nextOptionIndex === -1 ? 0 : nextOptionIndex,
-      answers: nextAnswers,
-      customNotes: nextCustomNotes,
+      questionIndex: nextIndex,
+      optionIndex: nextState.optionIndex,
+      selectedOptionIds: nextState.selectedOptionIds,
+      answers: cleanedAnswers,
+      customNotes: cleanedCustomNotes,
       customEntry: null,
       saving: false,
     });
@@ -134,8 +195,8 @@ function advanceEngineeringAnswer(
 
   saveEngineeringSection(
     engineeringSession,
-    nextAnswers,
-    nextCustomNotes,
+    cleanedAnswers,
+    cleanedCustomNotes,
     targetDir,
     actions,
   );
@@ -348,22 +409,33 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
 
       const sectionId = selected.id as EngineeringSectionId;
       const section = ENGINEERING_SECTIONS.find((item) => item.id === sectionId)!;
-      const firstUnanswered = section.questions.findIndex(
-        (question) => state.engineeringAnswers[question.id] === undefined,
+      const visibleQuestions = getVisibleQuestions(
+        section,
+        state.engineeringAnswers,
       );
-      const questionIndex = firstUnanswered === -1 ? 0 : firstUnanswered;
-      const question = section.questions[questionIndex];
-      const optionIndex = Math.max(
-        0,
-        question.options.findIndex(
-          (option) => option.id === state.engineeringAnswers[question.id],
-        ),
+      const firstUnansweredQuestion =
+        visibleQuestions.find(
+          (item) => state.engineeringAnswers[item.id] === undefined,
+        ) ?? visibleQuestions[0];
+
+      if (!firstUnansweredQuestion) {
+        return;
+      }
+
+      const questionIndex = section.questions.findIndex(
+        (item) => item.id === firstUnansweredQuestion.id,
+      );
+      const question = section.questions[questionIndex]!;
+      const sessionState = sessionStateForQuestion(
+        question,
+        state.engineeringAnswers,
       );
 
       actions.setEngineeringSession({
         sectionId,
         questionIndex,
-        optionIndex: optionIndex === -1 ? 0 : optionIndex,
+        optionIndex: sessionState.optionIndex,
+        selectedOptionIds: sessionState.selectedOptionIds,
         answers: { ...state.engineeringAnswers },
         customNotes: { ...state.engineeringCustomNotes },
         customEntry: null,
@@ -408,11 +480,16 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
             [question.id]: text,
           };
 
+          const answerId =
+            question.selectionMode === "multi"
+              ? formatMultiAnswer(engineeringSession.selectedOptionIds)
+              : "custom";
+
           advanceEngineeringAnswer(
             engineeringSession,
             section,
             question.id,
-            "custom",
+            answerId,
             nextCustomNotes,
             state.targetDir,
             actions,
@@ -432,23 +509,24 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
       }
 
       if (key.leftArrow) {
-        if (engineeringSession.questionIndex > 0) {
-          const previousIndex = engineeringSession.questionIndex - 1;
-          const previousQuestion = section.questions[previousIndex];
-          const previousAnswerId = engineeringSession.answers[previousQuestion.id];
-          const previousOptionIndex = previousAnswerId
-            ? Math.max(
-                0,
-                previousQuestion.options.findIndex(
-                  (option) => option.id === previousAnswerId,
-                ),
-              )
-            : 0;
+        const previousIndex = findPreviousVisibleQuestionIndex(
+          section,
+          engineeringSession.questionIndex,
+          engineeringSession.answers,
+        );
+
+        if (previousIndex !== -1) {
+          const previousQuestion = section.questions[previousIndex]!;
+          const previousState = sessionStateForQuestion(
+            previousQuestion,
+            engineeringSession.answers,
+          );
 
           actions.setEngineeringSession({
             ...engineeringSession,
             questionIndex: previousIndex,
-            optionIndex: previousOptionIndex,
+            optionIndex: previousState.optionIndex,
+            selectedOptionIds: previousState.selectedOptionIds,
             customEntry: null,
           });
         }
@@ -476,7 +554,57 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         actions.goBack();
         return;
       }
+
+      if (
+        question.selectionMode === "multi" &&
+        input === " " &&
+        !key.return
+      ) {
+        const optionId = question.options[engineeringSession.optionIndex]!.id;
+        const selected = engineeringSession.selectedOptionIds;
+        const nextSelected = selected.includes(optionId)
+          ? selected.filter((id) => id !== optionId)
+          : [...selected, optionId];
+
+        actions.setEngineeringSession({
+          ...engineeringSession,
+          selectedOptionIds: nextSelected,
+        });
+        return;
+      }
+
       if (!key.return) {
+        return;
+      }
+
+      if (question.selectionMode === "multi") {
+        if (engineeringSession.selectedOptionIds.length === 0) {
+          return;
+        }
+
+        if (
+          engineeringSession.selectedOptionIds.includes("custom") &&
+          !engineeringSession.customNotes[question.id]
+        ) {
+          actions.setEngineeringSession({
+            ...engineeringSession,
+            customEntry: {
+              questionId: question.id,
+              text: engineeringSession.customNotes[question.id] ?? "",
+            },
+          });
+          return;
+        }
+
+        advanceEngineeringAnswer(
+          engineeringSession,
+          section,
+          question.id,
+          formatMultiAnswer(engineeringSession.selectedOptionIds),
+          engineeringSession.customNotes,
+          state.targetDir,
+          actions,
+        );
         return;
       }
 

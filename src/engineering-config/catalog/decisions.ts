@@ -8,6 +8,71 @@ export const engineeringDecisionsSection: EngineeringSection = {
     "Architectural decisions that begin shaping how the system will be structured and operated.",
   questions: [
     {
+      id: "repository-organization",
+      title: "Organización de repositorios",
+      description:
+        "Define cómo se organiza el código a nivel de repositorios, no la estructura interna de carpetas.",
+      question: "¿Cómo quieres organizar el código?",
+      options: [
+        defineOption("single-monorepo", "Monorepo único", {
+          whatIsIt:
+            "Todo el código vive en un solo repositorio con una o varias aplicaciones o paquetes internos.",
+          example:
+            "Un único repo con apps web, API y librerías compartidas en carpetas o paquetes internos.",
+          bestFor:
+            "Equipos pequeños o medianos que priorizan cambios atómicos y visibilidad completa del sistema.",
+          considerations:
+            "El repo puede crecer; necesitas límites claros entre módulos y CI que escale con el tamaño.",
+          recommendation:
+            "Elige Monorepo único cuando la coordinación entre componentes es más crítica que el aislamiento por repo.",
+          learnMore:
+            "Un monorepo no prescribe la herramienta; solo define que el código comparte un mismo repositorio.",
+        }),
+        defineOption("independent-repos", "Repositorios independientes por app/servicio", {
+          whatIsIt:
+            "Cada aplicación o servicio mantiene su propio repositorio con ciclos de release independientes.",
+          example:
+            "Repos separados para la app web, la API, el worker y la app móvil.",
+          bestFor:
+            "Equipos autónomos, despliegues independientes y límites de propiedad claros por servicio.",
+          considerations:
+            "Contratos entre repos, versionado de APIs y coordinación cross-repo requieren disciplina explícita.",
+          recommendation:
+            "Elige repos independientes cuando cada superficie evoluciona con ritmos y equipos distintos.",
+          learnMore:
+            "Polyrepo facilita autonomía; compensa con contratos estables y documentación de integración.",
+        }),
+        defineOption("orchestrator-independent", "Repo orquestador + repos independientes", {
+          whatIsIt:
+            "Un repositorio orquestador coordina despliegue, documentación o tooling mientras el código vive en repos separados.",
+          example:
+            "Un repo platform con scripts de CI/CD y docs que referencia repos de web, API y mobile.",
+          bestFor:
+            "Organizaciones que necesitan autonomía por servicio pero un punto central de coordinación operativa.",
+          considerations:
+            "El orquestador debe tener dueño claro; evita convertirlo en un monorepo disfrazado sin código.",
+          recommendation:
+            "Elige orquestador + repos independientes cuando quieres autonomía con un hub de coordinación.",
+          learnMore:
+            "Este patrón separa topología de repos de layout interno dentro de cada repo.",
+        }),
+        defineOption("custom", "Otra — especifica", {
+          whatIsIt:
+            "Un esquema de organización distinto, definido por restricciones internas, legado o política de la organización.",
+          example:
+            "Repos por unidad de negocio con submódulos, o un modelo híbrido documentado en un RFC interno.",
+          bestFor:
+            "Organizaciones con restricciones regulatorias, legado o monorepos parciales ya establecidos.",
+          considerations:
+            "Sin documentación escrita, los esquemas personalizados se degradan rápido para nuevos contribuidores.",
+          recommendation:
+            "Elige Otra solo si puedes describir reglas claras de dónde debe vivir el código nuevo.",
+          learnMore:
+            "Los esquemas custom necesitan ejemplos y enforcement para mantenerse coherentes.",
+        }),
+      ],
+    },
+    {
       id: "project-organization",
       title: "Project Organization",
       description: "Defines how source code is grouped and navigated across the codebase.",

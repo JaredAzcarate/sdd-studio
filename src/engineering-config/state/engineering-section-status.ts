@@ -2,6 +2,11 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { ENGINEERING_SECTIONS } from "../catalog/index.js";
+import {
+  formatMultiAnswer,
+  getVisibleQuestions,
+  parseMultiAnswer,
+} from "../catalog/question-utils.js";
 import type {
   EngineeringConfigAnswers,
   EngineeringCustomNotes,
@@ -44,9 +49,41 @@ function parseAnswersFromMarkdown(content: string): {
         continue;
       }
 
-      if (label.startsWith("Custom — ")) {
+      if (label.startsWith("Custom — ") || label.startsWith("Otra — ")) {
+        const prefix = label.startsWith("Custom — ")
+          ? "Custom — "
+          : "Otra — ";
         answers[question.id] = "custom";
-        customNotes[question.id] = label.slice("Custom — ".length);
+        customNotes[question.id] = label.slice(prefix.length);
+        continue;
+      }
+
+      if (question.selectionMode === "multi") {
+        const parts = label.split(",").map((part) => part.trim());
+        const optionIds: string[] = [];
+
+        for (const part of parts) {
+          if (part.startsWith("Otra — ")) {
+            optionIds.push("custom");
+            customNotes[question.id] = part.slice("Otra — ".length);
+            continue;
+          }
+
+          if (part.startsWith("Custom — ")) {
+            optionIds.push("custom");
+            customNotes[question.id] = part.slice("Custom — ".length);
+            continue;
+          }
+
+          const option = question.options.find((item) => item.label === part);
+          if (option) {
+            optionIds.push(option.id);
+          }
+        }
+
+        if (optionIds.length > 0) {
+          answers[question.id] = formatMultiAnswer(optionIds);
+        }
         continue;
       }
 
@@ -93,7 +130,8 @@ export function getSectionStatus(
     return "not-started";
   }
 
-  const answered = section.questions.filter(
+  const visibleQuestions = getVisibleQuestions(section, answers);
+  const answered = visibleQuestions.filter(
     (question) => answers[question.id] !== undefined,
   ).length;
 
@@ -101,7 +139,7 @@ export function getSectionStatus(
     return "not-started";
   }
 
-  if (answered === section.questions.length) {
+  if (answered === visibleQuestions.length) {
     return "completed";
   }
 

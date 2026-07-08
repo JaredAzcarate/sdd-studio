@@ -2,6 +2,7 @@ import type { AppScreen, AppState, FooterShortcut } from "./types.js";
 import { defaultFooterShortcuts } from "./data/menu-items.js";
 import { countCompletedSections } from "../engineering-config/state/engineering-section-status.js";
 import { ENGINEERING_SECTIONS } from "../engineering-config/catalog/index.js";
+import { findPreviousVisibleQuestionIndex } from "../engineering-config/catalog/question-utils.js";
 import type { EngineeringSession } from "./use-app-input.js";
 
 export function getSectionTitle(screen: AppScreen): string {
@@ -66,13 +67,36 @@ export function getFooterShortcuts(
       ];
     }
 
-    const shortcuts: FooterShortcut[] = [
-      { keys: "↑↓", label: "Navigate" },
-      { keys: "Enter", label: "Confirm" },
-      { keys: "Esc", label: "Dashboard" },
-    ];
+    const section = engineeringSession
+      ? ENGINEERING_SECTIONS.find(
+          (item) => item.id === engineeringSession.sectionId,
+        )
+      : undefined;
+    const question = section?.questions[engineeringSession!.questionIndex];
+    const hasPrevious =
+      engineeringSession &&
+      section &&
+      findPreviousVisibleQuestionIndex(
+        section,
+        engineeringSession.questionIndex,
+        engineeringSession.answers,
+      ) !== -1;
 
-    if (engineeringSession && engineeringSession.questionIndex > 0) {
+    const shortcuts: FooterShortcut[] =
+      question?.selectionMode === "multi"
+        ? [
+            { keys: "↑↓", label: "Navigate" },
+            { keys: "Space", label: "Toggle" },
+            { keys: "Enter", label: "Confirm" },
+            { keys: "Esc", label: "Dashboard" },
+          ]
+        : [
+            { keys: "↑↓", label: "Navigate" },
+            { keys: "Enter", label: "Confirm" },
+            { keys: "Esc", label: "Dashboard" },
+          ];
+
+    if (hasPrevious) {
       shortcuts.unshift({ keys: "←", label: "Previous" });
     }
 

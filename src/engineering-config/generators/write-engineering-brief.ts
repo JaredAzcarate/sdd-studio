@@ -4,6 +4,7 @@ import {
   ENGINEERING_SECTIONS,
   getDefaultEngineeringAnswers,
 } from "../catalog/index.js";
+import { formatAnswerValue, isQuestionVisible } from "../catalog/question-utils.js";
 import type {
   EngineeringConfigAnswers,
   EngineeringCustomNotes,
@@ -15,17 +16,6 @@ const OUTPUT_FILES: Record<EngineeringSectionId, string> = {
   decisions: "engineering-decisions.md",
   conventions: "engineering-conventions.md",
 };
-
-function formatAnswerLabel(
-  optionLabel: string,
-  customNote?: string,
-): string {
-  if (optionLabel === "Custom" && customNote) {
-    return `Custom — ${customNote}`;
-  }
-
-  return optionLabel;
-}
 
 function renderSectionDocument(
   sectionId: EngineeringSectionId,
@@ -45,22 +35,28 @@ function renderSectionDocument(
     "",
   ];
 
-  section.questions.forEach((question, index) => {
-    const answerId = answers[question.id];
-    const selected = question.options.find((option) => option.id === answerId);
+  let visibleIndex = 0;
 
-    if (!selected) {
+  section.questions.forEach((question) => {
+    if (!isQuestionVisible(question, answers)) {
+      return;
+    }
+
+    const answerValue = answers[question.id];
+    if (!answerValue) {
       throw new Error(
         `Missing answer for engineering question "${question.id}".`,
       );
     }
 
-    const answerLabel = formatAnswerLabel(
-      selected.label,
+    visibleIndex += 1;
+    const answerLabel = formatAnswerValue(
+      question,
+      answerValue,
       customNotes[question.id],
     );
 
-    lines.push(`## ${index + 1}. ${question.title}`);
+    lines.push(`## ${visibleIndex}. ${question.title}`);
     lines.push("");
     lines.push(`**Question:** ${question.question}`);
     lines.push("");
