@@ -1,223 +1,145 @@
 # EXAMPLES — sdd-technical
 
-## Chat — modo conciso (default)
+## Chat — turno 1 (intro + `AskQuestion`)
 
-### Turno 1 — Fase 0 + Fase 1 (digest corto + lista)
+**Mensaje en chat:**
 
 ```markdown
-Fase 1/5 — Lista de secciones
+Basado en `.workspace/brief/technical`, voy a proponerte tecnologías, librerías e integraciones para definir el stack del proyecto.
 
-### Del Brief (explícito)
-- Backend integrado (Principle §4)
-- App Router (Decision §4)
-- Autenticación social + roles (Decision §8–§9)
-- Base de datos relacional (Decision §10)
-- Plataformas: Web, Mobile nativo iOS/Android (Principle §2)
-- Repos: monorepo único (Decision §1)
-- Testing y deployment profesional (Decision §13–§14)
-
-### Inferido por el agente (requiere confirmación)
-- (ninguno pendiente)
-
-### Confirmado por el usuario
-- (pendiente Fase 1b)
-
-| # | Sección | Etiqueta |
-|---|---------|----------|
-| 1 | Frontend | [Brief-locked] |
-| 2 | Backend | [Brief-locked] |
-| 3 | Database | [Brief-locked] |
-| … | … | … |
-
-¿Confirmas esta lista? (sí / ajustes)
+Veo **web + iOS/Android + desktop** con **máximo code sharing**, **App Router** y backend **integrado**. Empecemos por web.
 ```
 
-### Turno 2 — Fase 1b (solo tablas multiple-choice)
+**Luego `AskQuestion` (no repetir opciones en markdown):**
+
+- **title:** `Stack — Web`
+- **prompt:** `¿Qué te gustaría usar para desarrollo web?`
+- **options:**
+  - `Next.js (Recommended) — App Router, SSR, React para compartir con mobile`
+  - `Remix — file routing, React, loaders/actions`
+  - `Nuxt — Vue; menos alineado si mobile será React/Expo`
+
+## Chat — turno 2 (mobile)
+
+**Chat:**
 
 ```markdown
-Fase 2/5 — Dimensiones arquitectónicas
-
-## Fase 1b — Dimensiones arquitectónicas
-
-### 1. Plataformas objetivo
-| Opción | Respuesta |
-| ------ | --------- |
-| A | Web solamente |
-| B | Web + mobile nativo |
-| C | Web + mobile + desktop |
-| D | **Other** — especifica |
-
-### 2. Organización de repositorios
-| Opción | Respuesta |
-| ------ | --------- |
-| A | Monorepo único |
-| B | Repositorios independientes |
-| C | Repo orquestador + repos independientes |
-| D | **Other** — especifica |
-
-### 3. Preferencias existentes
-| Opción | Respuesta |
-| ------ | --------- |
-| A | No, empezar desde cero según el Brief |
-| B | **Other** — lista tecnologías ya elegidas |
-
-### 4. Restricciones de equipo (opcional)
-| Opción | Respuesta |
-| ------ | --------- |
-| A | Ninguna |
-| B | **Other** — especifica |
-
-Responde con: `1B, 2A, 3A, 4A` o texto libre por pregunta.
+Confirmado: Web=Next.js
 ```
 
-### Turno 3+ — Fase 3 (una sección)
+**`AskQuestion`:**
+
+- **title:** `Stack — Mobile`
+- **prompt:** `¿Cómo quieres abordar mobile nativo (iOS/Android)? El Brief pide máximo code sharing.`
+- **options:**
+  - `Expo (Recommended) — React Native, alinea con Next.js`
+  - `React Native sin Expo`
+  - `Capacitor — empaquetar la app web`
+
+## Chat — turno 3 (desktop)
+
+**Chat:**
 
 ```markdown
-Fase 3/8 — Database
+Confirmado: Web=Next.js, Mobile=Expo
+```
 
-**Etiqueta:** [Brief-locked] — Decision §10 (Relational)
+**`AskQuestion`:**
 
-**Requirement:** Almacenamiento relacional con ACID.
+- **title:** `Stack — Desktop`
+- **prompt:** `¿Qué prefieren para desktop?`
+- **options:**
+  - `Tauri (Recommended) — binario ligero, reutiliza UI web`
+  - `Electron`
+  - `PWA / shell web mínimo`
 
-**Recommendation:** PostgreSQL — alineado con modelo relacional del Brief.
+## Chat — turno N (base de datos)
 
-| Option | Technology |
+**`AskQuestion`:**
+
+- **title:** `Stack — Database`
+- **prompt:** `¿Qué base de datos relacional usamos?`
+- **options:**
+  - `PostgreSQL (Recommended) — ACID, JSON, ecosistema amplio`
+  - `MySQL 8`
+  - `SQLite — single-node / dev`
+
+## Chat — bloqueo (auditor)
+
+**Chat** explica el conflicto en lenguaje plano (2–4 frases).
+
+**`AskQuestion`:**
+
+- **prompt:** `¿Cómo quieren resolver el code sharing entre plataformas?`
+- **options:** enfoques viables según el Brief (no tecnologías aún si el bloqueo es arquitectónico)
+
+## Chat — resumen final
+
+**Chat:** tabla área → selección.
+
+**`AskQuestion`:**
+
+- **title:** `Stack — Aprobación`
+- **prompt:** `¿Apruebas este stack para escribir engineering-stack.md?`
+- **options:**
+  - `Sí, escribir engineering-stack.md`
+  - `Quiero edits`
+
+## Anti-ejemplo — tabla markdown (incorrecto)
+
+```markdown
+| Opción | Tecnología |
 | ------ | ---------- |
-| 1 | PostgreSQL *(recommended)* |
-| 2 | MySQL 8 |
-| 3 | SQLite (single-node) |
-| 4 | **Other** — specify your choice |
+| 1 | Next.js |
+| 2 | Remix |
 
 Responde con 1, 2, 3, 4 u Other.
 ```
 
-### Anti-ejemplo — Mezcla de fases en un turno
+**Correcto:** intro breve en chat + `AskQuestion` con opciones clicables.
 
-**Incorrecto:** Un solo mensaje con digest de 20 bullets, análisis de tensiones T1–T4, tabla de 18 secciones, Fase 1b abierta y pregunta de Database con trade-offs de MySQL vs PostgreSQL.
-
-**Correcto:** Turno 1 = digest corto + lista. Turno 2 = solo 1b. Turno 3 = una línea de revisión o primera sección. Turnos siguientes = una sección cada uno.
-
----
-
-## Chat — section prompt (verbose / referencia)
+## Anti-ejemplo — estilo arquitecto (incorrecto)
 
 ```markdown
-## Database — choose one
-
-**Requirement:** Relational storage with ACID (Engineering Principle §8, Decision §10 — *from Brief digest*).
-
-**Recommendation:** PostgreSQL — …
-
-| Option | Technology |
-| ------ | ---------- |
-| 1 | PostgreSQL *(recommended)* |
-| 2 | MySQL 8 |
-| 3 | SQLite (single-node / embedded) |
-| 4 | **Other** — specify your choice |
-
-Reply with the option number, technology name, or custom text for **Other**.
+Fase 3/18 — Frontend [Brief-locked]
 ```
 
-Use this extended format **only** in `modo verbose`.
+**Correcto:** intro de equipo + `AskQuestion` con pregunta natural.
 
----
+## Anti-ejemplo — opciones hardcodeadas
 
-## Chat — Brief digest format (referencia)
+**Incorrecto:** Siempre las mismas opciones sin leer el Brief.
 
-```markdown
-### Del Brief (explícito)
-- Backend integrado, fuente de verdad en servidor (Principle §4–§5)
-- App Router (Decision §4)
-- Autenticación social, autorización por roles (Decision §8–§9)
+**Correcto:** Filtrar opciones según App Router, code sharing, backend integrado, etc.
 
-### Inferido por el agente (requiere confirmación)
-- ~~Organización multi-paquete~~ → **retirado; no confirmado**
-
-### Confirmado por el usuario
-- Plataformas: web + iOS + Android + desktop
-- Repositorios: orquestador + repos independientes
-```
-
-En modo conciso: máximo 8 + 3 + 3 bullets.
-
----
-
-## Chat — user preference already stated (excerpt)
-
-```markdown
-Fase 3/5 — Frontend
-
-**Etiqueta:** [User-elicited] — preferencia declarada en Phase 1b
-
-**Requirement:** App Router (Decision §4)
-
-**Tu elección:** Next.js 15
-
-**Compatibilidad con el Brief:** Cumple App Router y plataformas confirmadas.
-
-¿Confirmas Next.js 15? (sí / quiero ver alternativas)
-```
-
----
-
-## engineering-stack.md (excerpt — after user confirms)
-
-> **Note:** `engineering-stack.md` may include a **Repository Organization** section when confirmed in Phase 1b — **Selected:** pattern name, not tool name, unless user selected a tool in Phase 3.
+## engineering-stack.md (excerpt — after approval)
 
 ```markdown
 # Engineering Stack
 
 ## Overview
 
-TypeScript monolith: SvelteKit UI and server routes, PostgreSQL, Drizzle ORM.
+Next.js full-stack web app, Expo for iOS/Android, Tauri for desktop, PostgreSQL with Drizzle.
 
-Traceability: Engineering Principles §2, Engineering Decisions §1, §3.
+Traceability: Engineering Principles §2–§4, Engineering Decisions §4–§5, §11.
 
 ---
 
 ## Frontend
 
-**Selected:** SvelteKit with TypeScript
+**Selected:** Next.js with TypeScript
 
-Compiler-driven UI with file-based routing and SSR.
+App Router, SSR, and shared React patterns with Expo mobile.
 
-Traceability: Engineering Principles §2, Engineering Conventions (TypeScript end-to-end).
-
----
-
-## Database
-
-**Selected:** PostgreSQL
-
-Relational core for aggregates and billing.
-
-Traceability: Engineering Principle §8, Engineering Decision §10.
+Traceability: Engineering Principles §2, Engineering Decisions §5 (App Router).
 
 ---
 
 ## Architecture Summary
 
-Single SvelteKit application on PostgreSQL with Drizzle. Matches maintainability goals in the Brief.
+Next.js hosts the integrated backend and web UI. Expo and Tauri extend the product to mobile and desktop while maximizing shared TypeScript and React code.
 ```
 
-## Anti-example — Inferring structure from broad principles
+## Anti-ejemplo — escribir sin confirmación
 
-**Incorrect:** After reading "multi-platform" + "maximum code sharing", add "Monorepo" as section #1 in Phase 3 without asking repository organization.
-
-**Correct:** Phase 1b asks repository organization → user answers → proceed.
-
-## Anti-example — Incorrect file content
-
-```markdown
-## Frontend
-
-**Recommended:** Next.js 15
-
-**Not selected:** Vite + React — viable but …
-```
-
-The file must use **Selected:** only.
-
-## Anti-example — Incorrect workflow
-
-Writing `engineering-stack.md` in one shot without per-section user confirmation.
+Writing `engineering-stack.md` without per-area `AskQuestion` answers and final approval question.
