@@ -3,6 +3,8 @@ dist/
 *.log
 .DS_Store
 .env
-.cursor/
 .env.*
 *.tgz
+.cursor/
+.workspace/
+.vscode/

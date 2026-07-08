@@ -112,6 +112,11 @@ describe("initWorkspace", () => {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
     }
 
+    expect(
+      existsSync(join(tempDir, ".workspace/brief/technical/stack")),
+      "legacy stack folder must not be generated",
+    ).toBe(false);
+
     expect(result.createdPaths.length).toBeGreaterThanOrEqual(
       BASE_PATHS.length + CURSOR_PATHS.length,
     );
