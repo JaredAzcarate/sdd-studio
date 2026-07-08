@@ -5,7 +5,6 @@ disable-model-invocation: true
 tools: ["read", "edit", "search", "execute"]
 ---
 
-
 # SDD Plan
 
 Read the Brief and validated specification, then generate or update `.workspace/workflow/`.
@@ -30,7 +29,7 @@ Before planning, read:
 
 1. Read `.workspace/brief/business/product-principles.md`.
 2. Read `.workspace/brief/business/product-guide.md`.
-3. Read `.workspace/brief/technical/development.md`, `modeling.md`, and `stack/*.md`.
+3. Read `.workspace/brief/technical/engineering-decisions.md`, `engineering-modeling.md`, and `engineering-stack.md`.
 4. Read all of `.workspace/spec/business/` and `.workspace/spec/technical/`.
 5. Read .github/sdd-studio/sdd-plan/STANDARDS.md and .github/sdd-studio/sdd-plan/EXAMPLES.md.
 6. Verify substantial spec (domains with 12 files each).
@@ -43,7 +42,7 @@ Before planning, read:
 
 From brief/ and spec/, extract:
 
-- Technical constraints (stack, architecture, methodology from `brief/technical/`)
+- Technical constraints (stack from `engineering-stack.md`, architecture and organization from `engineering-decisions.md`, modeling from `engineering-modeling.md`)
 - Product constraints (user journeys and experiences from `brief/business/product-guide.md`)
 - Domains and dependencies (`*-relations.md`)
 - Priority capabilities and flows
@@ -88,7 +87,7 @@ IDs: `TASK-001`, `TASK-002`, ... (never reuse).
 ### Phase 6 — Validation
 
 ```bash
-node .cursor/skills/sdd-plan/scripts/validate-workflow.mjs .workspace/workflow
+node .github/sdd-studio/sdd-plan/scripts/validate-workflow.mjs .workspace/workflow
 ```
 
 Fix errors and re-run until `OK`.

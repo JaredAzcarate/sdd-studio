@@ -10,7 +10,7 @@ export function formatMigrateResult(
     return [
       "SDD workspace already uses the Brief / Specification structure.",
       "",
-      `Marker: ${SDD_WORKSPACE_DIR}/brief/technical/development.md`,
+      `Marker: ${SDD_WORKSPACE_DIR}/brief/technical/engineering-principles.md`,
     ].join("\n");
   }
 

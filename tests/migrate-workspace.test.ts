@@ -91,18 +91,15 @@ Cursor
     ).toContain("# Product Principles");
     expect(
       readFileSync(
-        join(workspaceDir, "brief/business/product-guide.md"),
+        join(workspaceDir, "brief/technical/engineering-principles.md"),
         "utf8",
       ),
-    ).toContain("# Product Guide");
+    ).toContain("# Engineering Principles");
     expect(
       readFileSync(
-        join(workspaceDir, "brief/technical/development.md"),
+        join(workspaceDir, "brief/technical/engineering-modeling.md"),
         "utf8",
       ),
-    ).toContain("Kanban");
-    expect(
-      readFileSync(join(workspaceDir, "brief/technical/modeling.md"), "utf8"),
     ).toContain("Domain Driven Design");
     expect(
       readFileSync(
@@ -122,10 +119,10 @@ Cursor
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-migrate-"));
     const marker = join(
       tempDir,
-      ".workspace/brief/technical/development.md",
+      ".workspace/brief/technical/engineering-principles.md",
     );
     mkdirSync(join(marker, ".."), { recursive: true });
-    writeFileSync(marker, "# Development\n");
+    writeFileSync(marker, "# Engineering Principles\n");
 
     const result = await migrateWorkspace({ targetDir: tempDir });
 

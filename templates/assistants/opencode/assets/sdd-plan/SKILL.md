@@ -28,7 +28,7 @@ Before planning, read:
 
 1. Read `.workspace/brief/business/product-principles.md`.
 2. Read `.workspace/brief/business/product-guide.md`.
-3. Read `.workspace/brief/technical/development.md`, `modeling.md`, and `stack/*.md`.
+3. Read `.workspace/brief/technical/engineering-decisions.md`, `engineering-modeling.md`, and `engineering-stack.md`.
 4. Read all of `.workspace/spec/business/` and `.workspace/spec/technical/`.
 5. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
 6. Verify substantial spec (domains with 12 files each).
@@ -41,7 +41,7 @@ Before planning, read:
 
 From brief/ and spec/, extract:
 
-- Technical constraints (stack, architecture, methodology from `brief/technical/`)
+- Technical constraints (stack from `engineering-stack.md`, architecture and organization from `engineering-decisions.md`, modeling from `engineering-modeling.md`)
 - Product constraints (user journeys and experiences from `brief/business/product-guide.md`)
 - Domains and dependencies (`*-relations.md`)
 - Priority capabilities and flows

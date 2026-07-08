@@ -356,7 +356,7 @@ None required for this domain in the current scope.
 
 ## Notes
 
-See `brief/technical/stack/backend.md`. Module path follows `brief/technical/development.md` Code Organization.
+See `brief/technical/engineering-stack.md` (Backend + API sections). Module path follows **Project Organization** in `brief/technical/engineering-decisions.md`.
 ```
 
 ## spec/technical/ui/task-ui.md
@@ -476,15 +476,15 @@ Board → Task Detail → back to Board
 
 ## Dependencies
 
-- `brief/technical/development.md` — Code Organization (domain folder layout)
-- `brief/technical/modeling.md` — DDD aggregate boundaries
-- `brief/technical/stack/backend.md` — Server Actions surface
+- `brief/technical/engineering-decisions.md` — Project Organization (domain folder layout)
+- `brief/technical/engineering-modeling.md` — DDD aggregate boundaries
+- `brief/technical/engineering-stack.md` — Server Actions surface (Backend + API sections)
 
 ---
 
 ## Notes
 
-Replace `<resolved-code-root>` per Repository Strategy in `development.md` (e.g. repo root or `numo-app/`).
+Replace `<resolved-code-root>` per **Project Organization** in `engineering-decisions.md` (e.g. repo root or `numo-app/`).
 ```
 
 ## spec/technical/database/task-database.md
@@ -532,5 +532,5 @@ Replace `<resolved-code-root>` per Repository Strategy in `development.md` (e.g.
 
 ## Notes
 
-See `brief/technical/stack/database.md` for PostgreSQL conventions.
+See `brief/technical/engineering-stack.md` (Database section) for PostgreSQL conventions.
 ```

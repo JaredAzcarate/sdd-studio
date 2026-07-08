@@ -6,7 +6,7 @@ description: Reads the entire .workspace/brief/ (business and technical), discov
 
 Read the Brief (business and technical perspectives), discover domains, and generate the full specification under `.workspace/spec/business/` and `.workspace/spec/technical/`.
 
-The Business Brief (`brief/business/product-guide.md`) is the **primary and sole source** of functional knowledge. Transform its narrative into structured spec files. Use the Technical Brief (`brief/technical/`) for modeling, development, and stack context only. **Never invent functionality** not described in the Product Guide.
+The Business Brief (`brief/business/product-guide.md`) is the **primary and sole source** of functional knowledge. Transform its narrative into structured spec files. Use the Engineering Brief (`brief/technical/`) for modeling, project organization, and stack context only. **Never invent functionality** not described in the Product Guide.
 
 ## Required documents
 
@@ -30,8 +30,8 @@ Before generating, read:
 
 1. Read `.workspace/brief/business/product-principles.md` (conceptual context).
 2. Read `.workspace/brief/business/product-guide.md` (primary functional source).
-3. Read `.workspace/brief/technical/development.md`, `modeling.md`, and `stack/*.md` (technical context only).
-4. Resolve `<resolved-code-root>` and domain folder pattern from `development.md` before writing `technical/api/` or `technical/architecture/` files.
+3. Read `.workspace/brief/technical/engineering-decisions.md`, `engineering-modeling.md`, and `engineering-stack.md` (technical context only).
+4. Resolve `<resolved-code-root>` and domain folder pattern from **Project Organization** in `engineering-decisions.md` and **Architecture Summary** in `engineering-stack.md` before writing `technical/api/` or `technical/architecture/` files.
 5. Read @.opencode/sdd-studio/sdd-spec/STANDARDS.md and @.opencode/sdd-studio/sdd-spec/EXAMPLES.md.
 6. Verify the Brief exists; if not, stop and suggest **sdd-idea** (greenfield) or **sdd-generate** (existing codebase).
 7. Inventory existing files in `.workspace/spec/business/` and `.workspace/spec/technical/`.
@@ -41,12 +41,12 @@ Before generating, read:
 
 ### Phase 1 — Domain discovery
 
-From `product-guide.md` (user journeys and experiences) and `brief/technical/modeling.md` (modeling context), propose candidate domains. Ask:
+From `product-guide.md` (user journeys and experiences) and `brief/technical/engineering-modeling.md` (modeling context), propose candidate domains. Ask:
 
 1. Are the domains correct? Is anything missing or extra?
 2. Per domain: purpose, entities, boundaries — grounded in the Product Guide
 3. Relationships between domains
-4. If `modeling.md` indicates DDD: aggregates, invariants, ubiquitous language
+4. If `engineering-modeling.md` indicates DDD: aggregates, invariants, ubiquitous language
 
 Present the domain map for **approval** before writing files.
 
@@ -86,7 +86,7 @@ Use the exact templates from @.opencode/sdd-studio/sdd-spec/STANDARDS.md. See @.
 Run the validator from the project root:
 
 ```bash
-node .cursor/skills/sdd-spec/scripts/validate-spec.mjs .workspace/spec
+node .opencode/sdd-studio/sdd-spec/scripts/validate-spec.mjs .workspace/spec
 ```
 
 If it fails:

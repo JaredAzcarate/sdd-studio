@@ -8,8 +8,8 @@ import {
 
 describe("template-resolver", () => {
   it("resolves bundled template paths", () => {
-    const developmentTemplate = resolveWorkspaceTemplatePath(
-      "brief/technical/development.md",
+    const engineeringPrinciplesTemplate = resolveWorkspaceTemplatePath(
+      "brief/technical/engineering-principles.md",
     );
     const productGuideTemplate = resolveWorkspaceTemplatePath(
       "brief/business/product-guide.md",
@@ -21,7 +21,7 @@ describe("template-resolver", () => {
       "SKILL.md",
     );
 
-    expect(existsSync(developmentTemplate)).toBe(true);
+    expect(existsSync(engineeringPrinciplesTemplate)).toBe(true);
     expect(existsSync(productGuideTemplate)).toBe(true);
     expect(existsSync(cursorSkills)).toBe(true);
     expect(resolveTemplatePath()).toContain("templates");

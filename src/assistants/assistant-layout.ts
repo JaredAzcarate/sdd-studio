@@ -27,6 +27,7 @@ export type AssistantLayout = {
 
 const SKILL_NAMES = [
   "sdd-idea",
+  "sdd-technical",
   "sdd-generate",
   "sdd-spec",
   "sdd-review",

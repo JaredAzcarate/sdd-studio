@@ -24,6 +24,9 @@ describe("CursorAssistantStrategy", () => {
     expect(existsSync(join(tempDir, ".cursor/skills/sdd-idea/SKILL.md"))).toBe(
       true,
     );
+    expect(
+      existsSync(join(tempDir, ".cursor/skills/sdd-technical/SKILL.md")),
+    ).toBe(true);
     expect(existsSync(join(tempDir, ".cursor/skills/sdd-generate/SKILL.md"))).toBe(
       true,
     );
@@ -47,7 +50,7 @@ describe("CursorAssistantStrategy", () => {
       "utf8",
     );
     expect(rule).toContain(".workspace/brief/business/product-principles.md");
-    expect(rule).toContain(".workspace/brief/technical/development.md");
+    expect(rule).toContain(".workspace/brief/technical/engineering-principles.md");
     expect(rule).toContain(".workspace/spec/business/");
     expect(rule).toContain("sdd-idea");
   });

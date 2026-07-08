@@ -23,13 +23,10 @@ function createContext(
 const BASE_PATHS = [
   ".workspace/brief/business/product-principles.md",
   ".workspace/brief/business/product-guide.md",
-  ".workspace/brief/technical/development.md",
-  ".workspace/brief/technical/modeling.md",
-  ".workspace/brief/technical/stack/frontend.md",
-  ".workspace/brief/technical/stack/backend.md",
-  ".workspace/brief/technical/stack/database.md",
-  ".workspace/brief/technical/stack/infrastructure.md",
-  ".workspace/brief/technical/stack/ai.md",
+  ".workspace/brief/technical/engineering-principles.md",
+  ".workspace/brief/technical/engineering-decisions.md",
+  ".workspace/brief/technical/engineering-conventions.md",
+  ".workspace/brief/technical/engineering-modeling.md",
   ".workspace/spec/business/domain/.gitkeep",
   ".workspace/spec/business/relations/.gitkeep",
   ".workspace/spec/business/capabilities/.gitkeep",
@@ -56,6 +53,7 @@ const WORKFLOW_PATHS = [
 const CURSOR_PATHS = [
   ".cursor/rules/sdd-studio.mdc",
   ".cursor/skills/sdd-idea/SKILL.md",
+  ".cursor/skills/sdd-technical/SKILL.md",
   ".cursor/skills/sdd-generate/SKILL.md",
   ".cursor/skills/sdd-spec/SKILL.md",
   ".cursor/skills/sdd-review/SKILL.md",
@@ -88,8 +86,8 @@ describe("initWorkspace", () => {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(false);
     }
 
-    const developmentMd = readFileSync(
-      join(tempDir, ".workspace/brief/technical/development.md"),
+    const engineeringPrinciplesMd = readFileSync(
+      join(tempDir, ".workspace/brief/technical/engineering-principles.md"),
       "utf8",
     );
     const productGuideMd = readFileSync(
@@ -97,8 +95,8 @@ describe("initWorkspace", () => {
       "utf8",
     );
 
-    expect(developmentMd).toContain("# Development");
-    expect(developmentMd).toContain("sdd-idea");
+    expect(engineeringPrinciplesMd).toContain("# Engineering Principles");
+    expect(engineeringPrinciplesMd).toContain("sdd-studio configure");
     expect(productGuideMd).toContain("# Product Guide");
     expect(productGuideMd).toContain("sdd-idea");
     expect(

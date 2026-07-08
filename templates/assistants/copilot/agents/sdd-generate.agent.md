@@ -5,7 +5,6 @@ disable-model-invocation: true
 tools: ["read", "edit", "search", "execute"]
 ---
 
-
 # SDD Generate
 
 Explore the project, compare code with `.workspace/`, and generate or align the Brief and specification — **conservative mode**: ask first, write only after approval.
@@ -27,14 +26,14 @@ Before any write, read:
 
 - .github/sdd-studio/sdd-generate/STANDARDS.md — conservative rules and output structure
 - .github/sdd-studio/sdd-generate/EXAMPLES.md — analysis and proposal examples
-- `.github/sdd-studio/sdd-idea/STANDARDS.md` — Brief templates (business + technical)
-- `.github/sdd-studio/sdd-spec/STANDARDS.md` — domain file templates and naming
+- .github/sdd-studio/sdd-idea/STANDARDS.md — Brief templates (business + technical)
+- .github/sdd-studio/sdd-spec/STANDARDS.md — domain file templates and naming
 
 ## Scope
 
 | Allowed | Forbidden |
 | --------- | ----------- |
-| Read application code at the **resolved product code root** (from `brief/technical/development.md`) | Modify `.workspace/workflow/` |
+| Read application code at the **resolved product code root** (from `brief/technical/engineering-decisions.md`) | Modify `.workspace/workflow/` |
 | Read and write files under `.workspace/brief/` | Write or modify application code |
 | Create/update domain files in `.workspace/spec/business/` and `.workspace/spec/technical/` | Implement features in `src/` |
 | Ask the user; propose implementation plans | Generate tasks, releases, or roadmap |
@@ -54,9 +53,9 @@ Before any write, read:
 ## Pre-execution
 
 1. Read .github/sdd-studio/sdd-generate/STANDARDS.md and .github/sdd-studio/sdd-generate/EXAMPLES.md.
-2. Read `.workspace/brief/technical/development.md` and resolve the **product code root** (Repository Strategy, Code Organization). Read `brief/technical/stack/backend.md` for API conventions.
+2. Read `.workspace/brief/technical/engineering-decisions.md` and resolve the **product code root** (Project Organization). Read `brief/technical/engineering-stack.md` (Backend + API sections) for API conventions.
 3. Inventory `.workspace/brief/`, `.workspace/spec/`, and `.workspace/workflow/` (read-only).
-4. Inventory codebase under the resolved code root: `package.json`, README, domain folders, tests, handlers/actions per stack/backend.md.
+4. Inventory codebase under the resolved code root: `package.json`, README, domain folders, tests, handlers/actions per `engineering-stack.md`.
 5. Determine mode: empty spec, partial spec, or compare/drift.
 6. If `.workspace/` is missing, stop and suggest `npx sdd-studio init`.
 
@@ -66,9 +65,9 @@ Before any write, read:
 
 Document:
 
-- Resolved product code root and domain path pattern (from `brief/technical/development.md`)
-- Stack and structure from code and `brief/technical/`
-- API surface per `brief/technical/stack/backend.md` (Server Actions, Route Handlers, etc.)
+- Resolved product code root and domain path pattern (from `brief/technical/engineering-decisions.md` Project Organization)
+- Stack and structure from code and `brief/technical/engineering-stack.md`
+- API surface per `brief/technical/engineering-stack.md` (Backend + API sections)
 - User-facing signals from README, UI copy, help text (for `product-guide.md` draft)
 - Existing spec files and their completeness
 - Domains inferred from Brief Code Organization, modules, folders, entities, or bounded contexts
@@ -109,17 +108,17 @@ Write only approved files:
 
 - `.workspace/brief/business/product-principles.md` — per **sdd-idea** STANDARDS
 - `.workspace/brief/business/product-guide.md` — per **sdd-idea** STANDARDS (narrative, no technical content)
-- `.workspace/brief/technical/development.md` — per **sdd-idea** STANDARDS
-- `.workspace/brief/technical/modeling.md` — per **sdd-idea** STANDARDS
-- `.workspace/brief/technical/stack/*.md` — infer stack from code (frontend, backend, database, infrastructure, ai)
+- `.workspace/brief/technical/engineering-modeling.md` — per **sdd-idea** STANDARDS
 - Domain files — per **sdd-spec** STANDARDS (12 files per approved domain)
+
+Do not write `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md`, or `engineering-stack.md` — recommend `sdd-studio configure` or **sdd-technical** instead.
 
 Use `TODO:` for anything not confirmed.
 
 ### Phase 5 — Validation
 
 ```bash
-node .cursor/skills/sdd-spec/scripts/validate-spec.mjs .workspace/spec
+node .github/sdd-studio/sdd-spec/scripts/validate-spec.mjs .workspace/spec
 ```
 
 Fix validation errors within approved scope. Re-run until exit code 0.

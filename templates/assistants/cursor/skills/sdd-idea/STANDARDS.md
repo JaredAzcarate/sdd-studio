@@ -11,15 +11,26 @@ Mandatory rules for generating the Brief under `.workspace/brief/`.
 | Specification | (not written by sdd-idea) |
 | Workflow | (not written by sdd-idea) |
 
-**sdd-idea writes only the Brief.** Never create or modify `.workspace/spec/` or `.workspace/workflow/`.
+**sdd-idea writes only the Business Brief and `engineering-modeling.md`.** Never create or modify `.workspace/spec/` or `.workspace/workflow/`.
 
 **Generation order:**
 
 1. `brief/business/product-principles.md`
 2. `brief/business/product-guide.md`
-3. `brief/technical/development.md`
-4. `brief/technical/modeling.md`
-5. `brief/technical/stack/frontend.md` → `backend.md` → `database.md` → `infrastructure.md` → `ai.md`
+3. `brief/technical/engineering-modeling.md`
+
+## Engineering Brief (not written by sdd-idea)
+
+These files are created by `sdd-studio configure` (or `sdd-studio init`). **Read only** — do not write or modify:
+
+| File | Created by |
+| ---- | ---------- |
+| `brief/technical/engineering-principles.md` | `sdd-studio configure` |
+| `brief/technical/engineering-decisions.md` | `sdd-studio configure` |
+| `brief/technical/engineering-conventions.md` | `sdd-studio configure` |
+| `brief/technical/engineering-stack.md` | **sdd-technical** |
+
+If engineering principles, decisions, or conventions are missing or incomplete, tell the user to run `sdd-studio configure`. If the stack is undefined, tell the user to run **sdd-technical**.
 
 ---
 
@@ -80,54 +91,20 @@ Mandatory rules for generating the Brief under `.workspace/brief/`.
 
 ---
 
-## Technical Brief
+## Technical Brief (sdd-idea writes one file)
 
-### `.workspace/brief/technical/development.md`
+### `.workspace/brief/technical/engineering-modeling.md`
 
-**Question:** How will we develop this product?
-
-**Mandatory opening:**
-
-```markdown
-# Development
-
-> ¿Cómo desarrollaremos este producto?
->
-> Este documento define el modelo de desarrollo y las convenciones del proyecto.
-> No describe tecnologías específicas ni decisiones de implementación.
-```
-
-**Required H2 sections:**
-
-```text
-## Development Model
-## Workflow Methodology
-## Repository Strategy
-## Code Organization
-## Development Conventions
-```
-
-**Allowed:** SDD, Kanban/Scrum, monorepo/polyrepo, feature-first/layer-first, linting conventions.
-
-**Forbidden:** specific languages, frameworks, databases, cloud providers, user journeys, product behavior.
-
-`Development Model` defaults to `Specification Driven Development` unless the user says otherwise.
-
----
-
-### `.workspace/brief/technical/modeling.md`
-
-**Question:** How will we model the business?
+**Question:** How will we model the business domain?
 
 **Mandatory opening:**
 
 ```markdown
-# Modeling
+# Engineering Modeling
 
-> ¿Cómo modelaremos el negocio?
+> How the team interprets and structures the product domain.
 >
-> Este documento define cómo el equipo interpreta y estructura el dominio del producto.
-> No describe APIs, bases de datos ni detalles de implementación.
+> This document defines business modeling context. It does not describe APIs, databases, or implementation details.
 ```
 
 **Required H2 sections:**
@@ -140,25 +117,9 @@ Mandatory rules for generating the Brief under `.workspace/brief/`.
 ## Modeling Principles
 ```
 
-**Forbidden:** specific technologies, API contracts, UI specs, user journeys.
+**Allowed:** DDD approach, bounded contexts, aggregates, ubiquitous language, modeling principles.
 
----
-
-### `.workspace/brief/technical/stack/`
-
-Each file answers **one question only**:
-
-| File | Question |
-| ---- | -------- |
-| `frontend.md` | What technologies will we use to build the frontend? |
-| `backend.md` | What technologies will we use to build the backend? |
-| `database.md` | What technologies will we use for persistence? |
-| `infrastructure.md` | How will we deploy, monitor, and operate the solution? |
-| `ai.md` | What AI tools participate in development? |
-
-Each file must start with `# <Title>` and a blockquote stating its single question.
-
-**Forbidden in stack files:** user journeys, domain rules, development methodology (belongs in `development.md`), DDD structure (belongs in `modeling.md`).
+**Forbidden:** specific technologies, API contracts, UI specs, user journeys, product narratives, stack choices.
 
 ---
 
@@ -173,9 +134,10 @@ Each file must start with `# <Title>` and a blockquote stating its single questi
 
 - Do not create files outside `.workspace/brief/`
 - Do not modify `.workspace/spec/` or `.workspace/workflow/`
+- Do not modify `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md`, or `engineering-stack.md`
 - Do not mix Business Brief content into Technical Brief or vice versa
 - Do not duplicate principles as narratives or stack choices as modeling decisions
 
 ## Cross-skill contract
 
-Skills **sdd-spec** and **sdd-generate** must consume **Repository Strategy** and **Code Organization** from this file (and API surface from `brief/technical/stack/backend.md`). They must not contradict paths or conventions documented here.
+Skills **sdd-spec**, **sdd-generate**, and **sdd-review** must consume **Project Organization** from `brief/technical/engineering-decisions.md` and API/architecture context from `brief/technical/engineering-stack.md`. They must not contradict paths or conventions documented there.

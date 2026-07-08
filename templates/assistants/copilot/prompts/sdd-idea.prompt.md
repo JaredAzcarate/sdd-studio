@@ -1,6 +1,6 @@
 ---
 name: sdd-idea
-description: Discovers the product and writes the Brief under .workspace/brief/ (business and technical perspectives). Use when starting a new SDD project, defining product principles, the user journey, or development decisions. Never writes .workspace/spec/.
+description: Discovers the product and writes the Brief under .workspace/brief/ (business and technical perspectives). Use when starting a new SDD project, defining product principles, the user journey, or domain modeling. Never writes .workspace/spec/.
 agent: sdd-idea
 argument-hint: Optional context, goals, or constraints for this SDD step
 ---

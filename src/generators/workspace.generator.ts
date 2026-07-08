@@ -19,13 +19,10 @@ export type GenerateWorkspaceResult = {
 const REQUIRED_BRIEF_FILES = [
   "brief/business/product-principles.md",
   "brief/business/product-guide.md",
-  "brief/technical/development.md",
-  "brief/technical/modeling.md",
-  "brief/technical/stack/frontend.md",
-  "brief/technical/stack/backend.md",
-  "brief/technical/stack/database.md",
-  "brief/technical/stack/infrastructure.md",
-  "brief/technical/stack/ai.md",
+  "brief/technical/engineering-principles.md",
+  "brief/technical/engineering-decisions.md",
+  "brief/technical/engineering-conventions.md",
+  "brief/technical/engineering-modeling.md",
 ] as const;
 
 export async function generateWorkspace(

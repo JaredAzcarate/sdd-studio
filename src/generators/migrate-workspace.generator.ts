@@ -30,10 +30,21 @@ const BUSINESS_SPEC_CATEGORIES = [
   "events",
 ] as const;
 
-const TECHNICAL_SPEC_CATEGORIES = [
-  "api",
-  "ui",
-  "testing",
+const TECHNICAL_SPEC_CATEGORIES = ["api", "ui", "testing"] as const;
+
+const ENGINEERING_BRIEF_FILES = [
+  "brief/technical/engineering-principles.md",
+  "brief/technical/engineering-decisions.md",
+  "brief/technical/engineering-conventions.md",
+  "brief/technical/engineering-modeling.md",
+] as const;
+
+const STACK_FILES = [
+  "frontend",
+  "backend",
+  "database",
+  "infrastructure",
+  "ai",
 ] as const;
 
 const DEVELOPMENT_SECTIONS = new Set([
@@ -133,40 +144,31 @@ function appendSection(
     return;
   }
 
-  bucket.push(`## ${title.replace(/\b\w/g, (char) => char.toUpperCase())}\n\n${body}`);
-}
-
-async function buildDevelopmentMd(
-  sections: Map<string, string>,
-  destination: string,
-  migratedPaths: string[],
-): Promise<void> {
-  const header = await writeBriefFromTemplate(
-    "brief/technical/development.md",
-    destination,
-    migratedPaths,
+  bucket.push(
+    `## ${title.replace(/\b\w/g, (char) => char.toUpperCase())}\n\n${body}`,
   );
-  const bodyParts: string[] = [];
+}
 
-  for (const title of sections.keys()) {
-    if (DEVELOPMENT_SECTIONS.has(title)) {
-      appendSection(sections, title, bodyParts);
-    }
-  }
-
-  if (bodyParts.length > 0) {
-    const merged = `${header.trim()}\n\n${bodyParts.join("\n\n---\n\n")}\n`;
-    await writeFile(destination, merged, "utf8");
+async function writeEngineeringBriefTemplates(
+  workspaceDir: string,
+  migratedPaths: string[],
+): Promise<void> {
+  for (const relativePath of ENGINEERING_BRIEF_FILES) {
+    await writeBriefFromTemplate(
+      relativePath,
+      join(workspaceDir, relativePath),
+      migratedPaths,
+    );
   }
 }
 
-async function buildModelingMd(
+async function buildEngineeringModelingMd(
   sections: Map<string, string>,
   destination: string,
   migratedPaths: string[],
 ): Promise<void> {
   const header = await writeBriefFromTemplate(
-    "brief/technical/modeling.md",
+    "brief/technical/engineering-modeling.md",
     destination,
     migratedPaths,
   );
@@ -184,32 +186,138 @@ async function buildModelingMd(
   }
 }
 
-async function buildStackFile(
+async function buildEngineeringStackMd(
   sections: Map<string, string>,
-  stackKey: string,
-  templateRelativePath: string,
+  stackDir: string,
   destination: string,
   migratedPaths: string[],
 ): Promise<void> {
-  const header = await writeBriefFromTemplate(
-    templateRelativePath,
-    destination,
-    migratedPaths,
-  );
-  const bodyParts: string[] = [];
+  const bodyParts: string[] = ["# Engineering Stack", "", "## Overview", ""];
 
-  for (const [title, stackFile] of Object.entries(STACK_SECTION_MAP)) {
-    if (stackFile !== stackKey) {
+  for (const stackKey of STACK_FILES) {
+    const stackPath = join(stackDir, `${stackKey}.md`);
+    if (!existsSync(stackPath)) {
       continue;
     }
 
-    appendSection(sections, title, bodyParts);
+    const content = await readFile(stackPath, "utf8");
+    if (!content.includes("TODO") || content.trim().length > 120) {
+      bodyParts.push(`### ${stackKey}`, "", content.trim(), "");
+    }
   }
 
-  if (bodyParts.length > 0) {
-    const merged = `${header.trim()}\n\n${bodyParts.join("\n\n---\n\n")}\n`;
-    await writeFile(destination, merged, "utf8");
+  for (const [title, stackFile] of Object.entries(STACK_SECTION_MAP)) {
+    const sectionParts: string[] = [];
+    appendSection(sections, title, sectionParts);
+    if (sectionParts.length > 0) {
+      bodyParts.push(`### ${stackFile} (from legacy project.md)`, "");
+      bodyParts.push(...sectionParts);
+      bodyParts.push("");
+    }
   }
+
+  if (bodyParts.length <= 4) {
+    return;
+  }
+
+  await writeFile(destination, `${bodyParts.join("\n").trimEnd()}\n`, "utf8");
+  migratedPaths.push(destination);
+}
+
+async function migrateLegacyProjectMd(
+  workspaceDir: string,
+  projectContent: string,
+  migratedPaths: string[],
+): Promise<void> {
+  const sections = parseMarkdownSections(projectContent);
+  const modelingPath = join(
+    workspaceDir,
+    "brief/technical/engineering-modeling.md",
+  );
+  const stackPath = join(workspaceDir, "brief/technical/engineering-stack.md");
+
+  await buildEngineeringModelingMd(sections, modelingPath, migratedPaths);
+  await buildEngineeringStackMd(
+    sections,
+    join(workspaceDir, "brief/technical/stack"),
+    stackPath,
+    migratedPaths,
+  );
+}
+
+async function migrateV05BriefLayout(
+  workspaceDir: string,
+  migratedPaths: string[],
+  removedPaths: string[],
+): Promise<void> {
+  const modelingSource = join(workspaceDir, "brief/technical/modeling.md");
+  const modelingDestination = join(
+    workspaceDir,
+    "brief/technical/engineering-modeling.md",
+  );
+
+  if (existsSync(modelingSource)) {
+    if (!existsSync(modelingDestination)) {
+      await moveIfExists(modelingSource, modelingDestination, migratedPaths);
+    } else {
+      const legacyContent = await readFile(modelingSource, "utf8");
+      await writeFile(modelingDestination, legacyContent, "utf8");
+      migratedPaths.push(modelingDestination);
+      await rm(modelingSource);
+      removedPaths.push(modelingSource);
+    }
+  } else if (!existsSync(modelingDestination)) {
+    await writeBriefFromTemplate(
+      "brief/technical/engineering-modeling.md",
+      modelingDestination,
+      migratedPaths,
+    );
+  }
+
+  for (const relativePath of [
+    "brief/technical/engineering-principles.md",
+    "brief/technical/engineering-decisions.md",
+    "brief/technical/engineering-conventions.md",
+  ] as const) {
+    const destination = join(workspaceDir, relativePath);
+    if (!existsSync(destination)) {
+      await writeBriefFromTemplate(relativePath, destination, migratedPaths);
+    }
+  }
+
+  const stackDir = join(workspaceDir, "brief/technical/stack");
+  const stackDestination = join(
+    workspaceDir,
+    "brief/technical/engineering-stack.md",
+  );
+
+  if (!existsSync(stackDestination) && existsSync(stackDir)) {
+    await buildEngineeringStackMd(
+      new Map(),
+      stackDir,
+      stackDestination,
+      migratedPaths,
+    );
+  }
+
+  const developmentPath = join(workspaceDir, "brief/technical/development.md");
+  if (existsSync(developmentPath)) {
+    await rm(developmentPath);
+    removedPaths.push(developmentPath);
+  }
+
+  if (existsSync(stackDir)) {
+    await rm(stackDir, { recursive: true, force: true });
+    removedPaths.push(stackDir);
+  }
+}
+
+function hasLegacyV05Layout(workspaceDir: string): boolean {
+  return (
+    existsSync(join(workspaceDir, "brief/technical/development.md")) ||
+    existsSync(join(workspaceDir, "brief/technical/modeling.md")) ||
+    existsSync(join(workspaceDir, "brief/technical/stack"))
+  );
 }
 
 export async function migrateWorkspace(
@@ -217,11 +325,14 @@ export async function migrateWorkspace(
 ): Promise<MigrateWorkspaceResult> {
   const workspaceDir = join(options.targetDir, SDD_WORKSPACE_DIR);
   const markerPath = join(options.targetDir, SDD_WORKSPACE_MARKER_PATH);
-  const legacyMarkerPath = join(options.targetDir, SDD_WORKSPACE_LEGACY_MARKER_PATH);
+  const legacyMarkerPath = join(
+    options.targetDir,
+    SDD_WORKSPACE_LEGACY_MARKER_PATH,
+  );
   const migratedPaths: string[] = [];
   const removedPaths: string[] = [];
 
-  if (existsSync(markerPath)) {
+  if (existsSync(markerPath) && !hasLegacyV05Layout(workspaceDir)) {
     return {
       workspaceDir,
       migratedPaths: [],
@@ -230,65 +341,66 @@ export async function migrateWorkspace(
     };
   }
 
-  if (!existsSync(legacyMarkerPath)) {
+  if (
+    !existsSync(legacyMarkerPath) &&
+    !hasLegacyV05Layout(workspaceDir) &&
+    !existsSync(markerPath)
+  ) {
     throw new Error(
       "No legacy SDD workspace found. Run `sdd-studio init` to create a new project.",
     );
   }
 
   await ensureDir(join(workspaceDir, "brief/business"));
-  await ensureDir(join(workspaceDir, "brief/technical/stack"));
+  await ensureDir(join(workspaceDir, "brief/technical"));
   await ensureDir(join(workspaceDir, "spec/business"));
   await ensureDir(join(workspaceDir, "spec/technical/architecture"));
   await ensureDir(join(workspaceDir, "spec/technical/database"));
 
-  await moveIfExists(
-    join(workspaceDir, "product-principles.md"),
-    join(workspaceDir, "brief/business/product-principles.md"),
-    migratedPaths,
-  );
-  await moveIfExists(
-    join(workspaceDir, "product-guide.md"),
-    join(workspaceDir, "brief/business/product-guide.md"),
-    migratedPaths,
-  );
+  if (existsSync(legacyMarkerPath)) {
+    await moveIfExists(
+      join(workspaceDir, "product-principles.md"),
+      join(workspaceDir, "brief/business/product-principles.md"),
+      migratedPaths,
+    );
+    await moveIfExists(
+      join(workspaceDir, "product-guide.md"),
+      join(workspaceDir, "brief/business/product-guide.md"),
+      migratedPaths,
+    );
 
-  for (const category of BUSINESS_SPEC_CATEGORIES) {
-    await moveSpecCategory(workspaceDir, category, "business", migratedPaths);
+    for (const category of BUSINESS_SPEC_CATEGORIES) {
+      await moveSpecCategory(workspaceDir, category, "business", migratedPaths);
+    }
+
+    for (const category of TECHNICAL_SPEC_CATEGORIES) {
+      await moveSpecCategory(
+        workspaceDir,
+        category,
+        "technical",
+        migratedPaths,
+      );
+    }
+
+    const projectContent = await readFile(legacyMarkerPath, "utf8");
+    await writeEngineeringBriefTemplates(workspaceDir, migratedPaths);
+    await migrateLegacyProjectMd(workspaceDir, projectContent, migratedPaths);
+
+    await rm(legacyMarkerPath);
+    removedPaths.push(legacyMarkerPath);
   }
 
-  for (const category of TECHNICAL_SPEC_CATEGORIES) {
-    await moveSpecCategory(workspaceDir, category, "technical", migratedPaths);
+  if (hasLegacyV05Layout(workspaceDir)) {
+    await migrateV05BriefLayout(workspaceDir, migratedPaths, removedPaths);
   }
 
-  const projectContent = await readFile(legacyMarkerPath, "utf8");
-  const sections = parseMarkdownSections(projectContent);
-
-  const developmentPath = join(workspaceDir, "brief/technical/development.md");
-  const modelingPath = join(workspaceDir, "brief/technical/modeling.md");
-  const stackDir = join(workspaceDir, "brief/technical/stack");
-
-  await buildDevelopmentMd(sections, developmentPath, migratedPaths);
-  await buildModelingMd(sections, modelingPath, migratedPaths);
-
-  for (const stackKey of [
-    "frontend",
-    "backend",
-    "database",
-    "infrastructure",
-    "ai",
-  ] as const) {
-    await buildStackFile(
-      sections,
-      stackKey,
-      `brief/technical/stack/${stackKey}.md`,
-      join(stackDir, `${stackKey}.md`),
+  if (!existsSync(markerPath)) {
+    await writeBriefFromTemplate(
+      "brief/technical/engineering-principles.md",
+      markerPath,
       migratedPaths,
     );
   }
-
-  await rm(legacyMarkerPath);
-  removedPaths.push(legacyMarkerPath);
 
   return {
     workspaceDir,

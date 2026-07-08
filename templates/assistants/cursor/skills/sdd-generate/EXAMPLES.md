@@ -18,8 +18,8 @@ Task CRUD API exists; workspace has no domain spec. Product intent partially vis
 | Item | Severity | Notes |
 | ---- | -------- | ----- |
 | brief/business/product-guide.md | high | Stub only |
-| brief/technical/development.md | high | Stub only |
-| brief/technical/stack/backend.md | high | Stub only |
+| brief/technical/engineering-decisions.md | high | Stub only (Project Organization) |
+| brief/technical/engineering-stack.md | high | Missing — recommend sdd-technical |
 | task domain (×12) | high | No domain files |
 
 ## Open questions
@@ -38,10 +38,12 @@ Task CRUD API exists; workspace has no domain spec. Product intent partially vis
 | File | Action | Summary |
 | ---- | ------ | ------- |
 | .workspace/brief/business/product-guide.md | update | Task management for small teams (narrative, confirm scope) |
-| .workspace/brief/technical/development.md | update | SDD, Clean Architecture conventions inferred |
-| .workspace/brief/technical/modeling.md | update | DDD with Task aggregate inferred |
-| .workspace/brief/technical/stack/backend.md | update | TypeScript, Express inferred |
-| .workspace/brief/technical/stack/database.md | update | PostgreSQL inferred |
+| .workspace/brief/technical/engineering-modeling.md | update | DDD with Task aggregate inferred |
+
+## Deferred / not in scope
+
+- engineering-decisions.md — recommend `sdd-studio configure`
+- engineering-stack.md — recommend **sdd-technical** after configure
 
 ## Spec files
 
@@ -91,7 +93,7 @@ Task CRUD API exists; workspace has no domain spec. Product intent partially vis
 Built with TypeScript and PostgreSQL.
 ```
 
-**Correct** — move to `brief/technical/stack/backend.md` and `brief/technical/stack/database.md`.
+**Correct** — recommend **sdd-technical** to document stack in `engineering-stack.md`.
 
 ---
 
@@ -105,23 +107,22 @@ Built with TypeScript and PostgreSQL.
 
 ## Example 5 — Orchestrator repo + product submodule (polyrepo)
 
-**Context:** Workspace root is `numo-orchestrator` (only `.workspace/`, skills, workflow). `brief/technical/development.md` documents:
+**Context:** Workspace root is `numo-orchestrator` (only `.workspace/`, skills, workflow). `brief/technical/engineering-decisions.md` documents:
 
-- **Repository Strategy:** two repos; product code in Git submodule `numo-app/`
-- **Code Organization:** `numo-app/src/domains/<domain>/` with `domain/`, `application/`, `infrastructure/` layers
+- **Project Organization:** two repos; product code in Git submodule `numo-app/`; domains at `numo-app/src/domains/<domain>/` with `domain/`, `application/`, `infrastructure/` layers
 
 ### Pre-execution (excerpt)
 
-1. Read `development.md` → product code root = `numo-app/`
+1. Read `engineering-decisions.md` → product code root = `numo-app/`
 2. Explore `numo-app/src/domains/`, not `./src/` at orchestrator root
-3. Read `stack/backend.md` → Server Actions primary; Route Handlers for OAuth/webhooks only
+3. Read `engineering-stack.md` (Backend + API) → Server Actions primary; Route Handlers for OAuth/webhooks only
 
 ### Analysis (excerpt)
 
 ```markdown
 ## Summary
 
-Orchestrator has no product code at root; domains found under `numo-app/src/domains/task/`. Spec stubs exist; API files should follow Server Actions model per stack/backend.md.
+Orchestrator has no product code at root; domains found under `numo-app/src/domains/task/`. Spec stubs exist; API files should follow Server Actions model per engineering-stack.md.
 
 ## Gaps
 
@@ -132,4 +133,4 @@ Orchestrator has no product code at root; domains found under `numo-app/src/doma
 
 **Incorrect:** searching `src/modules/task/` at orchestrator root because a generic template said so.
 
-**Correct:** `Inferred from numo-app/src/domains/task/` per Brief Code Organization.
+**Correct:** `Inferred from numo-app/src/domains/task/` per Brief Project Organization.

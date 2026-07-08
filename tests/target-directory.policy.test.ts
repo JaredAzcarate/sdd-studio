@@ -22,11 +22,11 @@ describe("assertTargetDirectoryAvailable", () => {
     expect(() => assertTargetDirectoryAvailable(tempDir)).not.toThrow();
   });
 
-  it("blocks when .workspace/brief/technical/development.md already exists", () => {
+  it("blocks when .workspace/brief/technical/engineering-principles.md already exists", () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
     const markerPath = join(
       tempDir,
-      ".workspace/brief/technical/development.md",
+      ".workspace/brief/technical/engineering-principles.md",
     );
     mkdirSync(join(markerPath, ".."), { recursive: true });
     writeFileSync(markerPath, "# Existing");
@@ -58,11 +58,11 @@ describe("assertSyncTargetEligible", () => {
     }
   });
 
-  it("allows a directory with .workspace/brief/technical/development.md", () => {
+  it("allows a directory with .workspace/brief/technical/engineering-principles.md", () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-"));
     const markerPath = join(
       tempDir,
-      ".workspace/brief/technical/development.md",
+      ".workspace/brief/technical/engineering-principles.md",
     );
     mkdirSync(join(markerPath, ".."), { recursive: true });
     writeFileSync(markerPath, "# Existing");

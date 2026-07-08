@@ -6,8 +6,10 @@ Mandatory rules when reviewing and updating `.workspace/brief/` and `.workspace/
 
 - May modify `.workspace/brief/business/product-guide.md` for functional or user-facing changes
 - May modify `.workspace/brief/business/product-principles.md` for conceptual changes
-- May modify `.workspace/brief/technical/` for technical configuration changes (development, modeling, stack/*)
+- May modify `.workspace/brief/technical/engineering-modeling.md` for domain modeling changes
 - May modify files under `.workspace/spec/business/` and `.workspace/spec/technical/` for specification changes
+- **Never** modify `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md` (use `sdd-studio configure`)
+- **Never** modify `engineering-stack.md` (use **sdd-technical**)
 - **Never** modify `.workspace/workflow/`
 - **Never** write code in `src/`
 - **Never** place Brief content inside `.workspace/spec/`
@@ -20,9 +22,11 @@ If the change requires replanning, suggest **sdd-plan**. Do not create tasks or 
 | ---- | ------------ |
 | `.workspace/brief/business/product-principles.md` | Conceptual principles or product foundations change |
 | `.workspace/brief/business/product-guide.md` | User journey, experiences, scope, or product narrative change |
-| `.workspace/brief/technical/development.md` | Development model, workflow methodology, or conventions change |
-| `.workspace/brief/technical/modeling.md` | Modeling approach, DDD, or domain boundaries change |
-| `.workspace/brief/technical/stack/*.md` | Stack, architecture, or technology choices change |
+| `.workspace/brief/technical/engineering-modeling.md` | Modeling approach, DDD, or domain boundaries change |
+| `.workspace/brief/technical/engineering-principles.md` | Read only — recommend `sdd-studio configure` |
+| `.workspace/brief/technical/engineering-decisions.md` | Read only — recommend `sdd-studio configure` |
+| `.workspace/brief/technical/engineering-conventions.md` | Read only — recommend `sdd-studio configure` |
+| `.workspace/brief/technical/engineering-stack.md` | Read only — recommend **sdd-technical** |
 | `.workspace/spec/<business\|technical>/<category>/<domain>-*.md` | Domain-level specification change |
 
 Do not put technical details in `product-guide.md`. Do not put product behavior in the Technical Brief.
@@ -31,20 +35,20 @@ Do not put technical details in `product-guide.md`. Do not put product behavior 
 
 Before creating or editing `technical/api/` or `technical/architecture/` files, read:
 
-- `.workspace/brief/technical/development.md` — **Repository Strategy**, **Code Organization** (resolve `<resolved-code-root>` and domain folder pattern)
-- `.workspace/brief/technical/stack/backend.md` — API surface (Server Actions vs Route Handlers)
+- `.workspace/brief/technical/engineering-decisions.md` — **Project Organization** (resolve `<resolved-code-root>` and domain folder pattern)
+- `.workspace/brief/technical/engineering-stack.md` — **Backend** and **API** sections (API surface)
 
 | Principle | Rule |
 | --------- | ---- |
-| Brief over convention | `development.md` wins over default folder names (`src/modules/`, `packages/`) |
-| Stack over REST default | `*-api.md` follows `stack/backend.md`; do not revert to REST-by-default |
-| Polyrepo-aware | Module paths must match Code Organization; orchestrator root may have no product code |
+| Brief over convention | `engineering-decisions.md` (Project Organization) wins over default folder names (`src/modules/`, `packages/`) |
+| Stack over REST default | `*-api.md` follows `engineering-stack.md` (Backend + API); do not revert to REST-by-default |
+| Polyrepo-aware | Module paths must match Project Organization; orchestrator root may have no product code |
 | Template fidelity | Use **sdd-spec** STANDARDS templates for `*-api.md` and `*-architecture.md` |
 | Evidence label | Paths cited in spec must match Brief, not generic examples |
 
-When **Repository Strategy** or **Code Organization** changes in `development.md`, propagate path updates to all affected `*-api.md` and `*-architecture.md` files.
+When **Project Organization** changes in `engineering-decisions.md`, propagate path updates to all affected `*-api.md` and `*-architecture.md` files.
 
-When **stack/backend.md** changes, verify all `*-api.md` files still match the documented API surface.
+When **engineering-stack.md** (Backend + API) changes, verify all `*-api.md` files still match the documented API surface.
 
 Keep the per-domain pattern:
 
@@ -73,13 +77,11 @@ Forbidden in `spec/`: `index.md`, `README.md`, `map.md`, per-domain folders, and
 - Requires explicit approval for scope changes that contradict existing domain specs
 - After functional changes, ensure `.workspace/spec/` stays aligned
 
-## brief/technical/
+## brief/technical/engineering-modeling.md
 
-- Modify only for **technical** changes
-- `development.md` — development model and conventions (no specific technologies)
-- `modeling.md` — modeling approach and DDD context
-- `stack/*.md` — technology choices per layer (frontend, backend, database, infrastructure, ai)
+- Modify only for **domain modeling** changes
 - Keep section structure from **sdd-idea** STANDARDS
+- No specific technologies, API contracts, or user journeys
 
 ## One question per document
 
@@ -89,9 +91,9 @@ Do not move business rules to `*-ui.md`. Do not put UI states in `*-flows.md`.
 
 ### Editing `*-api.md` and `*-architecture.md`
 
-1. Resolve `<resolved-code-root>` from `brief/technical/development.md` before writing paths.
-2. Follow the **sdd-spec** template for Server Actions + Route Handlers (unless `stack/backend.md` says otherwise).
-3. **Module Structure** in `*-architecture.md` must use the domain folder pattern from Code Organization (e.g. `<resolved-code-root>/domains/<domain>/`).
+1. Resolve `<resolved-code-root>` from `brief/technical/engineering-decisions.md` (Project Organization) before writing paths.
+2. Follow the **sdd-spec** template for Server Actions + Route Handlers (unless `engineering-stack.md` Backend + API sections say otherwise).
+3. **Module Structure** in `*-architecture.md` must use the domain folder pattern from Project Organization (e.g. `<resolved-code-root>/domains/<domain>/`).
 4. Never introduce `src/modules/` or `packages/` paths unless documented in the Brief.
 
 ## Actions by change type
@@ -100,17 +102,19 @@ Do not move business rules to `*-ui.md`. Do not put UI states in `*-flows.md`.
 | ---- | ------------- |
 | User-facing scope change | `brief/business/product-guide.md`; may require domain updates via **sdd-spec** |
 | Conceptual change | `brief/business/product-principles.md` |
-| Development model change | `brief/technical/development.md` |
-| Modeling change | `brief/technical/modeling.md` |
-| Technical stack change | `brief/technical/stack/*.md` |
+| Engineering principles change | Recommend `sdd-studio configure` (`engineering-principles.md`) |
+| Engineering decisions change | Recommend `sdd-studio configure` (`engineering-decisions.md`); may require path updates in `*-api.md` and `*-architecture.md` |
+| Engineering conventions change | Recommend `sdd-studio configure` (`engineering-conventions.md`) |
+| Modeling change | `brief/technical/engineering-modeling.md` |
+| Technical stack change | Recommend **sdd-technical** (`engineering-stack.md`) |
 | New domain | 12 domain files (7 business + 5 technical) |
 | New capability | `*-capabilities.md`, possibly `*-flows.md`, `*-api.md` |
 | Rule change | `*-rules.md`; verify `*-flows.md`, `*-testing.md` |
-| API change | `*-api.md` per **sdd-spec** + `stack/backend.md`; verify `*-capabilities.md`, `*-security.md` |
+| API change | `*-api.md` per **sdd-spec** + `engineering-stack.md` (Backend + API); verify `*-capabilities.md`, `*-security.md` |
 | UI change | `*-ui.md` for interface only |
-| Architecture change | `*-architecture.md` per **sdd-spec** + `development.md` Code Organization; verify `modeling.md` |
-| Repository / layout change | `brief/technical/development.md`; then update paths in all `*-api.md` and `*-architecture.md` |
-| Database change | `*-database.md`; verify `brief/technical/stack/database.md` |
+| Architecture change | `*-architecture.md` per **sdd-spec** + `engineering-decisions.md` Project Organization; verify `engineering-modeling.md` |
+| Repository / layout change | Recommend `sdd-studio configure` (`engineering-decisions.md`); then update paths in all `*-api.md` and `*-architecture.md` |
+| Database change | `*-database.md`; verify `engineering-stack.md` (Database section) |
 | New relationship | `*-relations.md` in both affected domains |
 | New event | `*-events.md`; verify consumers in relations |
 | Security change | `*-security.md`; verify `*-api.md` |

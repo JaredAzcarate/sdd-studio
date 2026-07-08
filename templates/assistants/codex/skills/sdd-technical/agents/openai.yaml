@@ -1,0 +1,3 @@
+display_name: SDD Technical
+short_description: Analyze the Engineering Brief and generate engineering-stack.md with a coherent technology stack.
+default_prompt: Run the sdd-technical skill to analyze the Engineering Brief and generate .workspace/brief/technical/engineering-stack.md.

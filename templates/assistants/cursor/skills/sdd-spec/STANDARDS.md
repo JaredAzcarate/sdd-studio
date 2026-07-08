@@ -17,13 +17,13 @@ Do not create:
 
 Before generating `technical/api/` or `technical/architecture/` files, read:
 
-- `.workspace/brief/technical/development.md` — **Repository Strategy**, **Code Organization** (resolve product code root and domain folder pattern)
-- `.workspace/brief/technical/stack/backend.md` — API surface (Server Actions vs Route Handlers vs REST)
+- `.workspace/brief/technical/engineering-decisions.md` — **Project Organization** (resolve product code root and domain folder pattern)
+- `.workspace/brief/technical/engineering-stack.md` — **Backend**, **API**, and **Architecture Summary** (API surface and stack coherence)
 
 | Principle | Rule |
 | --------- | ---- |
-| Brief over convention | `development.md` wins over default folder names (`src/modules/`, `packages/`) |
-| Stack over REST default | API spec format follows `stack/backend.md`, not REST-by-default |
+| Brief over convention | `engineering-decisions.md` (Project Organization) wins over default folder names (`src/modules/`, `packages/`) |
+| Stack over REST default | API spec format follows `engineering-stack.md` (Backend + API sections), not REST-by-default |
 | Polyrepo-aware | Paths in architecture/api docs use resolved code root from Brief |
 | Evidence label | Module paths in architecture must match Code Organization in Brief |
 
@@ -269,7 +269,7 @@ Consumers
 
 ### `<domain>-api.md`
 
-Use the API surface defined in `brief/technical/stack/backend.md`. Default template below assumes **Server Actions** as primary surface and **Route Handlers** only when HTTP is required (e.g. OAuth, webhooks, external signatures). If the Brief specifies REST-only or another model, follow the Brief instead.
+Use the API surface defined in `brief/technical/engineering-stack.md` (Backend and API sections). Default template below assumes **Server Actions** as primary surface and **Route Handlers** only when HTTP is required (e.g. OAuth, webhooks, external signatures). If the Engineering Stack specifies REST-only or another model, follow the Brief instead.
 
 ```markdown
 # [Domain] API
@@ -310,10 +310,10 @@ Errors
 
 ## Notes
 
-Reference `*-architecture.md`, business capabilities, and `brief/technical/stack/backend.md`.
+Reference `*-architecture.md`, business capabilities, and `brief/technical/engineering-stack.md` (Backend + API sections).
 ```
 
-Replace `<resolved-code-root>` with the path from `brief/technical/development.md` (e.g. repo root, `numo-app/`, or monorepo package path). Do not hardcode `src/modules/`.
+Replace `<resolved-code-root>` with the path from `brief/technical/engineering-decisions.md` (Project Organization) and `engineering-stack.md` (Architecture Summary) (e.g. repo root, `numo-app/`, or monorepo package path). Do not hardcode `src/modules/`.
 
 ### `<domain>-ui.md`
 
@@ -371,7 +371,7 @@ Do not document business rules.
 
 ### `<domain>-architecture.md`
 
-Paths in **Module Structure** must match `brief/technical/development.md` (Code Organization). Use `<resolved-code-root>` and the domain folder pattern documented there.
+Paths in **Module Structure** must match **Project Organization** in `brief/technical/engineering-decisions.md`. Use `<resolved-code-root>` and the domain folder pattern documented there.
 
 ```markdown
 # [Domain] Architecture

@@ -4,8 +4,8 @@ import {
   assertInteractiveTerminal,
   assertTargetDirectoryAvailable,
 } from "../policies/target-directory.policy.js";
-import { runInitPrompts } from "../prompts/run-init-prompts.js";
 import { initWorkspace } from "../use-cases/init-workspace.use-case.js";
+import { getDefaultEngineeringAnswers } from "../engineering-config/catalog/index.js";
 import { assistantIdSchema } from "../types/init-context.js";
 import { buildInitContext } from "../utils/build-init-context.js";
 import { formatGenerationResult } from "../utils/format-generation-result.js";
@@ -15,9 +15,10 @@ type InitCommandOptions = {
   yes?: boolean;
   assistant?: string;
   workflow?: boolean;
+  engineering?: boolean;
 };
 
-export function createInitCommand(): Command {
+export function createInitCommand(version: string): Command {
   return new Command("init")
     .description("Initialize an SDD workspace in the current directory")
     .option("--yes", "Skip prompts and use defaults")
@@ -29,29 +30,42 @@ export function createInitCommand(): Command {
       "--workflow",
       "Include the SDD workflow module (roadmap, milestones, releases)",
     )
+    .option(
+      "--engineering",
+      "Apply default Engineering Brief answers (non-interactive; use with --yes)",
+    )
     .action(async (options: InitCommandOptions) => {
       const targetDir = cwd();
       assertTargetDirectoryAvailable(targetDir);
 
-      const context = options.yes
-        ? buildInitContext({
-            targetDir,
-            assistant: options.assistant
-              ? assistantIdSchema.parse(options.assistant)
-              : undefined,
-            modules: { workflow: options.workflow ?? false },
-          })
-        : await (() => {
-            assertInteractiveTerminal();
-            return runInitPrompts(targetDir);
-          })();
+      if (options.yes) {
+        const context = buildInitContext({
+          targetDir,
+          assistant: options.assistant
+            ? assistantIdSchema.parse(options.assistant)
+            : undefined,
+          modules: { workflow: options.workflow ?? false },
+          engineering: options.engineering
+            ? { answers: getDefaultEngineeringAnswers() }
+            : undefined,
+        });
 
-      const result = await initWorkspace({ context });
+        const result = await initWorkspace({ context });
 
-      console.log("");
-      console.log(formatInitSummary(context, result));
-      console.log("");
-      console.log(formatGenerationResult(targetDir, context.assistant, result));
-      console.log("");
+        console.log("");
+        console.log(formatInitSummary(context, result));
+        console.log("");
+        console.log(formatGenerationResult(targetDir, context.assistant, result));
+        console.log("");
+        return;
+      }
+
+      assertInteractiveTerminal();
+      const { runTui } = await import("../tui/run-tui.js");
+      await runTui({
+        targetDir,
+        version,
+        initialScreen: { name: "install-sdd-assistant" },
+      });
     });
 }

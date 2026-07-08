@@ -1,0 +1,410 @@
+import React, { memo } from "react";
+import { Box, Text } from "ink";
+import { MenuPreview, OptionPreview } from "./PreviewPanels.js";
+import { SelectableList } from "./SelectableList.js";
+import {
+  ENGINEERING_SECTION_ITEMS,
+  MAIN_MENU_ITEMS,
+} from "../data/menu-items.js";
+import { theme } from "../theme.js";
+import type { EngineeringSession } from "../use-app-input.js";
+import type { AppScreen, AppState } from "../types.js";
+import {
+  countCompletedSections,
+  getSectionStatus,
+  statusIcon,
+} from "../../engineering-config/state/engineering-section-status.js";
+import { ENGINEERING_SECTIONS } from "../../engineering-config/catalog/index.js";
+import { ASSISTANTS } from "../../registries/assistants.registry.js";
+import type { EngineeringSectionId } from "../../engineering-config/types.js";
+
+const EngineeringSectionNavigation = memo(function EngineeringSectionNavigation({
+  sectionId,
+  questionIndex,
+  optionIndex,
+  saving,
+}: {
+  sectionId: EngineeringSectionId;
+  questionIndex: number;
+  optionIndex: number;
+  saving: boolean;
+}) {
+  const section = ENGINEERING_SECTIONS.find((item) => item.id === sectionId)!;
+  const question = section.questions[questionIndex];
+
+  return (
+    <Box flexDirection="column" overflow="hidden">
+      <Text bold color={theme.brand}>
+        Question {questionIndex + 1} / {section.questions.length}
+      </Text>
+      <Box marginTop={1} flexDirection="column">
+        <Text bold>{question.title}</Text>
+        <Text wrap="wrap" color={theme.muted}>
+          {question.description}
+        </Text>
+      </Box>
+      <Box marginTop={1}>
+        <Text bold>{question.question}</Text>
+      </Box>
+      <Box marginTop={1} overflow="hidden">
+        <SelectableList
+          title="Options"
+          selectedIndex={optionIndex}
+          items={question.options.map((option) => ({
+            id: option.id,
+            label: option.label,
+          }))}
+        />
+      </Box>
+      {saving ? (
+        <Box marginTop={1}>
+          <Text color={theme.accent}>Saving section…</Text>
+        </Box>
+      ) : null}
+    </Box>
+  );
+});
+
+const EngineeringSectionPreview = memo(function EngineeringSectionPreview({
+  sectionId,
+  questionIndex,
+  optionIndex,
+}: {
+  sectionId: EngineeringSectionId;
+  questionIndex: number;
+  optionIndex: number;
+}) {
+  const section = ENGINEERING_SECTIONS.find((item) => item.id === sectionId)!;
+  const question = section.questions[questionIndex];
+
+  return (
+    <OptionPreview
+      title="Option Preview"
+      detail={question.options[optionIndex]?.detail ?? null}
+    />
+  );
+});
+
+type NavigationPanelProps = {
+  screen: AppScreen;
+  state: AppState;
+  selectedIndex: number;
+  engineeringSession: EngineeringSession | null;
+};
+
+type ContentPanelProps = NavigationPanelProps & {
+  resultLines: string[];
+};
+
+const MainMenuNavigation = memo(function MainMenuNavigation({
+  selectedIndex,
+}: {
+  selectedIndex: number;
+}) {
+  return (
+    <SelectableList
+      title="Actions"
+      selectedIndex={selectedIndex}
+      items={MAIN_MENU_ITEMS.map((item) => ({
+        id: item.id,
+        label: item.label,
+      }))}
+    />
+  );
+});
+
+const MainMenuContent = memo(function MainMenuContent({
+  selectedIndex,
+}: {
+  selectedIndex: number;
+}) {
+  const selected = MAIN_MENU_ITEMS[selectedIndex];
+  return (
+    <MenuPreview
+      title={selected.label}
+      description={selected.description}
+      why={selected.why}
+      filesAffected={selected.filesAffected}
+      estimatedTime={selected.estimatedTime}
+      recommendedUsage={selected.recommendedUsage}
+    />
+  );
+});
+
+export const NavigationPanel = memo(function NavigationPanel({
+  screen,
+  state,
+  selectedIndex,
+  engineeringSession,
+}: NavigationPanelProps) {
+  if (screen.name === "main-menu") {
+    return <MainMenuNavigation selectedIndex={selectedIndex} />;
+  }
+
+  if (screen.name === "install-sdd-assistant" || screen.name === "sync-assistant") {
+    return (
+      <SelectableList
+        title={screen.name === "sync-assistant" ? "Assistant to sync" : "AI Assistant"}
+        selectedIndex={selectedIndex}
+        items={ASSISTANTS.map((item) => ({
+          id: item.id,
+          label: item.label,
+        }))}
+      />
+    );
+  }
+
+  if (
+    screen.name === "install-sdd-engineering" ||
+    screen.name === "install-sdd-workflow" ||
+    screen.name === "create-workspace-workflow"
+  ) {
+    const titles: Record<string, string> = {
+      "install-sdd-engineering": "Configure Engineering Brief now?",
+      "install-sdd-workflow": "Include workflow module?",
+      "create-workspace-workflow": "Include workflow module?",
+    };
+
+    return (
+      <SelectableList
+        title={titles[screen.name]}
+        selectedIndex={selectedIndex}
+        items={[
+          { id: "yes", label: "Yes" },
+          { id: "no", label: "No" },
+        ]}
+      />
+    );
+  }
+
+  if (screen.name === "engineering-dashboard") {
+    const completed = countCompletedSections(state.engineeringAnswers);
+    const items = ENGINEERING_SECTION_ITEMS.map((item) => {
+      const sectionId = item.id as EngineeringSectionId;
+      return {
+        id: item.id,
+        label: item.label,
+        icon: statusIcon(getSectionStatus(sectionId, state.engineeringAnswers)),
+      };
+    });
+
+    return (
+      <Box flexDirection="column">
+        <SelectableList
+          title="Sections"
+          selectedIndex={selectedIndex}
+          items={items}
+        />
+        <Box
+          marginTop={2}
+          flexDirection="column"
+          borderStyle="single"
+          borderColor={theme.border}
+          paddingX={1}
+        >
+          <Text bold>Progress</Text>
+          <Text>{completed} / 3 completed</Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (screen.name === "engineering-section" && engineeringSession) {
+    return (
+      <EngineeringSectionNavigation
+        sectionId={engineeringSession.sectionId}
+        questionIndex={engineeringSession.questionIndex}
+        optionIndex={engineeringSession.optionIndex}
+        saving={engineeringSession.saving}
+      />
+    );
+  }
+
+  if (screen.name === "engineering-summary") {
+    const sections = ENGINEERING_SECTION_ITEMS.map((item) => ({
+      label: item.label,
+      status: getSectionStatus(
+        item.id as EngineeringSectionId,
+        state.engineeringAnswers,
+      ),
+    }));
+
+    return (
+      <Box flexDirection="column">
+        <Text bold color={theme.accent}>
+          Engineering Brief
+        </Text>
+        {sections.map((section) => (
+          <Text key={section.label}>
+            {statusIcon(section.status)} {section.label}
+          </Text>
+        ))}
+      </Box>
+    );
+  }
+
+  if (screen.name === "action-running") {
+    return (
+      <Box flexDirection="column">
+        <Text bold color={theme.accent}>
+          {screen.label}
+        </Text>
+      </Box>
+    );
+  }
+
+  if (screen.name === "action-result") {
+    return (
+      <Box flexDirection="column">
+        <Text bold color={theme.accent}>
+          Result
+        </Text>
+      </Box>
+    );
+  }
+
+  return <Text>Loading…</Text>;
+});
+
+export const ContentPanel = memo(function ContentPanel({
+  screen,
+  state,
+  selectedIndex,
+  engineeringSession,
+  resultLines,
+}: ContentPanelProps) {
+  if (screen.name === "main-menu") {
+    return <MainMenuContent selectedIndex={selectedIndex} />;
+  }
+
+  if (screen.name === "install-sdd-assistant" || screen.name === "sync-assistant") {
+    const selected = ASSISTANTS[selectedIndex];
+    return (
+      <MenuPreview
+        title={selected.label}
+        description={`Install SDD skills for ${selected.label}.`}
+        why="Your assistant needs SDD skills to run sdd-idea, sdd-spec, and other workflows."
+        filesAffected={[`${selected.label}-specific skills folder`]}
+        estimatedTime="< 1 min"
+        recommendedUsage="Choose the assistant you use daily."
+      />
+    );
+  }
+
+  if (
+    screen.name === "install-sdd-engineering" ||
+    screen.name === "install-sdd-workflow" ||
+    screen.name === "create-workspace-workflow"
+  ) {
+    const meta: Record<string, { title: string; description: string }> = {
+      "install-sdd-engineering": {
+        title: "Configure Engineering Brief now?",
+        description:
+          "Set principles, decisions, and conventions before generating the technology stack.",
+      },
+      "install-sdd-workflow": {
+        title: "Include workflow module?",
+        description:
+          "Adds roadmap, milestones, and releases under .workspace/workflow/.",
+      },
+      "create-workspace-workflow": {
+        title: "Include workflow module?",
+        description:
+          "Adds roadmap, milestones, and releases under .workspace/workflow/.",
+      },
+    };
+    const item = meta[screen.name];
+
+    return (
+      <Box flexDirection="column">
+        <Text bold color={theme.accent}>
+          {item.title}
+        </Text>
+        <Text wrap="wrap">{item.description}</Text>
+      </Box>
+    );
+  }
+
+  if (screen.name === "engineering-dashboard") {
+    const selected = ENGINEERING_SECTION_ITEMS[selectedIndex];
+    const status = getSectionStatus(
+      selected.id as EngineeringSectionId,
+      state.engineeringAnswers,
+    );
+
+    return (
+      <Box flexDirection="column">
+        <Text bold color={theme.accent}>
+          {selected.label}
+        </Text>
+        <Text wrap="wrap">{selected.description}</Text>
+        <Box marginTop={1} flexDirection="column">
+          <Text bold>Status</Text>
+          <Text>
+            {statusIcon(status)} {status.replace("-", " ")}
+          </Text>
+        </Box>
+        <Box marginTop={1} flexDirection="column">
+          <Text bold>Generates</Text>
+          <Text>{selected.filesAffected.join(", ")}</Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (screen.name === "engineering-section" && engineeringSession) {
+    return (
+      <EngineeringSectionPreview
+        sectionId={engineeringSession.sectionId}
+        questionIndex={engineeringSession.questionIndex}
+        optionIndex={engineeringSession.optionIndex}
+      />
+    );
+  }
+
+  if (screen.name === "engineering-summary") {
+    const sections = ENGINEERING_SECTION_ITEMS.map((item) => ({
+      file: item.filesAffected[0],
+    }));
+
+    return (
+      <Box flexDirection="column">
+        <Text bold>Generated</Text>
+        {sections.map((section) => (
+          <Text key={section.file}>• {section.file}</Text>
+        ))}
+        <Box marginTop={2} flexDirection="column">
+          <Text bold color={theme.accent}>
+            Next step
+          </Text>
+          <Text wrap="wrap">
+            Run the sdd-technical skill to generate engineering-stack.md.
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (screen.name === "action-running") {
+    return (
+      <Box flexDirection="column">
+        <Text color={theme.muted}>Please wait…</Text>
+      </Box>
+    );
+  }
+
+  if (screen.name === "action-result") {
+    const lines = screen.lines.length > 0 ? screen.lines : resultLines;
+    return (
+      <Box flexDirection="column">
+        {lines.map((line, index) => (
+          <Text key={`${index}-${line}`} wrap="wrap">
+            {line}
+          </Text>
+        ))}
+      </Box>
+    );
+  }
+
+  return <Text color={theme.muted}>Preparing view…</Text>;
+});

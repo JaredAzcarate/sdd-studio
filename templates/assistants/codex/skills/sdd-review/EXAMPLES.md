@@ -20,11 +20,11 @@ Review scenarios and affected files.
 | create | `technical/api/comment-api.md` |
 | create | `technical/ui/comment-ui.md` |
 | create | `technical/testing/comment-testing.md` |
-| create | `technical/architecture/comment-architecture.md` (paths per `development.md` Code Organization) |
+| create | `technical/architecture/comment-architecture.md` (paths per `engineering-decisions.md` Project Organization) |
 | create | `technical/database/comment-database.md` |
 | update | `business/relations/task-relations.md` (Task → Comment) |
 
-New `comment-api.md` must follow **sdd-spec** Server Actions template and `stack/backend.md`.
+New `comment-api.md` must follow **sdd-spec** Server Actions template and `engineering-stack.md` (Backend + API sections).
 
 **Proposal to user:**
 
@@ -67,9 +67,9 @@ Do not touch `workflow/`.
 | update | `technical/ui/task-ui.md` (form field) |
 | update | `technical/testing/task-testing.md` |
 
-Verify `task-api.md` still matches `brief/technical/stack/backend.md` (Server Actions primary).
+Verify `task-api.md` still matches `brief/technical/engineering-stack.md` (Backend + API sections; Server Actions primary).
 
-**Incorrect:** documenting `POST /tasks` if the Brief defines Server Actions as the primary surface.
+**Incorrect:** documenting `POST /tasks` if the Engineering Stack defines Server Actions as the primary surface.
 
 ## Scenario 4 — Scope change (requires product-guide.md)
 
@@ -81,23 +81,23 @@ Verify `task-api.md` still matches `brief/technical/stack/backend.md` (Server Ac
 2. Only with approval: update `product-guide.md` affected experiences
 3. Then update domain spec according to new scope
 
-## Scenario 5 — Stack change (requires brief/technical/)
+## Scenario 5 — Stack change (requires sdd-technical)
 
 **Request:** "Migrate from PostgreSQL to MongoDB."
 
 **Action:**
 
-1. Update `brief/technical/stack/database.md`
+1. Recommend **sdd-technical** to update `engineering-stack.md` (Database section)
 2. Update affected `technical/database/<domain>-database.md` files
-3. Verify `technical/architecture/<domain>-architecture.md` paths still match `development.md` Code Organization
+3. Verify `technical/architecture/<domain>-architecture.md` paths still match `engineering-decisions.md` Project Organization
 
-## Scenario 6 — Code Organization change (Brief + spec paths)
+## Scenario 6 — Project Organization change (Brief + spec paths)
 
 **Request:** "Product code moved to submodule `numo-app/`; domains live under `numo-app/src/domains/<domain>/`."
 
 **Action:**
 
-1. Update `brief/technical/development.md` (Repository Strategy, Code Organization)
+1. Recommend `sdd-studio configure` to update `engineering-decisions.md` (Project Organization)
 2. Update **all** `technical/architecture/<domain>-architecture.md` — replace stale paths (e.g. `src/modules/`) with `<resolved-code-root>/domains/<domain>/`
 3. Update **all** `technical/api/<domain>-api.md` — Server Actions module paths per new layout
 4. Run `validate-spec.mjs`

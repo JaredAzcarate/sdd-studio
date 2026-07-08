@@ -5,6 +5,12 @@ Bootstrap a **Specification Driven Development (SDD)** workspace for AI-assisted
 The CLI prepares your folder structure and assistant-specific SDD skills. The intelligence lives in the skills — not in this tool.
 
 ```bash
+npx sdd-studio
+```
+
+Or use subcommands directly:
+
+```bash
 npx sdd-studio init
 ```
 
@@ -13,7 +19,7 @@ npx sdd-studio init
 `sdd-studio init` scaffolds by default:
 
 - `.workspace/brief/business/` — product principles and narrative product guide
-- `.workspace/brief/technical/` — development, modeling, and stack decisions
+- `.workspace/brief/technical/` — engineering principles, decisions, conventions, modeling, and stack (via configure + skills)
 - `.workspace/spec/business/` and `.workspace/spec/technical/` — specification scaffold (empty until **sdd-spec**)
 - Assistant files — skills, rules, or commands for your chosen AI tool
 
@@ -62,11 +68,23 @@ Include the SDD workflow module:
 npx sdd-studio init --yes --assistant cursor --workflow
 ```
 
-Then run the **sdd-idea** skill (or `/sdd-idea` in OpenCode) to complete the Brief under `.workspace/brief/`.
+Then run the **sdd-idea** skill (or `/sdd-idea` in OpenCode) to complete the Business Brief under `.workspace/brief/business/`.
+
+During interactive `init`, after choosing your assistant you can configure the **Engineering Brief** (28 questions across principles, decisions, and conventions). Press **Space** on any option for details. Skip it and run later with:
+
+```bash
+npx sdd-studio configure
+```
+
+Non-interactive defaults for the Engineering Brief:
+
+```bash
+npx sdd-studio init --yes --assistant cursor --engineering
+```
 
 ### Migrating an existing workspace
 
-If your project was created with sdd-studio 0.4.x (flat `project.md` and `spec/` layout):
+If your project was created with sdd-studio 0.4.x (flat `project.md` and `spec/` layout) or 0.5.x (`development.md`, `modeling.md`, `stack/`):
 
 ```bash
 npx sdd-studio migrate
@@ -86,7 +104,7 @@ Sync only skills (keep your rules or project instructions as-is):
 npx sdd-studio sync --skills
 ```
 
-Requires an existing SDD project (`.workspace/brief/technical/development.md`, legacy `.workspace/project.md`, or installed assistant skills from a prior `init`).
+Requires an existing SDD project (`.workspace/brief/technical/engineering-principles.md`, legacy `.workspace/project.md`, or installed assistant skills from a prior `init`).
 
 ## Assistant-specific layout
 
@@ -125,14 +143,11 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
 │   │   │   ├── product-principles.md
 │   │   │   └── product-guide.md
 │   │   └── technical/
-│   │       ├── development.md
-│   │       ├── modeling.md
-│   │       └── stack/
-│   │           ├── frontend.md
-│   │           ├── backend.md
-│   │           ├── database.md
-│   │           ├── infrastructure.md
-│   │           └── ai.md
+│   │       ├── engineering-principles.md   # sdd-studio configure
+│   │       ├── engineering-decisions.md    # sdd-studio configure
+│   │       ├── engineering-conventions.md  # sdd-studio configure
+│   │       ├── engineering-modeling.md     # sdd-idea
+│   │       └── engineering-stack.md        # sdd-technical (generated)
 │   ├── spec/
 │   │   ├── business/
 │   │   │   ├── domain/
@@ -161,6 +176,7 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
     ├── rules/sdd-studio.mdc
     └── skills/
         ├── sdd-idea/
+        ├── sdd-technical/
         ├── sdd-generate/
         ├── sdd-spec/
         ├── sdd-review/
@@ -175,6 +191,7 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
 └── .opencode/
     ├── commands/
     │   ├── sdd-idea.md
+    │   ├── sdd-technical.md
     │   ├── sdd-generate.md
     │   ├── sdd-spec.md
     │   ├── sdd-review.md
@@ -196,6 +213,7 @@ Invoke with `/sdd-idea`, `/sdd-spec`, etc.
     ├── copilot-instructions.md # repo-wide SDD context (always on)
     ├── agents/
     │   ├── sdd-idea.agent.md
+    │   ├── sdd-technical.agent.md
     │   ├── sdd-generate.agent.md
     │   ├── sdd-spec.agent.md
     │   ├── sdd-review.agent.md
@@ -218,7 +236,8 @@ Invoke with `/sdd-idea`, `/sdd-spec`, etc.
 
 | Skill | Purpose |
 | ----- | ------- |
-| **sdd-idea** | Discover product; write the Brief under `.workspace/brief/` |
+| **sdd-idea** | Discover product; write Business Brief and `engineering-modeling.md` |
+| **sdd-technical** | Analyze Engineering Brief; generate `engineering-stack.md` |
 | **sdd-spec** | Read Brief; generate `.workspace/spec/business/` and `.workspace/spec/technical/` |
 | **sdd-review** | Analyze changes; update Brief and/or Specification |
 | **sdd-plan** | Read Brief + spec; generate `.workspace/workflow/` |
@@ -234,16 +253,27 @@ Invoke skills explicitly in your AI assistant. Do not implement without a specif
 
 ## CLI reference
 
+Launch the Terminal UI (default):
+
+```bash
+sdd-studio
+```
+
+Subcommands:
+
 ```bash
 sdd-studio init [options]
+sdd-studio configure
 sdd-studio migrate
 sdd-studio sync [options]
 ```
 
 | Command | Description |
 | ------- | ----------- |
+| `(default)` | Launch the SDD Studio Terminal UI |
 | `init` | Scaffold a new SDD workspace |
-| `migrate` | Migrate a legacy flat workspace to Brief / Specification structure |
+| `configure` | Configure the Engineering Brief (TUI) |
+| `migrate` | Migrate a legacy workspace to the Engineering Brief structure |
 | `sync` | Update assistant files from the installed package |
 
 | Option | Description |
@@ -251,9 +281,10 @@ sdd-studio sync [options]
 | `--yes` | Skip prompts; use defaults (`init` only) |
 | `--assistant <id>` | `cursor` (default), `claude`, `codex`, `opencode`, or `copilot` |
 | `--workflow` | Include `.workspace/workflow/` scaffold (`init` only, default: off) |
+| `--engineering` | Write default Engineering Brief answers (`init --yes` only) |
 | `--skills` | Sync only skills/commands, not instructions or rules (`sync` only) |
 
-All assistants install the same five SDD skills with provider-native paths.
+All assistants install the same six SDD skills with provider-native paths.
 
 ## Requirements
 
