@@ -5,6 +5,4 @@ dist/
 .env
 .env.*
 *.tgz
-.cursor/
-.workspace/
-.vscode/
+
