@@ -148,9 +148,9 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
 │   │       ├── engineering-conventions.md  # sdd-studio configure
 │   │       ├── engineering-frontend-patterns.md  # sdd-studio configure
 │   │       ├── engineering-backend-patterns.md   # sdd-studio configure
-│   │       ├── engineering-modeling.md     # sdd-idea
+│   │       ├── engineering-contribution-patterns.md  # sdd-studio configure
 │   │       └── engineering-stack.md        # sdd-technical (generated)
-│   ├── spec/
+│   ├── spec/                   # Create spec scaffold (separate step)
 │   │   ├── business/
 │   │   │   ├── domain/
 │   │   │   ├── relations/

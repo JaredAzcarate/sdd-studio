@@ -125,9 +125,9 @@ Preguntas por superficie (web, mobile, backend, DB, auth, …) → confirmación
 
 ## 7. Especificación — sdd-spec
 
-Lee brief completo (producto + engineering + stack).
+Lee brief completo (producto + engineering + stack), incluyendo `engineering-*-patterns.md` y **Business Modeling** en `engineering-decisions.md`.
 
-Genera módulos bajo `spec/business/` y `spec/technical/` (domain, relations, capabilities, flows, rules, security, events, api, ui, testing, architecture, database).
+Genera módulos bajo `spec/business/` y `spec/technical/` (domain, relations, capabilities, flows, rules, security, events, api, ui, testing, architecture, database). El modelado de dominio vive en spec, no en `engineering-modeling.md`.
 
 **Next step:** selección de proveedor de trabajo.
 

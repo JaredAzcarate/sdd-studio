@@ -29,6 +29,22 @@ Before generating `technical/api/` or `technical/architecture/` files, read:
 
 Skills **sdd-generate** and **sdd-review** must apply the same rules when inferring or updating technical spec.
 
+## Brief-driven pattern alignment
+
+Before generating `technical/api/` or `technical/ui/` files, read:
+
+- `.workspace/brief/technical/engineering-frontend-patterns.md` — data flow, filters, async UI states, loading, notifications
+- `.workspace/brief/technical/engineering-backend-patterns.md` — response envelope, error shape, list metadata, server pagination
+- `.workspace/brief/technical/engineering-contribution-patterns.md` — branch workflow and PR conventions (reference in testing/review notes when relevant)
+
+| Spec file | Align with |
+| --------- | ---------- |
+| `<domain>-api.md` | `engineering-backend-patterns.md` + `engineering-stack.md` (Backend + API) |
+| `<domain>-ui.md` | `engineering-frontend-patterns.md` + stack UI sections when present |
+| `<domain>-architecture.md` | `engineering-decisions.md` (Project Organization) + `engineering-stack.md` (Architecture Summary) |
+
+Domain discovery uses **Business Modeling** in `engineering-decisions.md`, not `engineering-modeling.md`. The latter is legacy/brownfield only when present.
+
 ## Folder structure
 
 ```text

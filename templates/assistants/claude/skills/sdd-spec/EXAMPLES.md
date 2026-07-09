@@ -476,8 +476,9 @@ Board → Task Detail → back to Board
 
 ## Dependencies
 
-- `brief/technical/engineering-decisions.md` — Project Organization (domain folder layout)
-- `brief/technical/engineering-modeling.md` — DDD aggregate boundaries
+- `brief/technical/engineering-decisions.md` — Project Organization (domain folder layout) and Business Modeling (DDD vs CRUD)
+- `brief/technical/engineering-backend-patterns.md` — API response envelope and error shape
+- `brief/technical/engineering-frontend-patterns.md` — async UI states and loading conventions
 - `brief/technical/engineering-stack.md` — Server Actions surface (Backend + API sections)
 
 ---
