@@ -242,7 +242,7 @@ Invoke with `/sdd-idea`, `/sdd-spec`, etc.
 | 2 | **sdd-idea** | Business Brief (`product-principles.md`, `product-guide.md`) |
 | 3 | **sdd-technical** | Interactive stack selection → `engineering-stack.md` |
 | 4 | **sdd-spec** | Generate `.workspace/spec/business/` and `.workspace/spec/technical/` |
-| 5 | `sdd-studio configure-workflow` | Workflow methodology and task conventions (planned) |
+| 5 | `sdd-studio configure-workflow` | Workflow methodology and task conventions |
 | 6 | **sdd-plan** | Roadmap, milestones, releases under `.workspace/workflow/` |
 
 You may start with **sdd-idea** before step 1; after the product is defined, run configure, then **sdd-technical**.

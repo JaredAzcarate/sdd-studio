@@ -9,7 +9,7 @@ Fuente de verdad del camino feliz para proyectos **greenfield** (sin código exi
 | CLI | `npx sdd-studio` o `sdd-studio` |
 | Init | `sdd-studio init` |
 | Configure Engineering | `sdd-studio configure` o menú TUI **Configure Engineering** |
-| Configure Workflow | `sdd-studio configure-workflow` (planificado) |
+| Configure Workflow | `sdd-studio configure-workflow` |
 | Skills | Invocar en el asistente elegido (`/sdd-idea`, skill **sdd-idea**, etc.) |
 
 ### Orden canónico de skills
@@ -45,7 +45,7 @@ Al ejecutar `sdd-studio`, la TUI pregunta:
 | **Create Business & Technical foundation** | Brief stubs + skills del asistente. Sin `spec/`, sin `workflow/` |
 | **Create spec scaffold** | Carpetas vacías `spec/business/` y `spec/technical/` |
 | **Configure Engineering** | TUI del Engineering Brief |
-| **Configure Workflow** | Metodología y convenciones de tareas (planificado; tras spec) |
+| **Configure Workflow** | Metodología y convenciones de tareas (tras spec) |
 | **Sync Assistant Files** | Actualiza skills del paquete |
 | **Exit** | Cierra la TUI |
 
