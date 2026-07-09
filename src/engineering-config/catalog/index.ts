@@ -6,9 +6,11 @@ import { engineeringFrontendPatternsSection } from "./frontend-patterns.js";
 import { engineeringPrinciplesSection } from "./principles.js";
 import type {
   EngineeringConfigAnswers,
+  EngineeringQuestion,
   EngineeringSection,
   EngineeringSectionId,
 } from "../types.js";
+import { formatMultiAnswer } from "./question-utils.js";
 
 export const ENGINEERING_LEAF_SECTION_IDS = [
   "principles",
@@ -36,17 +38,30 @@ export const ENGINEERING_SECTIONS: EngineeringSection[] = [
   engineeringContributionPatternsSection,
 ];
 
+const MULTI_SELECT_DEFAULTS: Record<string, string[]> = {
+  "async-ui-states": ["loading", "error", "success", "empty"],
+  "pr-conventions": ["delete-branch-on-merge", "linked-task-required"],
+};
+
+function defaultAnswerForQuestion(question: EngineeringQuestion): string {
+  const preset = MULTI_SELECT_DEFAULTS[question.id];
+  if (preset) {
+    return formatMultiAnswer(preset);
+  }
+
+  if (question.selectionMode === "multi") {
+    return formatMultiAnswer([question.options[0]!.id]);
+  }
+
+  return question.options[0]!.id;
+}
+
 export const DEFAULT_ENGINEERING_ANSWERS: EngineeringConfigAnswers =
   Object.fromEntries(
     ENGINEERING_SECTIONS.flatMap((section) =>
       section.questions
         .filter((question) => !question.showWhen)
-        .map((question) => [
-          question.id,
-          question.selectionMode === "multi"
-            ? question.options[0]!.id
-            : question.options[0]!.id,
-        ]),
+        .map((question) => [question.id, defaultAnswerForQuestion(question)]),
     ),
   );
 

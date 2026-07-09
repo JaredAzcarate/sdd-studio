@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { assertPathsExist } from "./assert-paths.js";
 import {
   ALL_CURSOR_INIT_PATHS,
+  ALL_CURSOR_INIT_WITH_SPEC_PATHS,
   ALL_CURSOR_INIT_WITH_WORKFLOW_PATHS,
   WORKFLOW_PATHS,
 } from "./expected-paths.js";
@@ -73,6 +74,27 @@ describe("cli init e2e", () => {
     });
 
     assertPathsExist(tempDir, ALL_CURSOR_INIT_WITH_WORKFLOW_PATHS);
+  });
+
+  it("runs init --yes --spec and includes the spec scaffold", () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-e2e-"));
+
+    const output = execSync(
+      `node "${cliBin}" init --yes --assistant cursor --spec`,
+      {
+        cwd: tempDir,
+        encoding: "utf8",
+        stdio: ["pipe", "pipe", "pipe"],
+      },
+    );
+
+    assertPathsExist(tempDir, ALL_CURSOR_INIT_WITH_SPEC_PATHS);
+
+    for (const relativePath of WORKFLOW_PATHS) {
+      expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(false);
+    }
+
+    expect(output).toMatch(/Spec scaffold:\s+enabled/);
   });
 
   it("prints version", () => {

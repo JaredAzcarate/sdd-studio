@@ -34,6 +34,8 @@ import { getVisibleQuestions } from "../../engineering-config/catalog/question-u
 import { ASSISTANTS } from "../../registries/assistants.registry.js";
 import type { EngineeringSectionId } from "../../engineering-config/types.js";
 import type { WorkflowSectionId } from "../../workflow-config/types.js";
+import { formatEngineeringConfigureSummary } from "../../utils/format-engineering-summary.js";
+import { formatWorkflowConfigureSummary } from "../../utils/format-workflow-result.js";
 
 const EngineeringSectionNavigation = memo(function EngineeringSectionNavigation({
   sectionId,
@@ -562,7 +564,7 @@ export const NavigationPanel = memo(function NavigationPanel({
     return (
       <Box flexDirection="column">
         <Text bold color={theme.accent}>
-          Result
+          {screen.title}
         </Text>
       </Box>
     );
@@ -719,53 +721,29 @@ export const ContentPanel = memo(function ContentPanel({
   }
 
   if (screen.name === "workflow-summary") {
+    const lines = formatWorkflowConfigureSummary();
+
     return (
       <Box flexDirection="column">
-        <Text bold color={theme.accent}>
-          Success
-        </Text>
-        <Text wrap="wrap">
-          Your workflow configuration is ready in workflow-config.md.
-        </Text>
-        <Box marginTop={2} flexDirection="column">
-          <Text bold>Next step</Text>
-          <Text wrap="wrap">
-            Run **sdd-plan** to generate roadmaps, milestones, and releases
-            under `.workspace/workflow/`.
+        {lines.map((line, index) => (
+          <Text key={`${index}-${line}`} wrap="wrap">
+            {line}
           </Text>
-        </Box>
+        ))}
       </Box>
     );
   }
 
   if (screen.name === "engineering-summary") {
-    const sections = [
-      ...ENGINEERING_SECTION_ITEMS.filter((item) => item.id !== "patterns").map(
-        (item) => item.filesAffected[0],
-      ),
-      ...ENGINEERING_PATTERNS_ITEMS.map((item) => item.filesAffected[0]),
-    ];
+    const lines = formatEngineeringConfigureSummary();
 
     return (
       <Box flexDirection="column">
-        <Text bold color={theme.accent}>
-          Success
-        </Text>
-        <Text wrap="wrap">
-          Your Engineering Brief is ready. The following files were generated:
-        </Text>
-        <Box marginTop={1} flexDirection="column">
-          {sections.map((file) => (
-            <Text key={file}>• {file}</Text>
-          ))}
-        </Box>
-        <Box marginTop={2} flexDirection="column">
-          <Text bold>Next step</Text>
-          <Text wrap="wrap">
-            Run **sdd-idea** to define the product. Then **sdd-technical** to
-            generate engineering-stack.md.
+        {lines.map((line, index) => (
+          <Text key={`${index}-${line}`} wrap="wrap">
+            {line}
           </Text>
-        </Box>
+        ))}
       </Box>
     );
   }

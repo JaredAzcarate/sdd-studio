@@ -15,7 +15,7 @@ export function formatConfigureResult(
     "Updated files:",
     ...relativePaths.map((path) => `  ${path}`),
     "",
-    "Next step: run the **sdd-technical** skill to generate engineering-stack.md.",
+    "Next step: run **sdd-idea** for the Business Brief, then **sdd-technical** to generate engineering-stack.md.",
   ];
 
   return lines.join("\n");

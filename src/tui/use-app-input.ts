@@ -5,6 +5,7 @@ import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
 import {
   ENGINEERING_LEAF_SECTION_COUNT,
   ENGINEERING_SECTIONS,
+  DEFAULT_ENGINEERING_ANSWERS,
 } from "../engineering-config/catalog/index.js";
 import {
   WORKFLOW_LEAF_SECTION_COUNT,
@@ -106,15 +107,19 @@ function sessionStateForQuestion(
   question: EngineeringQuestion,
   answers: EngineeringConfigAnswers,
 ): Pick<EngineeringSession, "optionIndex" | "selectedOptionIds"> {
+  const resolvedAnswer =
+    answers[question.id] ?? DEFAULT_ENGINEERING_ANSWERS[question.id];
+
   if (question.selectionMode === "multi") {
+    const selected = parseMultiAnswer(resolvedAnswer);
     return {
       optionIndex: 0,
-      selectedOptionIds: parseMultiAnswer(answers[question.id]),
+      selectedOptionIds: selected.length > 0 ? selected : [],
     };
   }
 
   const optionIndex = question.options.findIndex(
-    (option) => option.id === answers[question.id],
+    (option) => option.id === resolvedAnswer,
   );
 
   return {

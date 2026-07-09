@@ -13,6 +13,11 @@ import {
 import { migrateWorkspace } from "../generators/migrate-workspace.generator.js";
 import { syncAssistant } from "../use-cases/sync-assistant.use-case.js";
 import { formatGenerationResult } from "../utils/format-generation-result.js";
+import {
+  formatSpecScaffoldError,
+  formatSpecScaffoldMissingWorkspace,
+  formatSpecScaffoldResult,
+} from "../utils/format-spec-scaffold-result.js";
 import { formatInitSummary } from "../utils/format-init-summary.js";
 import { formatMigrateResult } from "../utils/format-migrate-result.js";
 import { formatSyncResult } from "../utils/format-sync-result.js";
@@ -277,9 +282,9 @@ export function SddApp({
           lines: [],
         });
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : String(error);
-        setResultLines([`Error: ${message}`]);
+      const message =
+        error instanceof Error ? error.message : String(error);
+      setResultLines(formatSpecScaffoldError(message));
         setScreen({
           name: "action-result",
           title: "Error",
@@ -296,10 +301,7 @@ export function SddApp({
     try {
       const markerPath = join(targetDir, SDD_WORKSPACE_MARKER_PATH);
       if (!existsSync(markerPath)) {
-        setResultLines([
-          "No SDD workspace found.",
-          "Run Create Business & Technical foundation first.",
-        ]);
+        setResultLines(formatSpecScaffoldMissingWorkspace());
         setScreen({
           name: "action-result",
           title: "Create spec scaffold",
@@ -317,10 +319,7 @@ export function SddApp({
         ".gitkeep",
       );
       if (existsSync(specMarker)) {
-        setResultLines([
-          "Spec scaffold already exists under .workspace/spec/.",
-          "Next step: run **sdd-spec** when Brief and stack are ready.",
-        ]);
+        setResultLines(formatSpecScaffoldResult({ alreadyExists: true }));
         setScreen({
           name: "action-result",
           title: "Create spec scaffold",
@@ -330,13 +329,9 @@ export function SddApp({
       }
 
       const result = await generateSpecScaffold({ targetDir });
-      setResultLines([
-        "Spec scaffold created successfully.",
-        "",
-        `Files: ${result.createdPaths.length}`,
-        "",
-        "Next step: run **sdd-spec** after the Brief and engineering-stack.md are complete.",
-      ]);
+      setResultLines(
+        formatSpecScaffoldResult({ fileCount: result.createdPaths.length }),
+      );
       setScreen({
         name: "action-result",
         title: "Create spec scaffold",

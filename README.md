@@ -2,6 +2,8 @@
 
 Bootstrap a **Specification Driven Development (SDD)** workspace for AI-assisted projects.
 
+SDD Studio targets **web, mobile-native, and hybrid** client applications — not terminal-only or CLI-primary products.
+
 The CLI prepares your folder structure and assistant-specific SDD skills. The intelligence lives in the skills — not in this tool.
 
 ```bash
@@ -19,15 +21,15 @@ npx sdd-studio init
 `sdd-studio init` scaffolds by default:
 
 - `.workspace/brief/business/` — product principles and narrative product guide
-- `.workspace/brief/technical/` — engineering principles, decisions, conventions, patterns, modeling, and stack (via configure + skills)
-- `.workspace/spec/business/` and `.workspace/spec/technical/` — specification scaffold (empty until **sdd-spec**)
+- `.workspace/brief/technical/` — engineering stubs (completed via `configure` + skills)
 - Assistant files — skills, rules, or commands for your chosen AI tool
 
-Optionally, with `--workflow`:
+It does **not** create `.workspace/spec/` or `.workspace/workflow/` unless you opt in:
 
-- `.workspace/workflow/` — SDD planning (roadmap, milestones, releases, tasks)
+- **Spec scaffold** — TUI menu *Create spec scaffold*, or `init --spec` / `init --yes --spec`
+- **Workflow scaffold** — TUI *Configure Workflow* (creates folders as needed), or `init --workflow` / `init --yes --workflow`
 
-If you manage tasks elsewhere (Linear, GitHub Issues, etc.), skip the workflow module and use **sdd-plan** later only when you want SDD-native planning.
+After foundation, use **sdd-spec** to fill `.workspace/spec/business/` and `.workspace/spec/technical/`.
 
 It does **not** generate application code (`src/`, `tests/`, etc.). You implement after the spec is ready.
 
@@ -70,7 +72,7 @@ npx sdd-studio init --yes --assistant cursor --workflow
 
 Then run the **sdd-idea** skill (or `/sdd-idea` in OpenCode) to complete the Business Brief under `.workspace/brief/business/`.
 
-During interactive `init`, after choosing your assistant you can configure the **Engineering Brief** (principles, decisions, conventions, and frontend/backend patterns). Press **Space** on any option for details. Skip it and run later with:
+The interactive TUI (`sdd-studio`) starts with **Greenfield** and a main menu: foundation, spec scaffold, configure engineering, configure workflow, and sync. Engineering configuration is a separate step:
 
 ```bash
 npx sdd-studio configure
@@ -234,16 +236,20 @@ Invoke with `/sdd-idea`, `/sdd-spec`, etc.
 
 ## Skill workflow
 
+See [FLOW-GREENFIELD.md](./FLOW-GREENFIELD.md) for the full greenfield path (TUI menu + skills).
+
 ### Greenfield
 
 | Step | Skill / command | Purpose |
 | ---- | ----------------- | ------- |
+| 0 | `sdd-studio init` or TUI *Create Business & Technical foundation* | Brief stubs + assistant skills |
 | 1 | `sdd-studio configure` | Engineering Brief (principles, decisions, conventions, patterns) |
 | 2 | **sdd-idea** | Business Brief (`product-principles.md`, `product-guide.md`) |
 | 3 | **sdd-technical** | Interactive stack selection → `engineering-stack.md` |
-| 4 | **sdd-spec** | Generate `.workspace/spec/business/` and `.workspace/spec/technical/` |
-| 5 | `sdd-studio configure-workflow` | Workflow methodology and task conventions |
-| 6 | **sdd-plan** | Roadmap, milestones, releases under `.workspace/workflow/` |
+| 4 | TUI *Create spec scaffold* or `init --spec` | Empty `.workspace/spec/` folders |
+| 5 | **sdd-spec** | Generate domain files under `spec/` |
+| 6 | `sdd-studio configure-workflow` | Workflow methodology and task conventions |
+| 7 | **sdd-plan** | Roadmap, milestones, releases under `.workspace/workflow/` |
 
 You may start with **sdd-idea** before step 1; after the product is defined, run configure, then **sdd-technical**.
 
@@ -269,6 +275,7 @@ Subcommands:
 ```bash
 sdd-studio init [options]
 sdd-studio configure
+sdd-studio configure-workflow
 sdd-studio migrate
 sdd-studio sync [options]
 ```
@@ -276,8 +283,9 @@ sdd-studio sync [options]
 | Command | Description |
 | ------- | ----------- |
 | `(default)` | Launch the SDD Studio Terminal UI |
-| `init` | Scaffold a new SDD workspace |
+| `init` | Scaffold a new SDD workspace (foundation only by default) |
 | `configure` | Configure the Engineering Brief (TUI) |
+| `configure-workflow` | Configure workflow methodology and task conventions (TUI) |
 | `migrate` | Migrate a legacy workspace to the Engineering Brief structure |
 | `sync` | Update assistant files from the installed package |
 
@@ -285,6 +293,7 @@ sdd-studio sync [options]
 | ------ | ----------- |
 | `--yes` | Skip prompts; use defaults (`init` only) |
 | `--assistant <id>` | `cursor` (default), `claude`, `codex`, `opencode`, or `copilot` |
+| `--spec` | Include `.workspace/spec/` scaffold (`init` only, default: off) |
 | `--workflow` | Include `.workspace/workflow/` scaffold (`init` only, default: off) |
 | `--engineering` | Write default Engineering Brief answers (`init --yes` only) |
 | `--skills` | Sync only skills/commands, not instructions or rules (`sync` only) |

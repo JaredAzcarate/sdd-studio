@@ -9,8 +9,8 @@ Relacionado con el trabajo de **Engineering Patterns** y el flujo Configure → 
 
 ### Defaults y UX del TUI
 
-- [ ] **Multiselect con valores por defecto sensatos** — p. ej. en Async UI States pre-marcar `loading`, `error`, `success`, `empty` en lugar de solo la primera opción.
-- [ ] **Multiselect en PR Conventions** — definir qué opciones vienen pre-marcadas por defecto (p. ej. `delete-branch-on-merge`).
+- [x] **Multiselect con valores por defecto sensatos** — p. ej. en Async UI States pre-marcar `loading`, `error`, `success`, `empty` en lugar de solo la primera opción.
+- [x] **Multiselect en PR Conventions** — definir qué opciones vienen pre-marcadas por defecto (p. ej. `delete-branch-on-merge`).
 - [ ] **Validación de combinaciones incoherentes** — detectar y advertir antes de guardar, p. ej.:
   - envelope `flat` + `meta.pagination` en body
   - paginación `offset` en frontend + `embedded-cursor` en backend
@@ -29,8 +29,8 @@ Relacionado con el trabajo de **Engineering Patterns** y el flujo Configure → 
 
 ### `sdd-spec`
 
-- [ ] **Consumir `engineering-*-patterns.md`** al generar `*-api.md` y `*-ui.md` (envelopes, errores, async states, modals, paginación).
-- [ ] **Bloques globales en STANDARDS** — response shape, pagination meta, validation errors, HTTP status, loading/error/empty en UI.
+- [x] **Consumir `engineering-*-patterns.md`** al generar `*-api.md` y `*-ui.md` (envelopes, errores, async states, modals, paginación).
+- [x] **Bloques globales en STANDARDS** — response shape, pagination meta, validation errors, HTTP status, loading/error/empty en UI.
 - [ ] **Extender `validate-spec.mjs`** — referencias o checks mínimos a patrones del brief (opcional, definir alcance).
 
 ### `sdd-technical`
@@ -62,7 +62,7 @@ Relacionado con el trabajo de **Engineering Patterns** y el flujo Configure → 
 
 ## Alcance del producto
 
-- [ ] **Comunicar en README/docs** que SDD Studio apunta a aplicaciones **web, mobile-native e híbridas**, no a productos CLI/terminal como superficie principal (parcialmente en principles + rules).
+- [x] **Comunicar en README/docs** que SDD Studio apunta a aplicaciones **web, mobile-native e híbridas**, no a productos CLI/terminal como superficie principal (parcialmente en principles + rules).
 - [ ] **¿Excluir preguntas de patterns** cuando el brief indica solo API/backend sin UI? — hoy Frontend Patterns es obligatorio; evaluar `showWhen` a nivel sección.
 
 ---
