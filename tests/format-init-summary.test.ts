@@ -24,7 +24,7 @@ describe("formatInitSummary", () => {
     const summary = formatInitSummary(sampleContext, cursorResult);
 
     expect(summary).toContain("Cursor");
-    expect(summary).toContain("Brief under .workspace/brief/");
+    expect(summary).toContain("sdd-studio configure");
     expect(summary).toContain("Workflow module:   disabled");
   });
 
@@ -38,6 +38,21 @@ describe("formatInitSummary", () => {
     );
 
     expect(summary).toContain("Claude Code");
-    expect(summary).toContain("Brief under .workspace/brief/");
+    expect(summary).toContain("sdd-studio configure");
+  });
+
+  it("recommends sdd-idea before sdd-technical when engineering is configured", () => {
+    const summary = formatInitSummary(
+      {
+        ...sampleContext,
+        engineering: { answers: { "target-platforms": "web" } },
+      },
+      { ...cursorResult, engineering: true },
+    );
+
+    const ideaIndex = summary.indexOf("sdd-idea");
+    const technicalIndex = summary.indexOf("sdd-technical");
+    expect(ideaIndex).toBeGreaterThan(-1);
+    expect(technicalIndex).toBeGreaterThan(ideaIndex);
   });
 });

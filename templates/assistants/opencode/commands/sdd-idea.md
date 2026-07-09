@@ -1,5 +1,5 @@
 ---
-description: Discovers the product and writes the Brief under .workspace/brief/ (business and technical perspectives). Use when starting a new SDD project, defining product principles, the user journey, or domain modeling. Never writes .workspace/spec/.
+description: Discovers the product and writes the Brief under .workspace/brief/ (business and domain modeling). Use when starting a new SDD project, defining product principles, the user journey, or domain modeling. Never writes .workspace/spec/.
 ---
 
 # SDD Idea
@@ -127,7 +127,7 @@ Review against @.opencode/sdd-studio/sdd-idea/STANDARDS.md:
 2. User journey summary
 3. Domain modeling decisions summary
 4. Open items
-5. Next steps:
-   - Run `sdd-studio configure` if engineering principles, decisions, or conventions are incomplete
-   - Run **sdd-technical** if the technology stack is not yet defined
-   - Then **sdd-spec**
+5. Next steps (adapt wording; keep intent):
+   - If engineering principles, decisions, conventions, or patterns are **incomplete**, recommend **`sdd-studio configure`** with a friendly message, e.g. *"Now that the product is clear, let's define how we'll build it — run `sdd-studio configure` in the terminal."*
+   - If the Engineering Brief is complete but **`engineering-stack.md`** is missing, recommend **sdd-technical**
+   - If both Brief and stack are ready, recommend **sdd-spec**

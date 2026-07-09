@@ -9,9 +9,8 @@ description: >-
   /sdd-technical. Never modifies engineering input files or writes
   .workspace/spec/.
 disable-model-invocation: true
+tools: ["read", "edit", "search", "execute"]
 ---
-
-
 
 # SDD Technical
 
@@ -56,8 +55,8 @@ If any required file is missing or still default stubs, **stop** and tell the us
 Before starting, read:
 
 - All files in **Brief gate** above (use the Read tool)
-- [STANDARDS.md](STANDARDS.md) — question order, option rules, output structure
-- [EXAMPLES.md](EXAMPLES.md) — reference chat and file output
+- .github/sdd-studio/sdd-technical/STANDARDS.md — question order, option rules, output structure
+- .github/sdd-studio/sdd-technical/EXAMPLES.md — reference chat and file output
 
 ## Scope
 
@@ -77,7 +76,7 @@ Before starting, read:
 
 After reading the Brief:
 
-1. Build an **internal** list of areas to ask about (see [STANDARDS.md](STANDARDS.md) — question areas). Omit areas the Brief does not require.
+1. Build an **internal** list of areas to ask about (see .github/sdd-studio/sdd-technical/STANDARDS.md — question areas). Omit areas the Brief does not require.
 2. Skip re-asking dimensions already locked in the Brief (platforms, repo organization, auth strategy, etc.).
 3. Check for **blocking contradictions**. If found, explain in plain language and wait for resolution — do not open stack questions until resolved.
 
@@ -119,7 +118,7 @@ Each turn:
 
 ### Step 3 — Question order
 
-Order questions by **surfaces first**, then **shared infrastructure**, then **dependent choices**. See [STANDARDS.md](STANDARDS.md) for the default sequence. Adapt to the Brief — skip irrelevant areas.
+Order questions by **surfaces first**, then **shared infrastructure**, then **dependent choices**. See .github/sdd-studio/sdd-technical/STANDARDS.md for the default sequence. Adapt to the Brief — skip irrelevant areas.
 
 Typical order when Brief includes web + mobile + desktop:
 
@@ -144,7 +143,7 @@ When all applicable questions are answered:
 
 1. Show a **summary table** (area → selected technology) in chat
 2. Invoke **`AskQuestion`**: *¿Apruebas este stack?* — options: `Sí, escribir engineering-stack.md` / `Quiero edits`
-3. On approval, write `.workspace/brief/technical/engineering-stack.md` per [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md)
+3. On approval, write `.workspace/brief/technical/engineering-stack.md` per .github/sdd-studio/sdd-technical/STANDARDS.md and .github/sdd-studio/sdd-technical/EXAMPLES.md
 4. File records **selections only**, not debate
 
 ## Modo verbose
@@ -194,4 +193,4 @@ After writing the file:
 2. Table of areas and **user-selected** technologies
 3. Areas skipped because the Brief does not require them
 4. Contradictions found (if any)
-5. Next step: **sdd-spec** or **sdd-review** as appropriate
+5. Next step: **sdd-spec** (or **sdd-review** if the user wants to validate changes first)

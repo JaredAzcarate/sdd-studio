@@ -77,11 +77,17 @@ Domain specs under `.workspace/spec/technical/` **must align** with these patter
 
 ### Greenfield (no code yet)
 
-1. **sdd-idea** — discover product; write Business Brief and `engineering-modeling.md`
-2. **sdd-technical** — analyze engineering brief; generate `engineering-stack.md`
-3. **sdd-spec** — read entire brief/; generate domain files under `.workspace/spec/business/` and `.workspace/spec/technical/`
-4. **sdd-review** — analyze changes; update Brief and/or Specification
-5. **sdd-plan** — read brief/ + spec/; generate `.workspace/workflow/`
+Ideal order:
+
+1. **sdd-studio configure** — complete the Engineering Brief (principles, decisions, conventions, patterns)
+2. **sdd-idea** — discover product; write Business Brief
+3. **sdd-technical** — analyze engineering brief; generate `engineering-stack.md`
+4. **sdd-spec** — read entire brief/; generate domain files under `.workspace/spec/business/` and `.workspace/spec/technical/`
+5. **sdd-plan** — read brief/ + spec/; generate `.workspace/workflow/` (after workflow is configured)
+
+You may start with **sdd-idea** before configure. After the product is clear, run **sdd-studio configure**, then **sdd-technical**.
+
+**sdd-review** — optional; use when changes need analysis against Brief or Specification.
 
 ### Existing codebase (brownfield)
 

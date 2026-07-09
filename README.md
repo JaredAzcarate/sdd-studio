@@ -236,13 +236,16 @@ Invoke with `/sdd-idea`, `/sdd-spec`, etc.
 
 ### Greenfield
 
-| Skill | Purpose |
-| ----- | ------- |
-| **sdd-idea** | Discover product; write Business Brief and `engineering-modeling.md` |
-| **sdd-technical** | Interactive stack selection per layer; writes confirmed choices to `engineering-stack.md` |
-| **sdd-spec** | Read Brief; generate `.workspace/spec/business/` and `.workspace/spec/technical/` |
-| **sdd-review** | Analyze changes; update Brief and/or Specification |
-| **sdd-plan** | Read Brief + spec; generate `.workspace/workflow/` |
+| Step | Skill / command | Purpose |
+| ---- | ----------------- | ------- |
+| 1 | `sdd-studio configure` | Engineering Brief (principles, decisions, conventions, patterns) |
+| 2 | **sdd-idea** | Business Brief (`product-principles.md`, `product-guide.md`) |
+| 3 | **sdd-technical** | Interactive stack selection → `engineering-stack.md` |
+| 4 | **sdd-spec** | Generate `.workspace/spec/business/` and `.workspace/spec/technical/` |
+| 5 | `sdd-studio configure-workflow` | Workflow methodology and task conventions (planned) |
+| 6 | **sdd-plan** | Roadmap, milestones, releases under `.workspace/workflow/` |
+
+You may start with **sdd-idea** before step 1; after the product is defined, run configure, then **sdd-technical**.
 
 ### Existing codebase
 

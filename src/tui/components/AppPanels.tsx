@@ -500,7 +500,8 @@ export const ContentPanel = memo(function ContentPanel({
         <Box marginTop={2} flexDirection="column">
           <Text bold>Next step</Text>
           <Text wrap="wrap">
-            Run the sdd-technical skill to generate engineering-stack.md.
+            Run **sdd-idea** to define the product. Then **sdd-technical** to
+            generate engineering-stack.md.
           </Text>
         </Box>
       </Box>

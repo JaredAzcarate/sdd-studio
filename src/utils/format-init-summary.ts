@@ -23,9 +23,11 @@ export function formatInitSummary(
 
   if (result?.assistant.installed) {
     const layout = getAssistantLayout(context.assistant);
-    const nextSkill = context.engineering || result.engineering
-      ? "**sdd-technical** to generate engineering-stack.md, then **sdd-idea** for the Business Brief"
-      : "**sdd-studio configure** (or **sdd-idea**) to complete the Brief under .workspace/brief/";
+    const engineeringReady =
+      context.engineering || result.engineering;
+    const nextSkill = engineeringReady
+      ? "**sdd-idea** for the Business Brief, then **sdd-technical** to generate engineering-stack.md"
+      : "**sdd-studio configure** to complete the Engineering Brief (or start with **sdd-idea** if you prefer defining the product first)";
     lines.push(
       "",
       `Next step: run ${nextSkill} in ${layout.nextStepLabel}.`,

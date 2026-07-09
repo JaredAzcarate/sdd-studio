@@ -11,7 +11,7 @@ Discover the product and build the **Brief** — project context, not specificat
 
 **Output scope:** `.workspace/brief/business/` and `.workspace/brief/technical/engineering-modeling.md` only.
 
-Use **sdd-generate** when the project already has application code to analyze. Use **sdd-idea** for greenfield discovery through questions only.
+
 
 Never generate or modify files under `.workspace/spec/` or `.workspace/workflow/`.
 
@@ -130,7 +130,7 @@ Review against .github/sdd-studio/sdd-idea/STANDARDS.md:
 2. User journey summary
 3. Domain modeling decisions summary
 4. Open items
-5. Next steps:
-   - Run `sdd-studio configure` if engineering principles, decisions, or conventions are incomplete
-   - Run **sdd-technical** if the technology stack is not yet defined
-   - Then **sdd-spec**
+5. Next steps (adapt wording; keep intent):
+   - If engineering principles, decisions, conventions, or patterns are **incomplete**, recommend **`sdd-studio configure`** with a friendly message, e.g. *"Now that the product is clear, let's define how we'll build it — run `sdd-studio configure` in the terminal."*
+   - If the Engineering Brief is complete but **`engineering-stack.md`** is missing, recommend **sdd-technical**
+   - If both Brief and stack are ready, recommend **sdd-spec**
