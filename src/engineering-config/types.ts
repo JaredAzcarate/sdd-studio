@@ -31,7 +31,18 @@ export type EngineeringQuestion = {
   options: EngineeringOption[];
 };
 
-export type EngineeringSectionId = "principles" | "decisions" | "conventions";
+export type EngineeringSectionId =
+  | "principles"
+  | "decisions"
+  | "conventions"
+  | "frontend-patterns"
+  | "backend-patterns";
+
+export type EngineeringDashboardItemId =
+  | "principles"
+  | "decisions"
+  | "conventions"
+  | "patterns";
 
 export type EngineeringSection = {
   id: EngineeringSectionId;

@@ -2,7 +2,10 @@ import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
 import { join } from "node:path";
 import type { Key } from "ink";
 import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
-import { ENGINEERING_SECTIONS } from "../engineering-config/catalog/index.js";
+import {
+  ENGINEERING_LEAF_SECTION_COUNT,
+  ENGINEERING_SECTIONS,
+} from "../engineering-config/catalog/index.js";
 import {
   findNextVisibleQuestionIndex,
   findPreviousVisibleQuestionIndex,
@@ -13,6 +16,7 @@ import {
 import { writeEngineeringSection } from "../engineering-config/generators/write-engineering-brief.js";
 import { ASSISTANTS } from "../registries/assistants.registry.js";
 import {
+  ENGINEERING_PATTERNS_ITEMS,
   ENGINEERING_SECTION_ITEMS,
   MAIN_MENU_ITEMS,
 } from "./data/menu-items.js";
@@ -145,7 +149,7 @@ function saveEngineeringSection(
     actions.setEngineeringCustomNotes(nextCustomNotes);
     actions.setEngineeringSession(null);
 
-    if (countCompletedSections(nextAnswers) === 3) {
+    if (countCompletedSections(nextAnswers) === ENGINEERING_LEAF_SECTION_COUNT) {
       actions.navigate({ name: "engineering-summary" });
       return;
     }
@@ -399,7 +403,7 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         actions.goBack();
         return;
       }
-      if (completed === 3 && input === "s") {
+      if (completed === ENGINEERING_LEAF_SECTION_COUNT && input === "s") {
         actions.navigate({ name: "engineering-summary" });
         return;
       }
@@ -407,7 +411,75 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         return;
       }
 
-      const sectionId = selected.id as EngineeringSectionId;
+      if (selected.id === "patterns") {
+        actions.navigate({ name: "engineering-patterns-dashboard" });
+        return;
+      }
+
+      const sectionId = selected.id;
+      const section = ENGINEERING_SECTIONS.find((item) => item.id === sectionId)!;
+      const visibleQuestions = getVisibleQuestions(
+        section,
+        state.engineeringAnswers,
+      );
+      const firstUnansweredQuestion =
+        visibleQuestions.find(
+          (item) => state.engineeringAnswers[item.id] === undefined,
+        ) ?? visibleQuestions[0];
+
+      if (!firstUnansweredQuestion) {
+        return;
+      }
+
+      const questionIndex = section.questions.findIndex(
+        (item) => item.id === firstUnansweredQuestion.id,
+      );
+      const question = section.questions[questionIndex]!;
+      const sessionState = sessionStateForQuestion(
+        question,
+        state.engineeringAnswers,
+      );
+
+      actions.setEngineeringSession({
+        sectionId,
+        questionIndex,
+        optionIndex: sessionState.optionIndex,
+        selectedOptionIds: sessionState.selectedOptionIds,
+        answers: { ...state.engineeringAnswers },
+        customNotes: { ...state.engineeringCustomNotes },
+        customEntry: null,
+        saving: false,
+      });
+      actions.navigate({ name: "engineering-section", sectionId });
+      return;
+    }
+
+    if (screen.name === "engineering-patterns-dashboard") {
+      const selected = ENGINEERING_PATTERNS_ITEMS[selectedIndex];
+
+      if (key.upArrow) {
+        setSelectedIndex(
+          (current) =>
+            (current - 1 + ENGINEERING_PATTERNS_ITEMS.length) %
+            ENGINEERING_PATTERNS_ITEMS.length,
+        );
+        return;
+      }
+      if (key.downArrow) {
+        setSelectedIndex(
+          (current) => (current + 1) % ENGINEERING_PATTERNS_ITEMS.length,
+        );
+        return;
+      }
+      if (key.escape) {
+        actions.goBack();
+        return;
+      }
+      if (!key.return) {
+        return;
+      }
+
+      const sectionId = selected.id;
       const section = ENGINEERING_SECTIONS.find((item) => item.id === sectionId)!;
       const visibleQuestions = getVisibleQuestions(
         section,

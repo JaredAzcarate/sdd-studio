@@ -19,7 +19,7 @@ npx sdd-studio init
 `sdd-studio init` scaffolds by default:
 
 - `.workspace/brief/business/` — product principles and narrative product guide
-- `.workspace/brief/technical/` — engineering principles, decisions, conventions, modeling, and stack (via configure + skills)
+- `.workspace/brief/technical/` — engineering principles, decisions, conventions, patterns, modeling, and stack (via configure + skills)
 - `.workspace/spec/business/` and `.workspace/spec/technical/` — specification scaffold (empty until **sdd-spec**)
 - Assistant files — skills, rules, or commands for your chosen AI tool
 
@@ -70,7 +70,7 @@ npx sdd-studio init --yes --assistant cursor --workflow
 
 Then run the **sdd-idea** skill (or `/sdd-idea` in OpenCode) to complete the Business Brief under `.workspace/brief/business/`.
 
-During interactive `init`, after choosing your assistant you can configure the **Engineering Brief** (28 questions across principles, decisions, and conventions). Press **Space** on any option for details. Skip it and run later with:
+During interactive `init`, after choosing your assistant you can configure the **Engineering Brief** (principles, decisions, conventions, and frontend/backend patterns). Press **Space** on any option for details. Skip it and run later with:
 
 ```bash
 npx sdd-studio configure
@@ -146,6 +146,8 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
 │   │       ├── engineering-principles.md   # sdd-studio configure
 │   │       ├── engineering-decisions.md    # sdd-studio configure
 │   │       ├── engineering-conventions.md  # sdd-studio configure
+│   │       ├── engineering-frontend-patterns.md  # sdd-studio configure
+│   │       ├── engineering-backend-patterns.md   # sdd-studio configure
 │   │       ├── engineering-modeling.md     # sdd-idea
 │   │       └── engineering-stack.md        # sdd-technical (generated)
 │   ├── spec/

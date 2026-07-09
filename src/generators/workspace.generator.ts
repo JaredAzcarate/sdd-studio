@@ -22,6 +22,8 @@ const REQUIRED_BRIEF_FILES = [
   "brief/technical/engineering-principles.md",
   "brief/technical/engineering-decisions.md",
   "brief/technical/engineering-conventions.md",
+  "brief/technical/engineering-frontend-patterns.md",
+  "brief/technical/engineering-backend-patterns.md",
   "brief/technical/engineering-modeling.md",
 ] as const;
 

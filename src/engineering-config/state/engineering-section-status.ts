@@ -1,7 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
-import { ENGINEERING_SECTIONS } from "../catalog/index.js";
+import {
+  ENGINEERING_LEAF_SECTION_IDS,
+  ENGINEERING_PATTERNS_SECTION_IDS,
+  ENGINEERING_SECTIONS,
+} from "../catalog/index.js";
 import {
   formatMultiAnswer,
   getVisibleQuestions,
@@ -19,6 +23,8 @@ const SECTION_FILES: Record<EngineeringSectionId, string> = {
   principles: "engineering-principles.md",
   decisions: "engineering-decisions.md",
   conventions: "engineering-conventions.md",
+  "frontend-patterns": "engineering-frontend-patterns.md",
+  "backend-patterns": "engineering-backend-patterns.md",
 };
 
 function parseAnswersFromMarkdown(content: string): {
@@ -146,10 +152,28 @@ export function getSectionStatus(
   return "in-progress";
 }
 
+export function getPatternsGroupStatus(
+  answers: EngineeringConfigAnswers,
+): SectionStatus {
+  const statuses = ENGINEERING_PATTERNS_SECTION_IDS.map((sectionId) =>
+    getSectionStatus(sectionId, answers),
+  );
+
+  if (statuses.every((status) => status === "completed")) {
+    return "completed";
+  }
+
+  if (statuses.every((status) => status === "not-started")) {
+    return "not-started";
+  }
+
+  return "in-progress";
+}
+
 export function countCompletedSections(
   answers: EngineeringConfigAnswers,
 ): number {
-  return (["principles", "decisions", "conventions"] as const).filter(
+  return ENGINEERING_LEAF_SECTION_IDS.filter(
     (sectionId) => getSectionStatus(sectionId, answers) === "completed",
   ).length;
 }

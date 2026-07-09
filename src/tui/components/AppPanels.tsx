@@ -3,6 +3,7 @@ import { Box, Text } from "ink";
 import { MenuPreview, OptionPreview } from "./PreviewPanels.js";
 import { SelectableList } from "./SelectableList.js";
 import {
+  ENGINEERING_PATTERNS_ITEMS,
   ENGINEERING_SECTION_ITEMS,
   MAIN_MENU_ITEMS,
 } from "../data/menu-items.js";
@@ -11,10 +12,14 @@ import type { EngineeringSession } from "../use-app-input.js";
 import type { AppScreen, AppState } from "../types.js";
 import {
   countCompletedSections,
+  getPatternsGroupStatus,
   getSectionStatus,
   statusIcon,
 } from "../../engineering-config/state/engineering-section-status.js";
-import { ENGINEERING_SECTIONS } from "../../engineering-config/catalog/index.js";
+import {
+  ENGINEERING_LEAF_SECTION_COUNT,
+  ENGINEERING_SECTIONS,
+} from "../../engineering-config/catalog/index.js";
 import { getVisibleQuestions } from "../../engineering-config/catalog/question-utils.js";
 import { ASSISTANTS } from "../../registries/assistants.registry.js";
 import type { EngineeringSectionId } from "../../engineering-config/types.js";
@@ -223,11 +228,17 @@ export const NavigationPanel = memo(function NavigationPanel({
   if (screen.name === "engineering-dashboard") {
     const completed = countCompletedSections(state.engineeringAnswers);
     const items = ENGINEERING_SECTION_ITEMS.map((item) => {
-      const sectionId = item.id as EngineeringSectionId;
+      const icon =
+        item.id === "patterns"
+          ? statusIcon(getPatternsGroupStatus(state.engineeringAnswers))
+          : statusIcon(
+              getSectionStatus(item.id, state.engineeringAnswers),
+            );
+
       return {
         id: item.id,
         label: item.label,
-        icon: statusIcon(getSectionStatus(sectionId, state.engineeringAnswers)),
+        icon,
       };
     });
 
@@ -246,8 +257,30 @@ export const NavigationPanel = memo(function NavigationPanel({
           paddingX={1}
         >
           <Text bold>Progress</Text>
-          <Text>{completed} / 3 completed</Text>
+          <Text>
+            {completed} / {ENGINEERING_LEAF_SECTION_COUNT} completed
+          </Text>
         </Box>
+      </Box>
+    );
+  }
+
+  if (screen.name === "engineering-patterns-dashboard") {
+    const items = ENGINEERING_PATTERNS_ITEMS.map((item) => ({
+      id: item.id,
+      label: item.label,
+      icon: statusIcon(
+        getSectionStatus(item.id, state.engineeringAnswers),
+      ),
+    }));
+
+    return (
+      <Box flexDirection="column">
+        <SelectableList
+          title="Pattern areas"
+          selectedIndex={selectedIndex}
+          items={items}
+        />
       </Box>
     );
   }
@@ -267,13 +300,18 @@ export const NavigationPanel = memo(function NavigationPanel({
   }
 
   if (screen.name === "engineering-summary") {
-    const sections = ENGINEERING_SECTION_ITEMS.map((item) => ({
-      label: item.label,
-      status: getSectionStatus(
-        item.id as EngineeringSectionId,
-        state.engineeringAnswers,
+    const sections = [
+      ...ENGINEERING_SECTION_ITEMS.filter((item) => item.id !== "patterns").map(
+        (item) => ({
+          label: item.label,
+          status: getSectionStatus(item.id, state.engineeringAnswers),
+        }),
       ),
-    }));
+      ...ENGINEERING_PATTERNS_ITEMS.map((item) => ({
+        label: item.label,
+        status: getSectionStatus(item.id, state.engineeringAnswers),
+      })),
+    ];
 
     return (
       <Box flexDirection="column">
@@ -282,7 +320,8 @@ export const NavigationPanel = memo(function NavigationPanel({
         </Text>
         <Box marginTop={1}>
           <Text wrap="wrap">
-            All three sections were saved to your workspace.
+            All {ENGINEERING_LEAF_SECTION_COUNT} sections were saved to your
+            workspace.
           </Text>
         </Box>
         {sections.map((section) => (
@@ -351,7 +390,7 @@ export const ContentPanel = memo(function ContentPanel({
       "install-sdd-engineering": {
         title: "Configure Engineering Brief now?",
         description:
-          "Set principles, decisions, and conventions before generating the technology stack.",
+          "Set principles, decisions, conventions, and patterns before generating the technology stack.",
       },
       "install-sdd-workflow": {
         title: "Include workflow module?",
@@ -378,10 +417,34 @@ export const ContentPanel = memo(function ContentPanel({
 
   if (screen.name === "engineering-dashboard") {
     const selected = ENGINEERING_SECTION_ITEMS[selectedIndex];
-    const status = getSectionStatus(
-      selected.id as EngineeringSectionId,
-      state.engineeringAnswers,
+    const status =
+      selected.id === "patterns"
+        ? getPatternsGroupStatus(state.engineeringAnswers)
+        : getSectionStatus(selected.id, state.engineeringAnswers);
+
+    return (
+      <Box flexDirection="column">
+        <Text bold color={theme.accent}>
+          {selected.label}
+        </Text>
+        <Text wrap="wrap">{selected.description}</Text>
+        <Box marginTop={1} flexDirection="column">
+          <Text bold>Status</Text>
+          <Text>
+            {statusIcon(status)} {status.replace("-", " ")}
+          </Text>
+        </Box>
+        <Box marginTop={1} flexDirection="column">
+          <Text bold>Generates</Text>
+          <Text>{selected.filesAffected.join(", ")}</Text>
+        </Box>
+      </Box>
     );
+  }
+
+  if (screen.name === "engineering-patterns-dashboard") {
+    const selected = ENGINEERING_PATTERNS_ITEMS[selectedIndex];
+    const status = getSectionStatus(selected.id, state.engineeringAnswers);
 
     return (
       <Box flexDirection="column">
@@ -414,9 +477,12 @@ export const ContentPanel = memo(function ContentPanel({
   }
 
   if (screen.name === "engineering-summary") {
-    const sections = ENGINEERING_SECTION_ITEMS.map((item) => ({
-      file: item.filesAffected[0],
-    }));
+    const sections = [
+      ...ENGINEERING_SECTION_ITEMS.filter((item) => item.id !== "patterns").map(
+        (item) => item.filesAffected[0],
+      ),
+      ...ENGINEERING_PATTERNS_ITEMS.map((item) => item.filesAffected[0]),
+    ];
 
     return (
       <Box flexDirection="column">
@@ -427,8 +493,8 @@ export const ContentPanel = memo(function ContentPanel({
           Your Engineering Brief is ready. The following files were generated:
         </Text>
         <Box marginTop={1} flexDirection="column">
-          {sections.map((section) => (
-            <Text key={section.file}>• {section.file}</Text>
+          {sections.map((file) => (
+            <Text key={file}>• {file}</Text>
           ))}
         </Box>
         <Box marginTop={2} flexDirection="column">

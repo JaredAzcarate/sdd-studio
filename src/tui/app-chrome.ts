@@ -1,5 +1,6 @@
 import type { AppScreen, AppState, FooterShortcut } from "./types.js";
 import { defaultFooterShortcuts } from "./data/menu-items.js";
+import { ENGINEERING_LEAF_SECTION_COUNT } from "../engineering-config/catalog/index.js";
 import { countCompletedSections } from "../engineering-config/state/engineering-section-status.js";
 import { ENGINEERING_SECTIONS } from "../engineering-config/catalog/index.js";
 import { findPreviousVisibleQuestionIndex } from "../engineering-config/catalog/question-utils.js";
@@ -21,6 +22,8 @@ export function getSectionTitle(screen: AppScreen): string {
       return "Create Workspace";
     case "engineering-dashboard":
       return "Configure Engineering";
+    case "engineering-patterns-dashboard":
+      return "Engineering Patterns";
     case "engineering-section":
       return (
         ENGINEERING_SECTIONS.find((item) => item.id === screen.sectionId)
@@ -53,10 +56,18 @@ export function getFooterShortcuts(
       { keys: "Enter", label: "Open section" },
       { keys: "Esc", label: "Main menu" },
     ];
-    if (completed === 3) {
+    if (completed === ENGINEERING_LEAF_SECTION_COUNT) {
       shortcuts.push({ keys: "s", label: "Summary" });
     }
     return shortcuts;
+  }
+
+  if (screen.name === "engineering-patterns-dashboard") {
+    return [
+      { keys: "↑↓", label: "Navigate" },
+      { keys: "Enter", label: "Open area" },
+      { keys: "Esc", label: "Sections" },
+    ];
   }
 
   if (screen.name === "engineering-section") {
