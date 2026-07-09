@@ -6,9 +6,9 @@ Mandatory rules for conversational stack selection and generating `engineering-s
 
 Act as a **senior fullstack developer** and **technical auditor** in a team discussion. Read the Engineering Brief first. Propose technologies the team can actually ship with — options must fit the whole architecture, not isolated layers.
 
-**Chat (default)** = short intro per turn; **stack choices via numbered multiple-choice** (one question per message).
+**Chat (default)** = short intro per turn; **stack choices via `AskQuestion`** (clickable UI, one question per tool call).
 
-**Never** use wide markdown tables for stack options — use a compact numbered list instead.
+**Never** list stack options in markdown tables when `AskQuestion` is available.
 
 **Chat (`modo verbose`)** = full digest, trade-offs, tensions — only when requested.
 
@@ -27,6 +27,9 @@ Read all of the following from `.workspace/brief/technical/` using the Read tool
 | `engineering-principles.md` | Technology-agnostic principles | **Stop** — user must run `sdd-studio configure` |
 | `engineering-decisions.md` | Architectural decisions already made | **Stop** |
 | `engineering-conventions.md` | Development conventions and team practices | **Stop** |
+| `engineering-frontend-patterns.md` | Frontend implementation patterns | **Stop** |
+| `engineering-backend-patterns.md` | Backend response and error patterns | **Stop** |
+| `engineering-contribution-patterns.md` | Git workflow and PR conventions | **Stop** |
 | `engineering-modeling.md` | Modeling approach and domain structure | Optional; read if present |
 
 These documents are the **only** source for:
@@ -52,7 +55,7 @@ In default mode, surface at most **2 sentences** of Brief context in the opening
 
 Every recommendation and every multiple-choice option must:
 
-1. Be **compatible** with `engineering-principles.md`, `engineering-decisions.md`, and `engineering-conventions.md`
+1. Be **compatible** with `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md`, `engineering-frontend-patterns.md`, `engineering-backend-patterns.md`, and `engineering-contribution-patterns.md`
 2. Trace to at least one **specific** Principle or Decision when explaining *(recomendada)*
 3. **Not** contradict a locked decision without flagging the conflict
 4. **Not** be chosen because it is popular, trendy, or your default stack
@@ -61,7 +64,7 @@ If the Brief does not constrain an area enough, say so in one line and still off
 
 ## Chat output format (default)
 
-### Turn 1 — intro + first question
+### Turn 1 — intro + first `AskQuestion`
 
 **Chat message:**
 
@@ -70,42 +73,44 @@ Basado en `.workspace/brief/technical`, voy a proponerte tecnologías,
 librerías e integraciones para definir el stack del proyecto.
 
 <at most 2 sentences from Brief context>
-
-¿Qué te gustaría usar para desarrollo web?
-
-1. Next.js (Recommended) — App Router, SSR, React
-2. Remix — file routing, React
-3. Nuxt — Vue; menos alineado con Expo
-
-Responde con el número o describe otra opción.
 ```
 
-### Turn 2+ — one question per turn
+**Then call `AskQuestion`** (same turn) with the first area question and 3–4 Brief-derived options.
 
-**Chat:** optional one-line progress + at most 2 sentences of context + one numbered question (3–4 options; recommendation first with `(Recommended)`).
+### Turn 2+ — one `AskQuestion` per turn
 
-### Numbered options (reference)
+**Chat:** optional one-line progress + at most 2 sentences of context.
 
-```markdown
-¿Cómo quieres abordar mobile nativo (iOS/Android)?
+**`AskQuestion`:** one question, 3–4 options; recommendation first with `(Recommended)` in label.
 
-1. Expo (Recommended) — React Native, alinea con Next.js
-2. React Native sin Expo
-3. Capacitor — empaquetar la app web
+### `AskQuestion` shape (reference)
 
-Responde con el número o describe otra opción.
+```json
+{
+  "title": "Stack — Web",
+  "questions": [{
+    "id": "web-framework",
+    "prompt": "¿Qué te gustaría usar para desarrollo web?",
+    "options": [
+      { "id": "nextjs", "label": "Next.js (Recommended) — App Router, SSR, React" },
+      { "id": "remix", "label": "Remix — file routing, React" },
+      { "id": "nuxt", "label": "Nuxt — Vue, menos alineado con Expo" }
+    ]
+  }]
+}
 ```
 
-If the user describes a custom option, confirm it in one line before continuing.
+Cursor adds **Other** automatically. If the user picks Other, ask one follow-up for the custom name.
 
 ### Prohibited in default mode
 
-- Wide markdown tables listing stack options (`| Opción | Tecnología |`)
+- Markdown tables listing stack options (`| Opción | Tecnología |`)
+- `Responde con 1, 2, 3, 4 u Other` when `AskQuestion` is available
 - `Fase X/Y — …` headers
 - `[Brief-locked]`, `[User-elicited]`, `[Dependent on: X]` labels
 - Section list tables requiring user confirmation before questions
 - Digest blocks (Del Brief / Inferido / Confirmado)
-- Multiple technology questions in one turn
+- Multiple `AskQuestion` calls or technology questions in one turn
 - Hardcoded option menus unrelated to the current Brief
 
 ### Running summary
@@ -184,9 +189,11 @@ For each area:
 
 1. Re-read relevant Brief constraints for that layer.
 2. Short context in chat (optional).
-3. Present one question with 3–4 Brief-derived numbered options.
+3. Call **`AskQuestion`** with one question and 3–4 Brief-derived options.
 4. Wait for selection before the next area.
 5. Record choice internally.
+
+**Other:** provided by Cursor's Ask UI; follow up if custom text is needed.
 
 **Do not** write `engineering-stack.md` until all areas are covered and the summary is approved.
 
@@ -210,6 +217,9 @@ Never modify:
 - `engineering-principles.md`
 - `engineering-decisions.md`
 - `engineering-conventions.md`
+- `engineering-frontend-patterns.md`
+- `engineering-backend-patterns.md`
+- `engineering-contribution-patterns.md`
 - `engineering-modeling.md`
 
 ## Document structure
@@ -274,7 +284,7 @@ Add H2 sections for each confirmed area (Database, Authentication, Native Shell 
 The defined stack must be:
 
 - Architecturally coherent and internally consistent
-- Explicitly chosen by the user (or confirmed via custom option)
+- Explicitly chosen by the user (or confirmed via **Other**)
 - Traceable to the Engineering Brief
 - Readable as a **decision record**, not a proposal
 
@@ -289,4 +299,4 @@ The defined stack must be:
 - Do not store recommendation debates in `engineering-stack.md`
 - Do not use architect-style phase labels or section taxonomy in default chat
 - Do not require section-list confirmation before the first technology question
-- Do not use wide markdown tables for stack options in chat
+- Do not use markdown tables for stack options when `AskQuestion` is available

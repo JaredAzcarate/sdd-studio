@@ -1,6 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
+  ENGINEERING_LEAF_SECTION_IDS,
   ENGINEERING_SECTIONS,
   getDefaultEngineeringAnswers,
 } from "../catalog/index.js";
@@ -15,6 +16,9 @@ const OUTPUT_FILES: Record<EngineeringSectionId, string> = {
   principles: "engineering-principles.md",
   decisions: "engineering-decisions.md",
   conventions: "engineering-conventions.md",
+  "frontend-patterns": "engineering-frontend-patterns.md",
+  "backend-patterns": "engineering-backend-patterns.md",
+  "contribution-patterns": "engineering-contribution-patterns.md",
 };
 
 function renderSectionDocument(
@@ -112,7 +116,7 @@ export async function writeEngineeringBrief(
   const customNotes = options.customNotes ?? {};
   const writtenPaths: string[] = [];
 
-  for (const sectionId of Object.keys(OUTPUT_FILES) as EngineeringSectionId[]) {
+  for (const sectionId of ENGINEERING_LEAF_SECTION_IDS) {
     const fileName = OUTPUT_FILES[sectionId];
     const filePath = join(options.workspaceTechnicalDir, fileName);
     const content = renderSectionDocument(sectionId, answers, customNotes);

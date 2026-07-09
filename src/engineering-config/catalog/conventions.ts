@@ -143,5 +143,67 @@ export const engineeringConventionsSection: EngineeringSection = {
         }),
       ],
     },
+    {
+      id: "code-comments",
+      title: "Code Comments",
+      description:
+        "Defines when and how inline code comments are written (language follows project rules).",
+      question: "What code commenting standard should the project follow?",
+      options: [
+        defineOption("minimal", "Minimal (non-obvious logic only)", {
+          whatIsIt:
+            "Comments explain why, not what; avoid restating readable code.",
+          example:
+            "// Retry once — upstream rate-limits burst saves.",
+          bestFor:
+            "Teams preferring self-documenting code and small functions.",
+          considerations:
+            "Complex domain rules still need brief context.",
+          recommendation:
+            "Choose when code clarity is prioritized over inline prose.",
+          learnMore:
+            "Use with schema-based validation to reduce redundant comments.",
+        }),
+        defineOption("tsdoc-public-api", "TSDoc/JSDoc on public APIs", {
+          whatIsIt:
+            "Exported functions, hooks, and components document params and return values.",
+          example:
+            "/** @param filters - URL-synced task filters */ on exported hooks.",
+          bestFor:
+            "Shared libraries, design systems, and cross-team modules.",
+          considerations:
+            "Keep TSDoc in sync with types; stale docs mislead.",
+          recommendation:
+            "Choose when many consumers import from package boundaries.",
+          learnMore:
+            "Do not TSDoc every private helper — focus on public surface.",
+        }),
+        defineOption("why-not-what", "Why-not-what comments", {
+          whatIsIt:
+            "Comments capture decisions, invariants, and business constraints—not literal code behavior.",
+          example:
+            "// Invoice totals must match tax service rounding — do not use local Math.round.",
+          bestFor:
+            "Domains with non-obvious rules and regulatory constraints.",
+          considerations:
+            "Requires reviewers to enforce comment quality in PRs.",
+          recommendation:
+            "Choose when business logic is easy to misread without context.",
+          learnMore:
+            "Pair with engineering-modeling.md for domain references.",
+        }),
+        defineOption("custom", "Custom", {
+          whatIsIt:
+            "A documented commenting policy in CONTRIBUTING.md.",
+          example:
+            "File headers, TODO format, or required @see links to spec files.",
+          bestFor: "Teams with existing lint rules for comments.",
+          considerations: "Document examples of good vs bad comments.",
+          recommendation: "Choose Custom only with written standards.",
+          learnMore:
+            "Language for comments follows project README, not this wizard.",
+        }),
+      ],
+    },
   ],
 };

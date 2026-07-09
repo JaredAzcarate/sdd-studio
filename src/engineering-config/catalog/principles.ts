@@ -5,7 +5,7 @@ export const engineeringPrinciplesSection: EngineeringSection = {
   id: "principles",
   title: "Engineering Principles",
   description:
-    "Technology-agnostic principles that describe what the system should become, not how it will be implemented.",
+    "Technology-agnostic principles that describe what the system should become, not how it will be implemented. SDD Studio targets web, mobile-native, and hybrid client applications — not CLI-only or terminal tools as the primary product surface.",
   questions: [
     {
       id: "product-type",

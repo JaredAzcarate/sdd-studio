@@ -27,6 +27,9 @@ Read all of the following from `.workspace/brief/technical/` using the Read tool
 | `engineering-principles.md` | Technology-agnostic principles | **Stop** — user must run `sdd-studio configure` |
 | `engineering-decisions.md` | Architectural decisions already made | **Stop** |
 | `engineering-conventions.md` | Development conventions and team practices | **Stop** |
+| `engineering-frontend-patterns.md` | Frontend implementation patterns | **Stop** |
+| `engineering-backend-patterns.md` | Backend response and error patterns | **Stop** |
+| `engineering-contribution-patterns.md` | Git workflow and PR conventions | **Stop** |
 | `engineering-modeling.md` | Modeling approach and domain structure | Optional; read if present |
 
 These documents are the **only** source for:
@@ -52,7 +55,7 @@ In default mode, surface at most **2 sentences** of Brief context in the opening
 
 Every recommendation and every multiple-choice option must:
 
-1. Be **compatible** with `engineering-principles.md`, `engineering-decisions.md`, and `engineering-conventions.md`
+1. Be **compatible** with `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md`, `engineering-frontend-patterns.md`, `engineering-backend-patterns.md`, and `engineering-contribution-patterns.md`
 2. Trace to at least one **specific** Principle or Decision when explaining *(recomendada)*
 3. **Not** contradict a locked decision without flagging the conflict
 4. **Not** be chosen because it is popular, trendy, or your default stack
@@ -214,6 +217,9 @@ Never modify:
 - `engineering-principles.md`
 - `engineering-decisions.md`
 - `engineering-conventions.md`
+- `engineering-frontend-patterns.md`
+- `engineering-backend-patterns.md`
+- `engineering-contribution-patterns.md`
 - `engineering-modeling.md`
 
 ## Document structure

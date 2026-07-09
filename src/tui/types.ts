@@ -10,6 +10,7 @@ export type AppScreen =
   | { name: "install-sdd-workflow" }
   | { name: "create-workspace-workflow" }
   | { name: "engineering-dashboard" }
+  | { name: "engineering-patterns-dashboard" }
   | { name: "engineering-section"; sectionId: EngineeringSectionId }
   | { name: "engineering-summary" }
   | { name: "sync-assistant" }

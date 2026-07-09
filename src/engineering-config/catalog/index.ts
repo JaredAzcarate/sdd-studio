@@ -1,15 +1,39 @@
+import { engineeringContributionPatternsSection } from "./contribution-patterns.js";
+import { engineeringBackendPatternsSection } from "./backend-patterns.js";
 import { engineeringConventionsSection } from "./conventions.js";
 import { engineeringDecisionsSection } from "./decisions.js";
+import { engineeringFrontendPatternsSection } from "./frontend-patterns.js";
 import { engineeringPrinciplesSection } from "./principles.js";
 import type {
   EngineeringConfigAnswers,
   EngineeringSection,
+  EngineeringSectionId,
 } from "../types.js";
+
+export const ENGINEERING_LEAF_SECTION_IDS = [
+  "principles",
+  "decisions",
+  "conventions",
+  "frontend-patterns",
+  "backend-patterns",
+  "contribution-patterns",
+] as const satisfies readonly EngineeringSectionId[];
+
+export const ENGINEERING_LEAF_SECTION_COUNT = ENGINEERING_LEAF_SECTION_IDS.length;
+
+export const ENGINEERING_PATTERNS_SECTION_IDS = [
+  "frontend-patterns",
+  "backend-patterns",
+  "contribution-patterns",
+] as const satisfies readonly EngineeringSectionId[];
 
 export const ENGINEERING_SECTIONS: EngineeringSection[] = [
   engineeringPrinciplesSection,
   engineeringDecisionsSection,
   engineeringConventionsSection,
+  engineeringFrontendPatternsSection,
+  engineeringBackendPatternsSection,
+  engineeringContributionPatternsSection,
 ];
 
 export const DEFAULT_ENGINEERING_ANSWERS: EngineeringConfigAnswers =
@@ -31,8 +55,11 @@ export function getDefaultEngineeringAnswers(): EngineeringConfigAnswers {
 }
 
 export {
+  engineeringBackendPatternsSection,
   engineeringConventionsSection,
   engineeringDecisionsSection,
+  engineeringFrontendPatternsSection,
+  engineeringContributionPatternsSection,
   engineeringPrinciplesSection,
 };
 export {

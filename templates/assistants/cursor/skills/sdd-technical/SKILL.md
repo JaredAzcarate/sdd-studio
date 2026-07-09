@@ -42,6 +42,9 @@ Required files under `.workspace/brief/technical/`:
 | `engineering-principles.md` | **Yes** — stop if missing or empty |
 | `engineering-decisions.md` | **Yes** — stop if missing or empty |
 | `engineering-conventions.md` | **Yes** — stop if missing or empty |
+| `engineering-frontend-patterns.md` | **Yes** — stop if missing or empty |
+| `engineering-backend-patterns.md` | **Yes** — stop if missing or empty |
+| `engineering-contribution-patterns.md` | **Yes** — stop if missing or empty |
 | `engineering-modeling.md` | Read if present |
 
 If any required file is missing or still default stubs, **stop** and tell the user to run `sdd-studio configure` (or complete the Engineering Brief in the TUI). Do **not** invent stack options.
@@ -58,7 +61,7 @@ Before starting, read:
 
 | Allowed | Forbidden |
 |---------|-----------|
-| Read `.workspace/brief/technical/engineering-*.md` | Modify `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md`, or `engineering-modeling.md` |
+| Read `.workspace/brief/technical/engineering-*.md` | Modify `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md`, `engineering-frontend-patterns.md`, `engineering-backend-patterns.md`, `engineering-contribution-patterns.md`, or `engineering-modeling.md` |
 | Propose technologies in chat (one question per turn) | Write `engineering-stack.md` before all questions are answered |
 | Derive options dynamically from the Brief | Hardcode fixed option lists (React, Next.js, etc. as defaults) |
 | Flag contradictions before continuing | Offer options that contradict Engineering Decisions without noting the conflict |
@@ -152,10 +155,23 @@ Only when the user says `modo verbose` or `análisis completo`:
 
 Default remains conversational and minimal.
 
+## Project languages (planned — not in Configure)
+
+Language for **commits, PR titles, code comments, routes, and component copy** is a **project rule**, not set in the Engineering Patterns wizard.
+
+If the Brief does not state languages anywhere, ask **one short `AskQuestion` block** before stack selection:
+
+- Primary language for code comments and technical strings
+- Primary language for user-facing UI copy (may differ)
+- Primary language for commit messages and PR descriptions
+
+Record answers in chat only for the session unless the user asks to update `engineering-conventions.md` via `sdd-studio configure`.
+
 ## Checklist
 
 ```
 - [ ] engineering-principles.md, engineering-decisions.md, engineering-conventions.md read
+- [ ] engineering-frontend-patterns.md, engineering-backend-patterns.md, and engineering-contribution-patterns.md read
 - [ ] engineering-modeling.md read if present
 - [ ] Persona: dev fullstack / auditor, lenguaje de equipo
 - [ ] Opening message + primera `AskQuestion` en turno 1 (sin lista de secciones)
