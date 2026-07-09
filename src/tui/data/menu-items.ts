@@ -19,30 +19,50 @@ export type EngineeringPatternsItem = MenuItem & {
   id: "frontend-patterns" | "backend-patterns" | "contribution-patterns";
 };
 
-export const MAIN_MENU_ITEMS: MenuItem[] = [
+export const PROJECT_TYPE_ITEMS: MenuItem[] = [
   {
-    id: "install-sdd",
-    label: "Install SDD",
-    description:
-      "Full SDD setup: workspace scaffold, assistant skills, and optional Engineering Brief.",
-    why: "Start a new SDD project with everything your AI assistant needs.",
-    filesAffected: [
-      ".workspace/brief/",
-      ".workspace/spec/",
-      ".cursor/ or assistant-specific skills",
-    ],
-    estimatedTime: "3–8 min",
-    recommendedUsage: "New projects or first-time SDD adoption.",
+    id: "greenfield",
+    label: "Greenfield",
+    description: "New product with no existing application code.",
+    why: "Follow the SDD greenfield path from Brief to Specification.",
+    filesAffected: [],
+    estimatedTime: "—",
+    recommendedUsage: "Starting a new SDD project.",
   },
   {
-    id: "create-workspace",
-    label: "Create Workspace",
+    id: "brownfield",
+    label: "Brownfield (coming soon)",
+    description: "Existing codebase to align with SDD documentation.",
+    why: "Brownfield workflows are not available yet.",
+    filesAffected: [],
+    estimatedTime: "—",
+    recommendedUsage: "Check back in a future release.",
+  },
+];
+
+export const MAIN_MENU_ITEMS: MenuItem[] = [
+  {
+    id: "setup-foundation",
+    label: "Create Business & Technical foundation",
     description:
-      "Scaffold only the .workspace/ folder (Brief + Specification structure).",
-    why: "Add SDD documentation structure without reinstalling assistant files.",
-    filesAffected: [".workspace/brief/", ".workspace/spec/"],
-    estimatedTime: "1 min",
-    recommendedUsage: "When assistant skills are already installed.",
+      "Brief stubs under .workspace/brief/ plus assistant SDD skills. No spec or workflow.",
+    why: "First step for a greenfield project — product and engineering context live in the Brief.",
+    filesAffected: [
+      ".workspace/brief/",
+      ".cursor/ or assistant-specific skills",
+    ],
+    estimatedTime: "2–5 min",
+    recommendedUsage: "New greenfield projects.",
+  },
+  {
+    id: "create-spec-scaffold",
+    label: "Create spec scaffold",
+    description:
+      "Empty .workspace/spec/business/ and .workspace/spec/technical/ folder structure.",
+    why: "Prepare specification folders before running sdd-spec.",
+    filesAffected: [".workspace/spec/business/", ".workspace/spec/technical/"],
+    estimatedTime: "< 1 min",
+    recommendedUsage: "After foundation exists, before sdd-spec.",
   },
   {
     id: "configure-engineering",
@@ -59,7 +79,17 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
       "engineering-contribution-patterns.md",
     ],
     estimatedTime: "5–15 min",
-    recommendedUsage: "After init, before running sdd-technical.",
+    recommendedUsage: "After foundation, before sdd-technical.",
+  },
+  {
+    id: "configure-workflow",
+    label: "Configure Workflow (coming soon)",
+    description:
+      "Workflow methodology and task conventions under .workspace/workflow/.",
+    why: "Plan releases after specification — available in a future release.",
+    filesAffected: [".workspace/workflow/"],
+    estimatedTime: "—",
+    recommendedUsage: "After sdd-spec, before sdd-plan.",
   },
   {
     id: "sync",
@@ -71,15 +101,6 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
     recommendedUsage: "After npm update sdd-studio.",
   },
   {
-    id: "migrate",
-    label: "Migrate Workspace",
-    description: "Migrate legacy SDD layouts to the Engineering Brief model.",
-    why: "Upgrade projects from sdd-studio 0.4.x or 0.5.x.",
-    filesAffected: [".workspace/brief/technical/"],
-    estimatedTime: "< 1 min",
-    recommendedUsage: "Existing projects with development.md or project.md.",
-  },
-  {
     id: "exit",
     label: "Exit",
     description: "Close SDD Studio.",
@@ -89,6 +110,10 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
     recommendedUsage: "When you are done.",
   },
 ];
+
+export function getVisibleMainMenuItems(): MenuItem[] {
+  return MAIN_MENU_ITEMS;
+}
 
 export const ENGINEERING_SECTION_ITEMS: EngineeringDashboardItem[] = [
   {

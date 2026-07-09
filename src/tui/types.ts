@@ -4,11 +4,10 @@ import type { InitContextWithLabels } from "../types/init-context.js";
 import type { EngineeringSectionId } from "../engineering-config/types.js";
 
 export type AppScreen =
+  | { name: "project-type" }
+  | { name: "brownfield-notice" }
   | { name: "main-menu" }
-  | { name: "install-sdd-assistant" }
-  | { name: "install-sdd-engineering" }
-  | { name: "install-sdd-workflow" }
-  | { name: "create-workspace-workflow" }
+  | { name: "setup-foundation-assistant" }
   | { name: "engineering-dashboard" }
   | { name: "engineering-patterns-dashboard" }
   | { name: "engineering-section"; sectionId: EngineeringSectionId }
@@ -22,8 +21,7 @@ export type TuiExitResult =
   | { type: "init"; context: InitContextWithLabels }
   | { type: "configure"; answers: EngineeringConfigAnswers }
   | { type: "sync"; assistant: AssistantId }
-  | { type: "migrate" }
-  | { type: "workspace-only"; workflow: boolean };
+  | { type: "migrate" };
 
 export type AppState = {
   screen: AppScreen;
@@ -31,10 +29,8 @@ export type AppState = {
   projectName: string;
   version: string;
   assistant?: AssistantId;
-  workflow?: boolean;
   engineeringAnswers: EngineeringConfigAnswers;
   engineeringCustomNotes: EngineeringCustomNotes;
-  installEngineering: boolean;
   history: AppScreen[];
 };
 

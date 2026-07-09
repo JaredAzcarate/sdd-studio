@@ -18,6 +18,7 @@ export const INIT_CONTEXT_DEFAULTS = {
   assistant: "cursor" as const,
   modules: {
     workflow: false,
+    spec: false,
   } satisfies WorkspaceModules,
 };
 
@@ -30,6 +31,7 @@ export function buildInitContext(
     modules: {
       workflow:
         input.modules?.workflow ?? INIT_CONTEXT_DEFAULTS.modules.workflow,
+      spec: input.modules?.spec ?? INIT_CONTEXT_DEFAULTS.modules.spec,
     },
     engineering: input.engineering,
   });

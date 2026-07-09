@@ -58,9 +58,9 @@ describe("cli init e2e", () => {
     expect(engineeringPrinciplesMd).toContain("# Engineering Principles");
     expect(productPrinciplesMd).toContain("# Product Principles");
     expect(productGuideMd).toContain("# Product Guide");
-    expect(output).toContain("SDD project generated successfully");
-    expect(output).toContain("Workflow module: not installed");
-    expect(output).toContain("sdd-idea");
+    expect(output).toContain("SDD foundation generated successfully");
+    expect(output).toContain("Spec scaffold: not created");
+    expect(output).toContain("sdd-studio configure");
   });
 
   it("runs init --yes --workflow and includes the workflow module", () => {

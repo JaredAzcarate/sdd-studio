@@ -5,7 +5,7 @@ import { SDD_WORKSPACE_DIR, SDD_WORKSPACE_MARKER_PATH } from "../constants/sdd-w
 import { loadEngineeringAnswersFromWorkspace } from "../engineering-config/state/engineering-section-status.js";
 import { buildInitContext } from "../utils/build-init-context.js";
 import { initWorkspace } from "../use-cases/init-workspace.use-case.js";
-import { generateWorkspace } from "../generators/workspace.generator.js";
+import { generateSpecScaffold } from "../generators/workspace.generator.js";
 import { migrateWorkspace } from "../generators/migrate-workspace.generator.js";
 import { syncAssistant } from "../use-cases/sync-assistant.use-case.js";
 import { formatGenerationResult } from "../utils/format-generation-result.js";
@@ -33,7 +33,7 @@ type SddAppProps = {
 export function SddApp({
   targetDir,
   version,
-  initialScreen = { name: "main-menu" },
+  initialScreen = { name: "project-type" },
   onFinish,
 }: SddAppProps) {
   const workspaceTechnicalDir = join(
@@ -55,8 +55,6 @@ export function SddApp({
   const [engineeringSession, setEngineeringSession] =
     useState<EngineeringSession | null>(null);
   const [assistant, setAssistant] = useState<AssistantId | undefined>();
-  const [installEngineering, setInstallEngineering] = useState(false);
-  const [workflow, setWorkflow] = useState(false);
   const [resultLines, setResultLines] = useState<string[]>([]);
   const [loadedAnswers, setLoadedAnswers] = useState(false);
 
@@ -75,10 +73,8 @@ export function SddApp({
       projectName,
       version,
       assistant,
-      workflow,
       engineeringAnswers,
       engineeringCustomNotes,
-      installEngineering,
       history,
     }),
     [
@@ -87,10 +83,8 @@ export function SddApp({
       projectName,
       version,
       assistant,
-      workflow,
       engineeringAnswers,
       engineeringCustomNotes,
-      installEngineering,
       history,
     ],
   );
@@ -141,7 +135,7 @@ export function SddApp({
     if (!existsSync(markerPath)) {
       setResultLines([
         "No SDD workspace found.",
-        "Run Install SDD or Create Workspace first.",
+        "Run Create Business & Technical foundation first.",
       ]);
       setScreen({
         name: "action-result",
@@ -158,11 +152,10 @@ export function SddApp({
   const runInit = useCallback(
     async (options: {
       assistantId: AssistantId;
-      includeAssistant: boolean;
-      includeEngineering: boolean;
-      includeWorkflow: boolean;
+      includeSpec?: boolean;
+      includeWorkflow?: boolean;
     }) => {
-      setScreen({ name: "action-running", label: "Installing SDD…" });
+      setScreen({ name: "action-running", label: "Setting up SDD foundation…" });
 
       try {
         assertTargetDirectoryAvailable(targetDir);
@@ -170,37 +163,22 @@ export function SddApp({
         const context = buildInitContext({
           targetDir,
           assistant: options.assistantId,
-          modules: { workflow: options.includeWorkflow },
-          engineering:
-            options.includeEngineering &&
-            Object.keys(engineeringAnswers).length > 0
-              ? { answers: engineeringAnswers }
-              : undefined,
+          modules: {
+            workflow: options.includeWorkflow ?? false,
+            spec: options.includeSpec ?? false,
+          },
         });
 
-        if (options.includeAssistant) {
-          const result = await initWorkspace({ context });
-          setResultLines([
-            formatInitSummary(context, result),
-            "",
-            formatGenerationResult(targetDir, context.assistant, result),
-          ]);
-        } else {
-          const workspace = await generateWorkspace({
-            targetDir,
-            modules: { workflow: options.includeWorkflow },
-          });
-          setResultLines([
-            "Workspace created successfully.",
-            "",
-            `Files: ${workspace.createdPaths.length}`,
-            `Workflow module: ${options.includeWorkflow ? "enabled" : "disabled"}`,
-          ]);
-        }
+        const result = await initWorkspace({ context });
+        setResultLines([
+          formatInitSummary(context, result),
+          "",
+          formatGenerationResult(targetDir, context.assistant, result),
+        ]);
 
         setScreen({
           name: "action-result",
-          title: options.includeAssistant ? "Install SDD" : "Create Workspace",
+          title: "Create Business & Technical foundation",
           lines: [],
         });
       } catch (error) {
@@ -214,8 +192,71 @@ export function SddApp({
         });
       }
     },
-    [engineeringAnswers, targetDir],
+    [targetDir],
   );
+
+  const runSpecScaffold = useCallback(async () => {
+    setScreen({ name: "action-running", label: "Creating spec scaffold…" });
+
+    try {
+      const markerPath = join(targetDir, SDD_WORKSPACE_MARKER_PATH);
+      if (!existsSync(markerPath)) {
+        setResultLines([
+          "No SDD workspace found.",
+          "Run Create Business & Technical foundation first.",
+        ]);
+        setScreen({
+          name: "action-result",
+          title: "Create spec scaffold",
+          lines: [],
+        });
+        return;
+      }
+
+      const specMarker = join(
+        targetDir,
+        SDD_WORKSPACE_DIR,
+        "spec",
+        "business",
+        "domain",
+        ".gitkeep",
+      );
+      if (existsSync(specMarker)) {
+        setResultLines([
+          "Spec scaffold already exists under .workspace/spec/.",
+          "Next step: run **sdd-spec** when Brief and stack are ready.",
+        ]);
+        setScreen({
+          name: "action-result",
+          title: "Create spec scaffold",
+          lines: [],
+        });
+        return;
+      }
+
+      const result = await generateSpecScaffold({ targetDir });
+      setResultLines([
+        "Spec scaffold created successfully.",
+        "",
+        `Files: ${result.createdPaths.length}`,
+        "",
+        "Next step: run **sdd-spec** after the Brief and engineering-stack.md are complete.",
+      ]);
+      setScreen({
+        name: "action-result",
+        title: "Create spec scaffold",
+        lines: [],
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setResultLines([`Error: ${message}`]);
+      setScreen({
+        name: "action-result",
+        title: "Error",
+        lines: [],
+      });
+    }
+  }, [targetDir]);
 
   const runMigrate = useCallback(async () => {
     setScreen({ name: "action-running", label: "Migrating workspace…" });
@@ -256,18 +297,6 @@ export function SddApp({
     [targetDir],
   );
 
-  const continueInstallAfterEngineering = useCallback(() => {
-    if (installEngineering && assistant) {
-      navigate({ name: "install-sdd-workflow" });
-      return;
-    }
-    if (history.some((item) => item.name === "install-sdd-engineering")) {
-      navigate({ name: "install-sdd-workflow" });
-      return;
-    }
-    goBack();
-  }, [assistant, goBack, history, installEngineering, navigate]);
-
   const actions = useMemo(
     () => ({
       navigate,
@@ -277,14 +306,12 @@ export function SddApp({
       runMigrate,
       runSync,
       runInit,
+      runSpecScaffold,
       setAssistant,
-      setInstallEngineering,
-      setWorkflow,
       setEngineeringAnswers,
       setEngineeringCustomNotes,
       setEngineeringSession,
       resetToMainMenu,
-      continueInstallAfterEngineering,
     }),
     [
       navigate,
@@ -294,7 +321,7 @@ export function SddApp({
       runMigrate,
       runSync,
       runInit,
-      continueInstallAfterEngineering,
+      runSpecScaffold,
       resetToMainMenu,
     ],
   );

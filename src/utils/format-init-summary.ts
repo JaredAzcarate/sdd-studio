@@ -12,6 +12,7 @@ export function formatInitSummary(
     `Directory:         ${context.targetDir}`,
     `Assistant:         ${context.labels.assistant}`,
     `Workflow module:   ${context.modules.workflow ? "enabled" : "disabled"}`,
+    `Spec scaffold:     ${context.modules.spec ? "enabled" : "disabled"}`,
     `Engineering Brief: ${
       context.engineering
         ? "configured"

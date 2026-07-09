@@ -1,4 +1,4 @@
-export const WORKSPACE_BASE_PATHS = [
+export const WORKSPACE_FOUNDATION_PATHS = [
   ".workspace/brief/business/product-principles.md",
   ".workspace/brief/business/product-guide.md",
   ".workspace/brief/technical/engineering-principles.md",
@@ -7,7 +7,9 @@ export const WORKSPACE_BASE_PATHS = [
   ".workspace/brief/technical/engineering-frontend-patterns.md",
   ".workspace/brief/technical/engineering-backend-patterns.md",
   ".workspace/brief/technical/engineering-contribution-patterns.md",
-  ".workspace/brief/technical/engineering-modeling.md",
+] as const;
+
+export const WORKSPACE_SPEC_PATHS = [
   ".workspace/spec/business/domain/.gitkeep",
   ".workspace/spec/business/relations/.gitkeep",
   ".workspace/spec/business/capabilities/.gitkeep",
@@ -20,6 +22,11 @@ export const WORKSPACE_BASE_PATHS = [
   ".workspace/spec/technical/testing/.gitkeep",
   ".workspace/spec/technical/architecture/.gitkeep",
   ".workspace/spec/technical/database/.gitkeep",
+] as const;
+
+export const WORKSPACE_BASE_PATHS = [
+  ...WORKSPACE_FOUNDATION_PATHS,
+  ...WORKSPACE_SPEC_PATHS,
 ] as const;
 
 export const WORKFLOW_PATHS = [
@@ -62,12 +69,18 @@ export const CURSOR_PATHS = [
 ] as const;
 
 export const ALL_CURSOR_INIT_PATHS = [
+  ...WORKSPACE_FOUNDATION_PATHS,
+  ...CURSOR_PATHS,
+] as const;
+
+export const ALL_CURSOR_INIT_WITH_SPEC_PATHS = [
   ...WORKSPACE_BASE_PATHS,
   ...CURSOR_PATHS,
 ] as const;
 
 export const ALL_CURSOR_INIT_WITH_WORKFLOW_PATHS = [
-  ...WORKSPACE_PATHS,
+  ...WORKSPACE_FOUNDATION_PATHS,
+  ...WORKFLOW_PATHS,
   ...CURSOR_PATHS,
 ] as const;
 

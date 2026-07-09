@@ -1,18 +1,20 @@
 ---
 name: sdd-idea
-description: Discovers the product and writes the Brief under .workspace/brief/ (business and domain modeling). Use when starting a new SDD project, defining product principles, the user journey, or domain modeling. Never writes .workspace/spec/.
+description: Discovers the product and writes the Business Brief under .workspace/brief/business/. Use when starting a new SDD project or defining product principles and the user journey. Never writes .workspace/spec/.
 disable-model-invocation: true
 ---
 
 # SDD Idea
 
-Discover the product and build the **Brief** — project context, not specification.
+Discover the product and build the **Business Brief** — project context, not specification.
 
-**Output scope:** `.workspace/brief/business/` and `.workspace/brief/technical/engineering-modeling.md` only.
+**Output scope:** `.workspace/brief/business/` only (`product-principles.md`, `product-guide.md`).
 
 Use **sdd-generate** when the project already has application code to analyze. Use **sdd-idea** for greenfield discovery through questions only.
 
 Never generate or modify files under `.workspace/spec/` or `.workspace/workflow/`.
+
+Domain modeling belongs in **sdd-spec**, not in the Brief.
 
 ## Required documents
 
@@ -26,11 +28,9 @@ Before writing, read:
 | Allowed | Forbidden |
 |---------|-----------|
 | Read and write files under `.workspace/brief/business/` | Create or modify `.workspace/spec/` |
-| Write `.workspace/brief/technical/engineering-modeling.md` | Modify `engineering-principles.md`, `engineering-decisions.md`, or `engineering-conventions.md` |
-| Ask the user questions | Generate or modify `engineering-stack.md` |
-| Build Business Brief and domain modeling | Modify `.workspace/workflow/` |
+| Ask the user questions | Modify `engineering-*.md` or `engineering-stack.md` |
+| Build Business Brief | Modify `.workspace/workflow/` |
 | | User journeys in `product-principles.md` |
-| | Technology choices in `engineering-modeling.md` |
 | | Product narratives in Technical Brief files |
 
 ## Pre-execution
@@ -42,11 +42,12 @@ Before writing, read:
 
 ## Engineering Brief (read-only)
 
-The following files are created by `sdd-studio configure` (or `sdd-studio init`). **Do not write or modify them** — point the user to configure instead:
+The following files are created by `sdd-studio configure`. **Do not write or modify them** — point the user to configure instead:
 
 - `.workspace/brief/technical/engineering-principles.md`
 - `.workspace/brief/technical/engineering-decisions.md`
 - `.workspace/brief/technical/engineering-conventions.md`
+- `engineering-*-patterns.md`
 
 For technology stack recommendations, point the user to **sdd-technical** (generates `engineering-stack.md`).
 
@@ -79,33 +80,19 @@ Align with **product-principles.md** without duplicating conceptual content.
 
 Store answers **only** in `.workspace/brief/business/product-guide.md`.
 
-### Phase 3 — Modeling discovery (Technical Brief)
-
-Ask in blocks (max 3–5 per turn). Modeling decisions only — **no specific technologies**:
-
-1. Domain Driven Design approach
-2. Bounded contexts
-3. Aggregates
-4. Ubiquitous language
-5. Modeling principles
-
-Store answers **only** in `.workspace/brief/technical/engineering-modeling.md`.
-
-### Phase 4 — Generation
+### Phase 3 — Generation
 
 Write files in this order, following [STANDARDS.md](STANDARDS.md):
 
 1. `.workspace/brief/business/product-principles.md`
 2. `.workspace/brief/business/product-guide.md`
-3. `.workspace/brief/technical/engineering-modeling.md`
 
-### Phase 5 — Validation
+### Phase 4 — Validation
 
 Review against [STANDARDS.md](STANDARDS.md):
 
 - [ ] Business Brief files contain no technical implementation details
-- [ ] `engineering-modeling.md` contains no user journeys, product narratives, or specific technologies
-- [ ] Engineering input files (`engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md`) were not modified
+- [ ] Engineering input files were not modified
 - [ ] `engineering-stack.md` was not created or modified
 - [ ] Only allowed Brief files were modified
 - [ ] User confirmed or open items documented
@@ -115,21 +102,18 @@ Review against [STANDARDS.md](STANDARDS.md):
 ```
 - [ ] STANDARDS.md and EXAMPLES.md read
 - [ ] Business Brief questions answered
-- [ ] Modeling discovery questions answered
 - [ ] brief/business/product-principles.md written
 - [ ] brief/business/product-guide.md written
-- [ ] brief/technical/engineering-modeling.md written
 - [ ] No engineering input files or engineering-stack.md modified
-- [ ] No files outside brief/ modified (except allowed paths above)
+- [ ] No files outside brief/business/ modified
 ```
 
 ## Report
 
 1. Product principles summary
 2. User journey summary
-3. Domain modeling decisions summary
-4. Open items
-5. Next steps:
-   - Run `sdd-studio configure` if engineering principles, decisions, or conventions are incomplete
-   - Run **sdd-technical** if the technology stack is not yet defined
-   - Then **sdd-spec**
+3. Open items
+4. Next steps (adapt wording; keep intent):
+   - If engineering principles, decisions, conventions, or patterns are **incomplete**, recommend **`sdd-studio configure`** with a friendly message, e.g. *"Now that the product is clear, let's define how we'll build it — run `sdd-studio configure` in the terminal."*
+   - If the Engineering Brief is complete but **`engineering-stack.md`** is missing, recommend **sdd-technical**
+   - If both Brief and stack are ready, recommend **Create spec scaffold** (TUI) if needed, then **sdd-spec**

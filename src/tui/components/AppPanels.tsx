@@ -5,7 +5,8 @@ import { SelectableList } from "./SelectableList.js";
 import {
   ENGINEERING_PATTERNS_ITEMS,
   ENGINEERING_SECTION_ITEMS,
-  MAIN_MENU_ITEMS,
+  getVisibleMainMenuItems,
+  PROJECT_TYPE_ITEMS,
 } from "../data/menu-items.js";
 import { theme } from "../theme.js";
 import type { EngineeringSession } from "../use-app-input.js";
@@ -144,16 +145,52 @@ type ContentPanelProps = NavigationPanelProps & {
   resultLines: string[];
 };
 
-const MainMenuNavigation = memo(function MainMenuNavigation({
+const ProjectTypeNavigation = memo(function ProjectTypeNavigation({
   selectedIndex,
 }: {
   selectedIndex: number;
 }) {
   return (
     <SelectableList
-      title="Actions"
+      title="Project type"
       selectedIndex={selectedIndex}
-      items={MAIN_MENU_ITEMS.map((item) => ({
+      items={PROJECT_TYPE_ITEMS.map((item) => ({
+        id: item.id,
+        label: item.label,
+      }))}
+    />
+  );
+});
+
+const ProjectTypeContent = memo(function ProjectTypeContent({
+  selectedIndex,
+}: {
+  selectedIndex: number;
+}) {
+  const selected = PROJECT_TYPE_ITEMS[selectedIndex];
+  return (
+    <MenuPreview
+      title={selected.label}
+      description={selected.description}
+      why={selected.why}
+      filesAffected={selected.filesAffected}
+      estimatedTime={selected.estimatedTime}
+      recommendedUsage={selected.recommendedUsage}
+    />
+  );
+});
+
+const MainMenuNavigation = memo(function MainMenuNavigation({
+  selectedIndex,
+}: {
+  selectedIndex: number;
+}) {
+  const items = getVisibleMainMenuItems();
+  return (
+    <SelectableList
+      title="Greenfield"
+      selectedIndex={selectedIndex}
+      items={items.map((item) => ({
         id: item.id,
         label: item.label,
       }))}
@@ -166,7 +203,7 @@ const MainMenuContent = memo(function MainMenuContent({
 }: {
   selectedIndex: number;
 }) {
-  const selected = MAIN_MENU_ITEMS[selectedIndex];
+  const selected = getVisibleMainMenuItems()[selectedIndex];
   return (
     <MenuPreview
       title={selected.label}
@@ -185,11 +222,18 @@ export const NavigationPanel = memo(function NavigationPanel({
   selectedIndex,
   engineeringSession,
 }: NavigationPanelProps) {
+  if (screen.name === "project-type") {
+    return <ProjectTypeNavigation selectedIndex={selectedIndex} />;
+  }
+
   if (screen.name === "main-menu") {
     return <MainMenuNavigation selectedIndex={selectedIndex} />;
   }
 
-  if (screen.name === "install-sdd-assistant" || screen.name === "sync-assistant") {
+  if (
+    screen.name === "setup-foundation-assistant" ||
+    screen.name === "sync-assistant"
+  ) {
     return (
       <SelectableList
         title={screen.name === "sync-assistant" ? "Assistant to sync" : "AI Assistant"}
@@ -198,29 +242,6 @@ export const NavigationPanel = memo(function NavigationPanel({
           id: item.id,
           label: item.label,
         }))}
-      />
-    );
-  }
-
-  if (
-    screen.name === "install-sdd-engineering" ||
-    screen.name === "install-sdd-workflow" ||
-    screen.name === "create-workspace-workflow"
-  ) {
-    const titles: Record<string, string> = {
-      "install-sdd-engineering": "Configure Engineering Brief now?",
-      "install-sdd-workflow": "Include workflow module?",
-      "create-workspace-workflow": "Include workflow module?",
-    };
-
-    return (
-      <SelectableList
-        title={titles[screen.name]}
-        selectedIndex={selectedIndex}
-        items={[
-          { id: "yes", label: "Yes" },
-          { id: "no", label: "No" },
-        ]}
       />
     );
   }
@@ -363,11 +384,34 @@ export const ContentPanel = memo(function ContentPanel({
   engineeringSession,
   resultLines,
 }: ContentPanelProps) {
+  if (screen.name === "brownfield-notice") {
+    return (
+      <Box flexDirection="column">
+        <Text bold color={theme.accent}>
+          Brownfield — coming soon
+        </Text>
+        <Box marginTop={1}>
+          <Text wrap="wrap">
+            Aligning an existing codebase with SDD will be available in a future
+            release. Use Greenfield for new projects today.
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (screen.name === "project-type") {
+    return <ProjectTypeContent selectedIndex={selectedIndex} />;
+  }
+
   if (screen.name === "main-menu") {
     return <MainMenuContent selectedIndex={selectedIndex} />;
   }
 
-  if (screen.name === "install-sdd-assistant" || screen.name === "sync-assistant") {
+  if (
+    screen.name === "setup-foundation-assistant" ||
+    screen.name === "sync-assistant"
+  ) {
     const selected = ASSISTANTS[selectedIndex];
     return (
       <MenuPreview
@@ -378,40 +422,6 @@ export const ContentPanel = memo(function ContentPanel({
         estimatedTime="< 1 min"
         recommendedUsage="Choose the assistant you use daily."
       />
-    );
-  }
-
-  if (
-    screen.name === "install-sdd-engineering" ||
-    screen.name === "install-sdd-workflow" ||
-    screen.name === "create-workspace-workflow"
-  ) {
-    const meta: Record<string, { title: string; description: string }> = {
-      "install-sdd-engineering": {
-        title: "Configure Engineering Brief now?",
-        description:
-          "Set principles, decisions, conventions, and patterns before generating the technology stack.",
-      },
-      "install-sdd-workflow": {
-        title: "Include workflow module?",
-        description:
-          "Adds roadmap, milestones, and releases under .workspace/workflow/.",
-      },
-      "create-workspace-workflow": {
-        title: "Include workflow module?",
-        description:
-          "Adds roadmap, milestones, and releases under .workspace/workflow/.",
-      },
-    };
-    const item = meta[screen.name];
-
-    return (
-      <Box flexDirection="column">
-        <Text bold color={theme.accent}>
-          {item.title}
-        </Text>
-        <Text wrap="wrap">{item.description}</Text>
-      </Box>
     );
   }
 

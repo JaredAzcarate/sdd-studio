@@ -14,16 +14,24 @@ export function formatGenerationResult(
     .sort();
 
   const layout = getAssistantLayout(assistantId);
+  const isFoundationOnly = !result.modules.spec && !result.modules.workflow;
 
   const lines = [
-    "SDD project generated successfully.",
+    isFoundationOnly
+      ? "SDD foundation generated successfully."
+      : "SDD project generated successfully.",
     "",
     "Main structure:",
     `  ${SDD_WORKSPACE_DIR}/brief/business/`,
     `  ${SDD_WORKSPACE_DIR}/brief/technical/`,
-    `  ${SDD_WORKSPACE_DIR}/spec/business/`,
-    `  ${SDD_WORKSPACE_DIR}/spec/technical/`,
   ];
+
+  if (result.modules.spec) {
+    lines.push(
+      `  ${SDD_WORKSPACE_DIR}/spec/business/`,
+      `  ${SDD_WORKSPACE_DIR}/spec/technical/`,
+    );
+  }
 
   if (result.modules.workflow) {
     lines.push(`  ${SDD_WORKSPACE_DIR}/workflow/releases/release-001/`);
@@ -71,12 +79,12 @@ export function formatGenerationResult(
   if (result.assistant.installed) {
     lines.push(
       "",
-      `Next step: run the **sdd-idea** skill to complete the Brief under ${SDD_WORKSPACE_DIR}/brief/ in ${layout.nextStepLabel}.`,
+      `Next step: run **sdd-studio configure** or the **sdd-idea** skill in ${layout.nextStepLabel}.`,
     );
 
-    if (!result.modules.workflow) {
+    if (!result.modules.spec) {
       lines.push(
-        "Workflow module: not installed. Run **sdd-plan** when you need SDD planning under `.workspace/workflow/`.",
+        "Spec scaffold: not created. Use **Create spec scaffold** in the TUI before **sdd-spec**.",
       );
     }
   }

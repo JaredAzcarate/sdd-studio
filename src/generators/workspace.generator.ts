@@ -25,13 +25,35 @@ const REQUIRED_BRIEF_FILES = [
   "brief/technical/engineering-frontend-patterns.md",
   "brief/technical/engineering-backend-patterns.md",
   "brief/technical/engineering-contribution-patterns.md",
-  "brief/technical/engineering-modeling.md",
 ] as const;
+
+const REQUIRED_SPEC_MARKERS = [
+  "spec/business/domain/.gitkeep",
+  "spec/business/relations/.gitkeep",
+  "spec/business/capabilities/.gitkeep",
+  "spec/business/flows/.gitkeep",
+  "spec/business/rules/.gitkeep",
+  "spec/business/security/.gitkeep",
+  "spec/business/events/.gitkeep",
+  "spec/technical/api/.gitkeep",
+  "spec/technical/ui/.gitkeep",
+  "spec/technical/testing/.gitkeep",
+  "spec/technical/architecture/.gitkeep",
+  "spec/technical/database/.gitkeep",
+] as const;
+
+export const DEFAULT_WORKSPACE_MODULES: WorkspaceModules = {
+  workflow: false,
+  spec: false,
+};
 
 export async function generateWorkspace(
   options: GenerateWorkspaceOptions,
 ): Promise<GenerateWorkspaceResult> {
-  const modules = options.modules ?? { workflow: false };
+  const modules = {
+    ...DEFAULT_WORKSPACE_MODULES,
+    ...options.modules,
+  };
   const overwrite = options.overwrite ?? false;
   const workspaceTarget = join(options.targetDir, SDD_WORKSPACE_DIR);
   const createdPaths: string[] = [];
@@ -43,12 +65,14 @@ export async function generateWorkspace(
   );
   createdPaths.push(...briefPaths);
 
-  const { createdPaths: specPaths } = await copyTemplateTree(
-    resolveWorkspaceTemplatePath("spec"),
-    join(workspaceTarget, "spec"),
-    { overwrite },
-  );
-  createdPaths.push(...specPaths);
+  if (modules.spec) {
+    const { createdPaths: specPaths } = await copyTemplateTree(
+      resolveWorkspaceTemplatePath("spec"),
+      join(workspaceTarget, "spec"),
+      { overwrite },
+    );
+    createdPaths.push(...specPaths);
+  }
 
   if (modules.workflow) {
     const { createdPaths: workflowPaths } = await copyTemplateTree(
@@ -66,9 +90,51 @@ export async function generateWorkspace(
     }
   }
 
+  if (modules.spec) {
+    for (const relativePath of REQUIRED_SPEC_MARKERS) {
+      const absolutePath = join(workspaceTarget, relativePath);
+      if (!createdPaths.includes(absolutePath)) {
+        throw new Error(`Failed to generate ${absolutePath}`);
+      }
+    }
+  }
+
   return {
     workspaceDir: workspaceTarget,
     createdPaths,
     modules,
+  };
+}
+
+export type GenerateSpecScaffoldOptions = {
+  targetDir: string;
+  overwrite?: boolean;
+};
+
+export async function generateSpecScaffold(
+  options: GenerateSpecScaffoldOptions,
+): Promise<GenerateWorkspaceResult> {
+  const overwrite = options.overwrite ?? false;
+  const workspaceTarget = join(options.targetDir, SDD_WORKSPACE_DIR);
+  const createdPaths: string[] = [];
+
+  const { createdPaths: specPaths } = await copyTemplateTree(
+    resolveWorkspaceTemplatePath("spec"),
+    join(workspaceTarget, "spec"),
+    { overwrite },
+  );
+  createdPaths.push(...specPaths);
+
+  for (const relativePath of REQUIRED_SPEC_MARKERS) {
+    const absolutePath = join(workspaceTarget, relativePath);
+    if (!createdPaths.includes(absolutePath)) {
+      throw new Error(`Failed to generate ${absolutePath}`);
+    }
+  }
+
+  return {
+    workspaceDir: workspaceTarget,
+    createdPaths,
+    modules: { workflow: false, spec: true },
   };
 }

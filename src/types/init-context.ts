@@ -10,6 +10,7 @@ export const assistantIdSchema = z.enum([
 
 export const workspaceModulesSchema = z.object({
   workflow: z.boolean(),
+  spec: z.boolean(),
 });
 
 export const engineeringConfigSchema = z.object({

@@ -15,6 +15,7 @@ type InitCommandOptions = {
   yes?: boolean;
   assistant?: string;
   workflow?: boolean;
+  spec?: boolean;
   engineering?: boolean;
 };
 
@@ -31,6 +32,10 @@ export function createInitCommand(version: string): Command {
       "Include the SDD workflow module (roadmap, milestones, releases)",
     )
     .option(
+      "--spec",
+      "Include the specification scaffold under .workspace/spec/",
+    )
+    .option(
       "--engineering",
       "Apply default Engineering Brief answers (non-interactive; use with --yes)",
     )
@@ -44,7 +49,10 @@ export function createInitCommand(version: string): Command {
           assistant: options.assistant
             ? assistantIdSchema.parse(options.assistant)
             : undefined,
-          modules: { workflow: options.workflow ?? false },
+          modules: {
+            workflow: options.workflow ?? false,
+            spec: options.spec ?? false,
+          },
           engineering: options.engineering
             ? { answers: getDefaultEngineeringAnswers() }
             : undefined,
@@ -65,7 +73,7 @@ export function createInitCommand(version: string): Command {
       await runTui({
         targetDir,
         version,
-        initialScreen: { name: "install-sdd-assistant" },
+        initialScreen: { name: "project-type" },
       });
     });
 }

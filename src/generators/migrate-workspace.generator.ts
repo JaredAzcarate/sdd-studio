@@ -36,8 +36,10 @@ const ENGINEERING_BRIEF_FILES = [
   "brief/technical/engineering-principles.md",
   "brief/technical/engineering-decisions.md",
   "brief/technical/engineering-conventions.md",
-  "brief/technical/engineering-modeling.md",
 ] as const;
+
+const ENGINEERING_MODELING_TEMPLATE =
+  "migrate/brief/technical/engineering-modeling.md";
 
 const STACK_FILES = [
   "frontend",
@@ -134,6 +136,19 @@ async function writeBriefFromTemplate(
   return await readFile(destination, "utf8");
 }
 
+async function writeModelingFromTemplate(
+  destination: string,
+  migratedPaths: string[],
+): Promise<string> {
+  await copyTemplateFile(
+    resolveWorkspaceTemplatePath(ENGINEERING_MODELING_TEMPLATE),
+    destination,
+    { overwrite: true },
+  );
+  migratedPaths.push(destination);
+  return await readFile(destination, "utf8");
+}
+
 function appendSection(
   sections: Map<string, string>,
   title: string,
@@ -167,11 +182,7 @@ async function buildEngineeringModelingMd(
   destination: string,
   migratedPaths: string[],
 ): Promise<void> {
-  const header = await writeBriefFromTemplate(
-    "brief/technical/engineering-modeling.md",
-    destination,
-    migratedPaths,
-  );
+  const header = await writeModelingFromTemplate(destination, migratedPaths);
   const bodyParts: string[] = [];
 
   for (const title of sections.keys()) {
@@ -267,11 +278,7 @@ async function migrateV05BriefLayout(
       removedPaths.push(modelingSource);
     }
   } else if (!existsSync(modelingDestination)) {
-    await writeBriefFromTemplate(
-      "brief/technical/engineering-modeling.md",
-      modelingDestination,
-      migratedPaths,
-    );
+    await writeModelingFromTemplate(modelingDestination, migratedPaths);
   }
 
   for (const relativePath of [

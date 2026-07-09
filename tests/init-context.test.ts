@@ -6,7 +6,7 @@ describe("initContextSchema", () => {
     const result = initContextSchema.parse({
       targetDir: "/tmp/project",
       assistant: "cursor",
-      modules: { workflow: false },
+      modules: { workflow: false, spec: false },
     });
 
     expect(result.assistant).toBe("cursor");
@@ -19,7 +19,7 @@ describe("initContextSchema", () => {
       initContextSchema.parse({
         targetDir: "/tmp/project",
         assistant: "vscode",
-        modules: { workflow: false },
+        modules: { workflow: false, spec: false },
       }),
     ).toThrow();
   });
@@ -29,7 +29,7 @@ describe("initContextSchema", () => {
       initContextSchema.parse({
         targetDir: "",
         assistant: "cursor",
-        modules: { workflow: false },
+        modules: { workflow: false, spec: false },
       }),
     ).toThrow();
   });

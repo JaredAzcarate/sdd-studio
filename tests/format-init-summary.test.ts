@@ -6,7 +6,7 @@ import type { InitWorkspaceResult } from "../src/use-cases/init-workspace.use-ca
 const sampleContext: InitContextWithLabels = {
   targetDir: "/tmp/demo",
   assistant: "cursor",
-  modules: { workflow: false },
+  modules: { workflow: false, spec: false },
   labels: {
     assistant: "Cursor",
   },
@@ -15,7 +15,7 @@ const sampleContext: InitContextWithLabels = {
 const cursorResult: InitWorkspaceResult = {
   workspaceDir: "/tmp/demo/workspace",
   createdPaths: [],
-  modules: { workflow: false },
+  modules: { workflow: false, spec: false },
   assistant: { assistantId: "cursor", installed: true, createdPaths: [] },
 };
 

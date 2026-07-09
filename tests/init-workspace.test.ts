@@ -3,12 +3,19 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import {
+  generateSpecScaffold,
+  generateWorkspace,
+} from "../src/generators/workspace.generator.js";
 import { initWorkspace } from "../src/use-cases/init-workspace.use-case.js";
 import type { InitContextWithLabels } from "../src/types/init-context.js";
 
 function createContext(
   targetDir: string,
-  modules: { workflow: boolean } = { workflow: false },
+  modules: { workflow: boolean; spec: boolean } = {
+    workflow: false,
+    spec: false,
+  },
 ): InitContextWithLabels {
   return {
     targetDir,
@@ -20,13 +27,18 @@ function createContext(
   };
 }
 
-const BASE_PATHS = [
+const FOUNDATION_PATHS = [
   ".workspace/brief/business/product-principles.md",
   ".workspace/brief/business/product-guide.md",
   ".workspace/brief/technical/engineering-principles.md",
   ".workspace/brief/technical/engineering-decisions.md",
   ".workspace/brief/technical/engineering-conventions.md",
-  ".workspace/brief/technical/engineering-modeling.md",
+  ".workspace/brief/technical/engineering-frontend-patterns.md",
+  ".workspace/brief/technical/engineering-backend-patterns.md",
+  ".workspace/brief/technical/engineering-contribution-patterns.md",
+];
+
+const SPEC_PATHS = [
   ".workspace/spec/business/domain/.gitkeep",
   ".workspace/spec/business/relations/.gitkeep",
   ".workspace/spec/business/capabilities/.gitkeep",
@@ -72,19 +84,29 @@ describe("initWorkspace", () => {
     }
   });
 
-  it("generates the default SDD workspace tree without workflow", async () => {
+  it("generates foundation only by default (no spec or workflow)", async () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-init-"));
     const context = createContext(tempDir);
 
     const result = await initWorkspace({ context });
 
-    for (const relativePath of BASE_PATHS) {
+    for (const relativePath of FOUNDATION_PATHS) {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
+    }
+
+    for (const relativePath of SPEC_PATHS) {
+      expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(false);
     }
 
     for (const relativePath of WORKFLOW_PATHS) {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(false);
     }
+
+    expect(
+      existsSync(
+        join(tempDir, ".workspace/brief/technical/engineering-modeling.md"),
+      ),
+    ).toBe(false);
 
     const engineeringPrinciplesMd = readFileSync(
       join(tempDir, ".workspace/brief/technical/engineering-principles.md"),
@@ -99,14 +121,9 @@ describe("initWorkspace", () => {
     expect(engineeringPrinciplesMd).toContain("sdd-studio configure");
     expect(productGuideMd).toContain("# Product Guide");
     expect(productGuideMd).toContain("sdd-idea");
-    expect(
-      readFileSync(
-        join(tempDir, ".workspace/brief/business/product-principles.md"),
-        "utf8",
-      ),
-    ).toContain("# Product Principles");
     expect(result.assistant.installed).toBe(true);
     expect(result.modules.workflow).toBe(false);
+    expect(result.modules.spec).toBe(false);
 
     for (const relativePath of CURSOR_PATHS) {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
@@ -118,21 +135,47 @@ describe("initWorkspace", () => {
     ).toBe(false);
 
     expect(result.createdPaths.length).toBeGreaterThanOrEqual(
-      BASE_PATHS.length + CURSOR_PATHS.length,
+      FOUNDATION_PATHS.length + CURSOR_PATHS.length,
     );
+  });
+
+  it("generates spec scaffold when spec module is enabled", async () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-init-"));
+    const context = createContext(tempDir, { workflow: false, spec: true });
+
+    const result = await initWorkspace({ context });
+
+    for (const relativePath of [...FOUNDATION_PATHS, ...SPEC_PATHS]) {
+      expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
+    }
+
+    expect(result.modules.spec).toBe(true);
   });
 
   it("generates the workflow module when enabled", async () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-init-"));
-    const context = createContext(tempDir, { workflow: true });
+    const context = createContext(tempDir, { workflow: true, spec: false });
 
     const result = await initWorkspace({ context });
 
-    for (const relativePath of [...BASE_PATHS, ...WORKFLOW_PATHS]) {
+    for (const relativePath of [...FOUNDATION_PATHS, ...WORKFLOW_PATHS]) {
       expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
     }
 
     expect(result.modules.workflow).toBe(true);
+  });
+
+  it("generateSpecScaffold adds spec folders to an existing workspace", async () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-init-"));
+    await generateWorkspace({ targetDir: tempDir });
+
+    const result = await generateSpecScaffold({ targetDir: tempDir });
+
+    for (const relativePath of SPEC_PATHS) {
+      expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
+    }
+
+    expect(result.modules.spec).toBe(true);
   });
 
   it("installs claude assistant files when assistant is claude", async () => {

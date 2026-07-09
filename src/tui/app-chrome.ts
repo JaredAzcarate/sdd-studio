@@ -8,18 +8,16 @@ import type { EngineeringSession } from "./use-app-input.js";
 
 export function getSectionTitle(screen: AppScreen): string {
   switch (screen.name) {
+    case "project-type":
+      return "Project Type";
+    case "brownfield-notice":
+      return "Brownfield";
     case "main-menu":
-      return "Main Menu";
-    case "install-sdd-assistant":
-      return "Install SDD";
+      return "Greenfield Menu";
+    case "setup-foundation-assistant":
+      return "Create Business & Technical foundation";
     case "sync-assistant":
       return "Sync Assistant Files";
-    case "install-sdd-engineering":
-      return "Install SDD";
-    case "install-sdd-workflow":
-      return "Install SDD";
-    case "create-workspace-workflow":
-      return "Create Workspace";
     case "engineering-dashboard":
       return "Configure Engineering";
     case "engineering-patterns-dashboard":
@@ -47,6 +45,13 @@ export function getFooterShortcuts(
 ): FooterShortcut[] {
   if (screen.name === "action-running") {
     return [];
+  }
+
+  if (screen.name === "brownfield-notice") {
+    return [
+      { keys: "Enter", label: "Back" },
+      { keys: "Esc", label: "Back" },
+    ];
   }
 
   if (screen.name === "engineering-dashboard") {

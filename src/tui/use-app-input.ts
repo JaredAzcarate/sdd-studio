@@ -18,7 +18,8 @@ import { ASSISTANTS } from "../registries/assistants.registry.js";
 import {
   ENGINEERING_PATTERNS_ITEMS,
   ENGINEERING_SECTION_ITEMS,
-  MAIN_MENU_ITEMS,
+  getVisibleMainMenuItems,
+  PROJECT_TYPE_ITEMS,
 } from "./data/menu-items.js";
 import { countCompletedSections } from "../engineering-config/state/engineering-section-status.js";
 import type { AppScreen, AppState, TuiExitResult } from "./types.js";
@@ -51,18 +52,15 @@ export type AppInputActions = {
   runSync: (assistantId: AssistantId) => Promise<void>;
   runInit: (options: {
     assistantId: AssistantId;
-    includeAssistant: boolean;
-    includeEngineering: boolean;
-    includeWorkflow: boolean;
+    includeSpec?: boolean;
+    includeWorkflow?: boolean;
   }) => Promise<void>;
+  runSpecScaffold: () => Promise<void>;
   setAssistant: (assistant: AssistantId) => void;
-  setInstallEngineering: (value: boolean) => void;
-  setWorkflow: (value: boolean) => void;
   setEngineeringAnswers: (answers: AppState["engineeringAnswers"]) => void;
   setEngineeringCustomNotes: (notes: EngineeringCustomNotes) => void;
   setEngineeringSession: (session: EngineeringSession | null) => void;
   resetToMainMenu: () => void;
-  continueInstallAfterEngineering: () => void;
 };
 
 export type AppInputContext = {
@@ -228,17 +226,57 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
       return;
     }
 
-    if (screen.name === "main-menu") {
-      const selected = MAIN_MENU_ITEMS[selectedIndex];
+    const mainMenuItems = getVisibleMainMenuItems();
+
+    if (screen.name === "project-type") {
+      const selected = PROJECT_TYPE_ITEMS[selectedIndex];
       if (key.upArrow) {
         setSelectedIndex(
           (current) =>
-            (current - 1 + MAIN_MENU_ITEMS.length) % MAIN_MENU_ITEMS.length,
+            (current - 1 + PROJECT_TYPE_ITEMS.length) % PROJECT_TYPE_ITEMS.length,
         );
         return;
       }
       if (key.downArrow) {
-        setSelectedIndex((current) => (current + 1) % MAIN_MENU_ITEMS.length);
+        setSelectedIndex(
+          (current) => (current + 1) % PROJECT_TYPE_ITEMS.length,
+        );
+        return;
+      }
+      if (key.escape) {
+        actions.onFinish({ type: "exit" });
+        return;
+      }
+      if (!key.return) {
+        return;
+      }
+
+      if (selected.id === "greenfield") {
+        actions.navigate({ name: "main-menu" });
+        return;
+      }
+      actions.navigate({ name: "brownfield-notice" });
+      return;
+    }
+
+    if (screen.name === "brownfield-notice") {
+      if (key.return || key.escape) {
+        actions.navigate({ name: "project-type" });
+      }
+      return;
+    }
+
+    if (screen.name === "main-menu") {
+      const selected = mainMenuItems[selectedIndex];
+      if (key.upArrow) {
+        setSelectedIndex(
+          (current) =>
+            (current - 1 + mainMenuItems.length) % mainMenuItems.length,
+        );
+        return;
+      }
+      if (key.downArrow) {
+        setSelectedIndex((current) => (current + 1) % mainMenuItems.length);
         return;
       }
       if (key.escape) {
@@ -250,20 +288,27 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
       }
 
       switch (selected.id) {
-        case "install-sdd":
-          actions.navigate({ name: "install-sdd-assistant" });
+        case "setup-foundation":
+          actions.navigate({ name: "setup-foundation-assistant" });
           break;
-        case "create-workspace":
-          actions.navigate({ name: "create-workspace-workflow" });
+        case "create-spec-scaffold":
+          void actions.runSpecScaffold();
           break;
         case "configure-engineering":
           void actions.openEngineeringDashboard();
           break;
+        case "configure-workflow":
+          actions.navigate({
+            name: "action-result",
+            title: "Configure Workflow",
+            lines: [
+              "Workflow configuration is coming in a future release.",
+              "Use **sdd-plan** after **sdd-spec** for now.",
+            ],
+          });
+          break;
         case "sync":
           actions.navigate({ name: "sync-assistant" });
-          break;
-        case "migrate":
-          void actions.runMigrate();
           break;
         case "exit":
           actions.onFinish({ type: "exit" });
@@ -272,7 +317,7 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
       return;
     }
 
-    if (screen.name === "install-sdd-assistant") {
+    if (screen.name === "setup-foundation-assistant") {
       if (key.upArrow) {
         setSelectedIndex(
           (current) => (current - 1 + ASSISTANTS.length) % ASSISTANTS.length,
@@ -288,8 +333,9 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         return;
       }
       if (key.return) {
-        actions.setAssistant(ASSISTANTS[selectedIndex].id);
-        actions.navigate({ name: "install-sdd-engineering" });
+        const assistantId = ASSISTANTS[selectedIndex].id;
+        actions.setAssistant(assistantId);
+        void actions.runInit({ assistantId });
       }
       return;
     }
@@ -315,69 +361,14 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
       return;
     }
 
-    if (screen.name === "install-sdd-engineering") {
-      if (key.upArrow || key.downArrow) {
-        setSelectedIndex((current) => (current === 0 ? 1 : 0));
-        return;
-      }
+    if (screen.name === "engineering-summary") {
       if (key.escape) {
         actions.goBack();
         return;
       }
-      if (!key.return) {
-        return;
+      if (key.return) {
+        actions.resetToMainMenu();
       }
-
-      const value = selectedIndex === 0;
-      actions.setInstallEngineering(value);
-      if (value) {
-        void actions.openEngineeringDashboard();
-        return;
-      }
-      actions.navigate({ name: "install-sdd-workflow" });
-      return;
-    }
-
-    if (
-      screen.name === "install-sdd-workflow" ||
-      screen.name === "create-workspace-workflow"
-    ) {
-      if (key.upArrow || key.downArrow) {
-        setSelectedIndex((current) => (current === 0 ? 1 : 0));
-        return;
-      }
-      if (key.escape) {
-        actions.goBack();
-        return;
-      }
-      if (!key.return) {
-        return;
-      }
-
-      const includeWorkflow = selectedIndex === 0;
-      actions.setWorkflow(includeWorkflow);
-
-      if (screen.name === "create-workspace-workflow") {
-        void actions.runInit({
-          assistantId: state.assistant ?? "cursor",
-          includeAssistant: false,
-          includeEngineering: false,
-          includeWorkflow,
-        });
-        return;
-      }
-
-      if (!state.assistant) {
-        actions.onFinish({ type: "exit" });
-        return;
-      }
-
-      void actions.runInit({
-        assistantId: state.assistant,
-        includeAssistant: true,
-        includeEngineering: state.installEngineering,
-        includeWorkflow,
-      });
       return;
     }
 
@@ -702,26 +693,6 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         state.targetDir,
         actions,
       );
-      return;
-    }
-
-    if (screen.name === "engineering-summary") {
-      if (key.escape) {
-        actions.goBack();
-        return;
-      }
-      if (key.return) {
-        const inInstallFlow =
-          state.installEngineering ||
-          state.history.some((item) => item.name === "install-sdd-engineering");
-
-        if (inInstallFlow) {
-          actions.continueInstallAfterEngineering();
-          return;
-        }
-
-        actions.resetToMainMenu();
-      }
       return;
     }
 
