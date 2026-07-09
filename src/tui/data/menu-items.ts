@@ -16,7 +16,7 @@ export type EngineeringDashboardItem = MenuItem & {
 };
 
 export type EngineeringPatternsItem = MenuItem & {
-  id: "frontend-patterns" | "backend-patterns";
+  id: "frontend-patterns" | "backend-patterns" | "contribution-patterns";
 };
 
 export const MAIN_MENU_ITEMS: MenuItem[] = [
@@ -56,6 +56,7 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
       "engineering-conventions.md",
       "engineering-frontend-patterns.md",
       "engineering-backend-patterns.md",
+      "engineering-contribution-patterns.md",
     ],
     estimatedTime: "5–15 min",
     recommendedUsage: "After init, before running sdd-technical.",
@@ -122,12 +123,13 @@ export const ENGINEERING_SECTION_ITEMS: EngineeringDashboardItem[] = [
     label: "Engineering Patterns",
     description:
       "Frontend and backend implementation patterns every feature and API must follow.",
-    why: "Defines data flow, filters, pagination, loading UX, response envelopes, and error shapes.",
+    why: "Defines data flow, filters, pagination, loading UX, response envelopes, error shapes, and Git workflow.",
     filesAffected: [
       "engineering-frontend-patterns.md",
       "engineering-backend-patterns.md",
+      "engineering-contribution-patterns.md",
     ],
-    estimatedTime: "3–6 min",
+    estimatedTime: "5–10 min",
     recommendedUsage: "After conventions — required before sdd-technical.",
   },
 ];
@@ -152,6 +154,16 @@ export const ENGINEERING_PATTERNS_ITEMS: EngineeringPatternsItem[] = [
     filesAffected: ["engineering-backend-patterns.md"],
     estimatedTime: "2–3 min",
     recommendedUsage: "Complete when the product exposes a backend or API surface.",
+  },
+  {
+    id: "contribution-patterns",
+    label: "Contribution Patterns",
+    description:
+      "Branch workflow, environment promotion, commits, pull requests, and merge strategy.",
+    why: "Ensures contributors and AI agents follow the same Git and PR conventions.",
+    filesAffected: ["engineering-contribution-patterns.md"],
+    estimatedTime: "2–4 min",
+    recommendedUsage: "Complete for every team using Git — required before sdd-technical.",
   },
 ];
 

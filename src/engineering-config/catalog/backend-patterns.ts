@@ -1,3 +1,4 @@
+import { defineCustomOption } from "./catalog-custom.js";
 import { defineOption } from "./helpers.js";
 import type { EngineeringSection } from "../types.js";
 
@@ -54,6 +55,7 @@ export const engineeringBackendPatternsSection: EngineeringSection = {
           learnMore:
             "Pair with list-meta-shape if lists need pagination metadata.",
         }),
+        defineCustomOption(),
       ],
     },
     {
@@ -61,6 +63,10 @@ export const engineeringBackendPatternsSection: EngineeringSection = {
       title: "List Metadata",
       description: "Defines where pagination and list metadata appear.",
       question: "Where should list pagination metadata live?",
+      showWhen: {
+        questionId: "response-envelope",
+        includesAny: ["strapi-like", "rfc7807", "flat", "custom"],
+      },
       options: [
         defineOption("meta-pagination", "meta.pagination object", {
           whatIsIt:
@@ -99,6 +105,110 @@ export const engineeringBackendPatternsSection: EngineeringSection = {
           learnMore:
             "Keep cursor field names stable across domains.",
         }),
+        defineCustomOption(),
+      ],
+    },
+    {
+      id: "list-sort",
+      title: "List Sort",
+      description:
+        "Defines how sort and order parameters are passed for list endpoints.",
+      question: "How should list sort and order be expressed in API requests?",
+      options: [
+        defineOption(
+          "sort-order-params",
+          "sort + order query params",
+          {
+            whatIsIt:
+              "Clients send sort field and order direction as separate query parameters.",
+            example:
+              "?sort=createdAt&order=desc — aligns with URL-synced frontend filters.",
+            bestFor:
+              "REST list endpoints paired with query-param frontend filters.",
+            considerations:
+              "Validate allowed sort fields server-side to prevent SQL injection.",
+            recommendation:
+              "Choose when frontend syncs sort to the URL alongside filters.",
+            learnMore:
+              "Whitelist sort fields per domain in API specs.",
+          },
+        ),
+        defineOption("signed-sort-token", "Signed sort token (sort=-createdAt)", {
+          whatIsIt:
+            "A single sort parameter encodes field and direction with a prefix.",
+          example: "?sort=-createdAt or ?sort=title.",
+          bestFor:
+            "Compact URLs and libraries expecting one sort string.",
+          considerations:
+            "Document allowed fields and direction syntax.",
+          recommendation:
+            "Choose when frontend prefers a single sort query key.",
+          learnMore:
+            "Map to database ORDER BY in the repository layer.",
+        }),
+        defineOption("post-body-sort", "Sort in POST list body", {
+          whatIsIt:
+            "Complex list queries use POST with sort in the JSON body.",
+          example:
+            'POST /tasks/search { "filter": {}, "sort": { "field": "createdAt", "order": "desc" } }.',
+          bestFor:
+            "Heavy filter payloads that do not fit query strings.",
+          considerations:
+            "Less cacheable than GET; document when POST is allowed for reads.",
+          recommendation:
+            "Choose for advanced enterprise filters only.",
+          learnMore:
+            "Pair with frontend hybrid filter strategy if used.",
+        }),
+        defineCustomOption(),
+      ],
+    },
+    {
+      id: "id-normalization",
+      title: "ID Normalization",
+      description: "Defines how entity identifiers appear in API JSON payloads.",
+      question: "How should entity IDs be represented in API responses?",
+      options: [
+        defineOption("string-ids", "String IDs everywhere", {
+          whatIsIt:
+            "All id fields serialize as strings in JSON even when numeric in the database.",
+          example: '{ "id": "42", "assigneeId": "7" }',
+          bestFor:
+            "JavaScript clients avoiding bigint/number precision issues.",
+          considerations:
+            "Clients must not assume numeric ids in types without parsing.",
+          recommendation:
+            "Choose for most TypeScript web and mobile clients.",
+          learnMore:
+            "Consistent string ids simplify TanStack Query keys.",
+        }),
+        defineOption("numeric-ids", "Numeric IDs as JSON numbers", {
+          whatIsIt:
+            "Integer primary keys serialize as numbers in JSON.",
+          example: '{ "id": 42, "assigneeId": 7 }',
+          bestFor:
+            "Internal APIs with int32/int64 ranges and typed clients.",
+          considerations:
+            "Very large ids may exceed JS safe integer range.",
+          recommendation:
+            "Choose when all ids stay within safe integer bounds.",
+          learnMore:
+            "Document bigint handling if snowflake ids are introduced.",
+        }),
+        defineOption("uuid-strings", "UUID strings only", {
+          whatIsIt:
+            "Identifiers are UUID strings in API and database.",
+          example: '{ "id": "550e8400-e29b-41d4-a716-446655440000" }',
+          bestFor:
+            "Distributed systems and public APIs without enumerable ids.",
+          considerations:
+            "Slightly larger payloads; index tuning matters at scale.",
+          recommendation:
+            "Choose when exposing public APIs or merging distributed writers.",
+          learnMore:
+            "Never expose sequential integer ids externally if enumeration is a risk.",
+        }),
+        defineCustomOption(),
       ],
     },
     {
@@ -146,6 +256,7 @@ export const engineeringBackendPatternsSection: EngineeringSection = {
           learnMore:
             "Gate extra fields behind NODE_ENV or an explicit debug flag.",
         }),
+        defineCustomOption(),
       ],
     },
     {
@@ -185,6 +296,7 @@ export const engineeringBackendPatternsSection: EngineeringSection = {
           learnMore:
             "Document all codes in domain API specs.",
         }),
+        defineCustomOption(),
       ],
     },
     {
@@ -218,6 +330,45 @@ export const engineeringBackendPatternsSection: EngineeringSection = {
           learnMore:
             "Prefer field-path-details when forms are in scope.",
         }),
+        defineCustomOption(),
+      ],
+    },
+    {
+      id: "http-status-mapping",
+      title: "HTTP Status Mapping",
+      description:
+        "Defines how error categories map to HTTP status codes for API clients.",
+      question: "How should HTTP status codes be used for API errors?",
+      options: [
+        defineOption("rest-conventional", "REST conventional mapping", {
+          whatIsIt:
+            "400 validation, 401 unauthenticated, 403 forbidden, 404 not found, 409 conflict, 422 semantic validation, 500 internal.",
+          example:
+            "ValidationError → 400; missing session → 401; wrong role → 403.",
+          bestFor:
+            "HTTP clients, mobile apps, and public APIs.",
+          considerations:
+            "Align error.name and body shape with status consistently.",
+          recommendation:
+            "Choose for most web and mobile products.",
+          learnMore:
+            "Document domain-specific 409 cases in API specs.",
+        }),
+        defineOption("minimal-status", "Minimal (400 client / 500 server)", {
+          whatIsIt:
+            "Only distinguish bad input (400) from server faults (500).",
+          example:
+            "All auth failures return 400 with error codes in the body.",
+          bestFor:
+            "Very simple internal APIs hiding HTTP nuance.",
+          considerations:
+            "Harder for generic HTTP clients to branch on status.",
+          recommendation:
+            "Choose only for tightly coupled internal clients.",
+          learnMore:
+            "Prefer REST conventional mapping for multi-client APIs.",
+        }),
+        defineCustomOption(),
       ],
     },
   ],

@@ -18,6 +18,7 @@ const OUTPUT_FILES: Record<EngineeringSectionId, string> = {
   conventions: "engineering-conventions.md",
   "frontend-patterns": "engineering-frontend-patterns.md",
   "backend-patterns": "engineering-backend-patterns.md",
+  "contribution-patterns": "engineering-contribution-patterns.md",
 };
 
 function renderSectionDocument(

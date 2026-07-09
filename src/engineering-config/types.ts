@@ -18,7 +18,8 @@ export type EngineeringOption = {
 
 export type EngineeringQuestionShowWhen = {
   questionId: string;
-  includes: string;
+  includes?: string;
+  includesAny?: string[];
 };
 
 export type EngineeringQuestion = {
@@ -36,7 +37,8 @@ export type EngineeringSectionId =
   | "decisions"
   | "conventions"
   | "frontend-patterns"
-  | "backend-patterns";
+  | "backend-patterns"
+  | "contribution-patterns";
 
 export type EngineeringDashboardItemId =
   | "principles"

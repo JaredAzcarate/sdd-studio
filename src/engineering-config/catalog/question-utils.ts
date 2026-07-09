@@ -28,7 +28,20 @@ export function isQuestionVisible(
   }
 
   const parentValue = answers[question.showWhen.questionId];
-  return parseMultiAnswer(parentValue).includes(question.showWhen.includes);
+  if (!parentValue) {
+    return false;
+  }
+
+  if (question.showWhen.includesAny) {
+    const values = parseMultiAnswer(parentValue);
+    return question.showWhen.includesAny.some((value) => values.includes(value));
+  }
+
+  if (question.showWhen.includes) {
+    return parseMultiAnswer(parentValue).includes(question.showWhen.includes);
+  }
+
+  return true;
 }
 
 export function getVisibleQuestions(
