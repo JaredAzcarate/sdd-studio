@@ -111,6 +111,49 @@ export type GenerateSpecScaffoldOptions = {
   overwrite?: boolean;
 };
 
+const REQUIRED_WORKFLOW_MARKERS = [
+  "workflow/roadmap/.gitkeep",
+  "workflow/milestones/.gitkeep",
+  "workflow/releases/release-001/release.md",
+  "workflow/releases/release-001/tasks.md",
+  "workflow/releases/release-001/reviews.md",
+  "workflow/releases/release-001/decisions.md",
+  "workflow/workflow-config.md",
+] as const;
+
+export type GenerateWorkflowScaffoldOptions = {
+  targetDir: string;
+  overwrite?: boolean;
+};
+
+export async function generateWorkflowScaffold(
+  options: GenerateWorkflowScaffoldOptions,
+): Promise<GenerateWorkspaceResult> {
+  const overwrite = options.overwrite ?? false;
+  const workspaceTarget = join(options.targetDir, SDD_WORKSPACE_DIR);
+  const createdPaths: string[] = [];
+
+  const { createdPaths: workflowPaths } = await copyTemplateTree(
+    resolveWorkspaceTemplatePath("workflow"),
+    join(workspaceTarget, "workflow"),
+    { overwrite },
+  );
+  createdPaths.push(...workflowPaths);
+
+  for (const relativePath of REQUIRED_WORKFLOW_MARKERS) {
+    const absolutePath = join(workspaceTarget, relativePath);
+    if (!createdPaths.includes(absolutePath)) {
+      throw new Error(`Failed to generate ${absolutePath}`);
+    }
+  }
+
+  return {
+    workspaceDir: workspaceTarget,
+    createdPaths,
+    modules: { workflow: true, spec: false },
+  };
+}
+
 export async function generateSpecScaffold(
   options: GenerateSpecScaffoldOptions,
 ): Promise<GenerateWorkspaceResult> {

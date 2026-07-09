@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   generateSpecScaffold,
+  generateWorkflowScaffold,
   generateWorkspace,
 } from "../src/generators/workspace.generator.js";
 import { initWorkspace } from "../src/use-cases/init-workspace.use-case.js";
@@ -56,6 +57,7 @@ const SPEC_PATHS = [
 const WORKFLOW_PATHS = [
   ".workspace/workflow/roadmap/.gitkeep",
   ".workspace/workflow/milestones/.gitkeep",
+  ".workspace/workflow/workflow-config.md",
   ".workspace/workflow/releases/release-001/release.md",
   ".workspace/workflow/releases/release-001/tasks.md",
   ".workspace/workflow/releases/release-001/reviews.md",
@@ -176,6 +178,19 @@ describe("initWorkspace", () => {
     }
 
     expect(result.modules.spec).toBe(true);
+  });
+
+  it("generateWorkflowScaffold adds workflow folders to an existing workspace", async () => {
+    tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-init-"));
+    await generateWorkspace({ targetDir: tempDir });
+
+    const result = await generateWorkflowScaffold({ targetDir: tempDir });
+
+    for (const relativePath of WORKFLOW_PATHS) {
+      expect(existsSync(join(tempDir, relativePath)), relativePath).toBe(true);
+    }
+
+    expect(result.modules.workflow).toBe(true);
   });
 
   it("installs claude assistant files when assistant is claude", async () => {

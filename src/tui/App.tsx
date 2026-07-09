@@ -3,9 +3,13 @@ import { basename, join } from "node:path";
 import { existsSync } from "node:fs";
 import { SDD_WORKSPACE_DIR, SDD_WORKSPACE_MARKER_PATH } from "../constants/sdd-workspace-path.js";
 import { loadEngineeringAnswersFromWorkspace } from "../engineering-config/state/engineering-section-status.js";
+import { loadWorkflowAnswersFromWorkspace } from "../workflow-config/state/workflow-section-status.js";
 import { buildInitContext } from "../utils/build-init-context.js";
 import { initWorkspace } from "../use-cases/init-workspace.use-case.js";
-import { generateSpecScaffold } from "../generators/workspace.generator.js";
+import {
+  generateSpecScaffold,
+  generateWorkflowScaffold,
+} from "../generators/workspace.generator.js";
 import { migrateWorkspace } from "../generators/migrate-workspace.generator.js";
 import { syncAssistant } from "../use-cases/sync-assistant.use-case.js";
 import { formatGenerationResult } from "../utils/format-generation-result.js";
@@ -17,10 +21,11 @@ import { AppLayout } from "./components/AppLayout.js";
 import { ContentPanel, NavigationPanel } from "./components/AppPanels.js";
 import { getFooterShortcuts, getSectionTitle } from "./app-chrome.js";
 import { useStableInput } from "./hooks/use-stable-input.js";
-import type { EngineeringSession } from "./use-app-input.js";
+import type { EngineeringSession, WorkflowSession } from "./use-app-input.js";
 import { useAppInput } from "./use-app-input.js";
 import type { AppScreen, AppState, TuiExitResult } from "./types.js";
 import type { EngineeringCustomNotes } from "../engineering-config/types.js";
+import type { WorkflowCustomNotes } from "../workflow-config/types.js";
 import type { AssistantId } from "../types/init-context.js";
 
 type SddAppProps = {
@@ -43,6 +48,8 @@ export function SddApp({
     "technical",
   );
 
+  const workspaceWorkflowDir = join(targetDir, SDD_WORKSPACE_DIR, "workflow");
+
   const [screen, setScreen] = useState<AppScreen>(initialScreen);
   const [history, setHistory] = useState<AppScreen[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -52,11 +59,20 @@ export function SddApp({
   const [engineeringCustomNotes, setEngineeringCustomNotes] = useState(
     () => ({} as EngineeringCustomNotes),
   );
+  const [workflowAnswers, setWorkflowAnswers] = useState(
+    () => ({} as AppState["workflowAnswers"]),
+  );
+  const [workflowCustomNotes, setWorkflowCustomNotes] = useState(
+    () => ({} as WorkflowCustomNotes),
+  );
   const [engineeringSession, setEngineeringSession] =
     useState<EngineeringSession | null>(null);
+  const [workflowSession, setWorkflowSession] =
+    useState<WorkflowSession | null>(null);
   const [assistant, setAssistant] = useState<AssistantId | undefined>();
   const [resultLines, setResultLines] = useState<string[]>([]);
   const [loadedAnswers, setLoadedAnswers] = useState(false);
+  const [loadedWorkflowAnswers, setLoadedWorkflowAnswers] = useState(false);
 
   const projectName = basename(targetDir) || targetDir;
 
@@ -65,6 +81,12 @@ export function SddApp({
       setScreen({ name: "engineering-dashboard" });
     }
   }, [engineeringSession, screen]);
+
+  useEffect(() => {
+    if (screen.name === "workflow-section" && !workflowSession) {
+      setScreen({ name: "workflow-dashboard" });
+    }
+  }, [workflowSession, screen]);
 
   const state: AppState = useMemo(
     () => ({
@@ -75,6 +97,8 @@ export function SddApp({
       assistant,
       engineeringAnswers,
       engineeringCustomNotes,
+      workflowAnswers,
+      workflowCustomNotes,
       history,
     }),
     [
@@ -85,6 +109,8 @@ export function SddApp({
       assistant,
       engineeringAnswers,
       engineeringCustomNotes,
+      workflowAnswers,
+      workflowCustomNotes,
       history,
     ],
   );
@@ -96,6 +122,7 @@ export function SddApp({
 
   const goBack = useCallback(() => {
     setEngineeringSession(null);
+    setWorkflowSession(null);
     setHistory((current) => {
       const previous = current.at(-1);
       if (!previous) {
@@ -110,6 +137,7 @@ export function SddApp({
   const resetToMainMenu = useCallback(() => {
     setResultLines([]);
     setEngineeringSession(null);
+    setWorkflowSession(null);
     setScreen({ name: "main-menu" });
     setHistory([]);
   }, []);
@@ -130,6 +158,22 @@ export function SddApp({
     setLoadedAnswers(true);
   }, [loadedAnswers, workspaceTechnicalDir]);
 
+  const ensureWorkflowAnswersLoaded = useCallback(async () => {
+    if (loadedWorkflowAnswers) {
+      return;
+    }
+
+    if (existsSync(workspaceWorkflowDir)) {
+      const { answers, customNotes } = await loadWorkflowAnswersFromWorkspace(
+        workspaceWorkflowDir,
+      );
+      setWorkflowAnswers(answers);
+      setWorkflowCustomNotes(customNotes);
+    }
+
+    setLoadedWorkflowAnswers(true);
+  }, [loadedWorkflowAnswers, workspaceWorkflowDir]);
+
   const openEngineeringDashboard = useCallback(async () => {
     const markerPath = join(targetDir, SDD_WORKSPACE_MARKER_PATH);
     if (!existsSync(markerPath)) {
@@ -148,6 +192,57 @@ export function SddApp({
     await ensureEngineeringAnswersLoaded();
     navigate({ name: "engineering-dashboard" });
   }, [ensureEngineeringAnswersLoaded, navigate, targetDir]);
+
+  const runWorkflowScaffold = useCallback(async () => {
+    const markerPath = join(targetDir, SDD_WORKSPACE_MARKER_PATH);
+    if (!existsSync(markerPath)) {
+      return false;
+    }
+
+    const workflowMarker = join(
+      targetDir,
+      SDD_WORKSPACE_DIR,
+      "workflow",
+      "roadmap",
+      ".gitkeep",
+    );
+    if (existsSync(workflowMarker)) {
+      return true;
+    }
+
+    await generateWorkflowScaffold({ targetDir });
+    return true;
+  }, [targetDir]);
+
+  const openWorkflowDashboard = useCallback(async () => {
+    const markerPath = join(targetDir, SDD_WORKSPACE_MARKER_PATH);
+    if (!existsSync(markerPath)) {
+      setResultLines([
+        "No SDD workspace found.",
+        "Run Create Business & Technical foundation first.",
+      ]);
+      setScreen({
+        name: "action-result",
+        title: "Configure Workflow",
+        lines: [],
+      });
+      return;
+    }
+
+    try {
+      await runWorkflowScaffold();
+      await ensureWorkflowAnswersLoaded();
+      navigate({ name: "workflow-dashboard" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setResultLines([`Error: ${message}`]);
+      setScreen({
+        name: "action-result",
+        title: "Configure Workflow",
+        lines: [],
+      });
+    }
+  }, [ensureWorkflowAnswersLoaded, navigate, runWorkflowScaffold, targetDir]);
 
   const runInit = useCallback(
     async (options: {
@@ -303,14 +398,19 @@ export function SddApp({
       goBack,
       onFinish,
       openEngineeringDashboard,
+      openWorkflowDashboard,
       runMigrate,
       runSync,
       runInit,
       runSpecScaffold,
+      runWorkflowScaffold,
       setAssistant,
       setEngineeringAnswers,
       setEngineeringCustomNotes,
       setEngineeringSession,
+      setWorkflowAnswers,
+      setWorkflowCustomNotes,
+      setWorkflowSession,
       resetToMainMenu,
     }),
     [
@@ -318,10 +418,12 @@ export function SddApp({
       goBack,
       onFinish,
       openEngineeringDashboard,
+      openWorkflowDashboard,
       runMigrate,
       runSync,
       runInit,
       runSpecScaffold,
+      runWorkflowScaffold,
       resetToMainMenu,
     ],
   );
@@ -331,6 +433,7 @@ export function SddApp({
     selectedIndex,
     setSelectedIndex,
     engineeringSession,
+    workflowSession,
     actions,
   });
 
@@ -341,6 +444,8 @@ export function SddApp({
     screen,
     engineeringAnswers,
     engineeringSession,
+    workflowAnswers,
+    workflowSession,
   );
 
   return (
@@ -355,6 +460,7 @@ export function SddApp({
           state={state}
           selectedIndex={selectedIndex}
           engineeringSession={engineeringSession}
+          workflowSession={workflowSession}
         />
       }
       content={
@@ -363,6 +469,7 @@ export function SddApp({
           state={state}
           selectedIndex={selectedIndex}
           engineeringSession={engineeringSession}
+          workflowSession={workflowSession}
           resultLines={resultLines}
         />
       }

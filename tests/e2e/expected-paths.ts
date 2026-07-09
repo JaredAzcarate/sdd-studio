@@ -32,6 +32,7 @@ export const WORKSPACE_BASE_PATHS = [
 export const WORKFLOW_PATHS = [
   ".workspace/workflow/roadmap/.gitkeep",
   ".workspace/workflow/milestones/.gitkeep",
+  ".workspace/workflow/workflow-config.md",
   ".workspace/workflow/releases/release-001/release.md",
   ".workspace/workflow/releases/release-001/tasks.md",
   ".workspace/workflow/releases/release-001/reviews.md",

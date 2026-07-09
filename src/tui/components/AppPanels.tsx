@@ -5,11 +5,12 @@ import { SelectableList } from "./SelectableList.js";
 import {
   ENGINEERING_PATTERNS_ITEMS,
   ENGINEERING_SECTION_ITEMS,
+  WORKFLOW_SECTION_ITEMS,
   getVisibleMainMenuItems,
   PROJECT_TYPE_ITEMS,
 } from "../data/menu-items.js";
 import { theme } from "../theme.js";
-import type { EngineeringSession } from "../use-app-input.js";
+import type { EngineeringSession, WorkflowSession } from "../use-app-input.js";
 import type { AppScreen, AppState } from "../types.js";
 import {
   countCompletedSections,
@@ -18,12 +19,21 @@ import {
   statusIcon,
 } from "../../engineering-config/state/engineering-section-status.js";
 import {
+  countCompletedWorkflowSections,
+  getWorkflowSectionStatus,
+} from "../../workflow-config/state/workflow-section-status.js";
+import {
   ENGINEERING_LEAF_SECTION_COUNT,
   ENGINEERING_SECTIONS,
 } from "../../engineering-config/catalog/index.js";
+import {
+  WORKFLOW_LEAF_SECTION_COUNT,
+  WORKFLOW_SECTIONS,
+} from "../../workflow-config/catalog/index.js";
 import { getVisibleQuestions } from "../../engineering-config/catalog/question-utils.js";
 import { ASSISTANTS } from "../../registries/assistants.registry.js";
 import type { EngineeringSectionId } from "../../engineering-config/types.js";
+import type { WorkflowSectionId } from "../../workflow-config/types.js";
 
 const EngineeringSectionNavigation = memo(function EngineeringSectionNavigation({
   sectionId,
@@ -134,11 +144,121 @@ const EngineeringSectionPreview = memo(function EngineeringSectionPreview({
   );
 });
 
+const WorkflowSectionNavigation = memo(function WorkflowSectionNavigation({
+  sectionId,
+  questionIndex,
+  optionIndex,
+  selectedOptionIds,
+  answers,
+  saving,
+  customEntry,
+}: {
+  sectionId: WorkflowSectionId;
+  questionIndex: number;
+  optionIndex: number;
+  selectedOptionIds: string[];
+  answers: AppState["workflowAnswers"];
+  saving: boolean;
+  customEntry: WorkflowSession["customEntry"];
+}) {
+  const section = WORKFLOW_SECTIONS.find((item) => item.id === sectionId)!;
+  const question = section.questions[questionIndex];
+  const visibleQuestions = getVisibleQuestions(section, answers);
+  const visibleQuestionIndex = visibleQuestions.findIndex(
+    (item) => item.id === question.id,
+  );
+
+  if (customEntry) {
+    return (
+      <Box flexDirection="column" overflow="hidden">
+        <Text bold color={theme.brand}>
+          Custom answer
+        </Text>
+        <Box marginTop={1} flexDirection="column">
+          <Text bold>{question.title}</Text>
+          <Text wrap="wrap" color={theme.muted}>
+            Describe your approach in your own words.
+          </Text>
+        </Box>
+        <Box marginTop={1} flexDirection="column">
+          <Text bold>Your answer</Text>
+          <Text>
+            {customEntry.text}
+            <Text color={theme.accent}>|</Text>
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  return (
+    <Box flexDirection="column" overflow="hidden">
+      <Text bold color={theme.brand}>
+        Question {visibleQuestionIndex + 1} / {visibleQuestions.length}
+      </Text>
+      <Box marginTop={1} flexDirection="column">
+        <Text bold>{question.title}</Text>
+        <Text wrap="wrap" color={theme.muted}>
+          {question.description}
+        </Text>
+      </Box>
+      <Box marginTop={1}>
+        <Text bold>{question.question}</Text>
+      </Box>
+      {question.selectionMode === "multi" ? (
+        <Box marginTop={1}>
+          <Text color={theme.muted} wrap="wrap">
+            Space to toggle. Enter to confirm.
+          </Text>
+        </Box>
+      ) : null}
+      <Box marginTop={1} overflow="hidden">
+        <SelectableList
+          title="Options"
+          selectedIndex={optionIndex}
+          selectionMode={question.selectionMode}
+          selectedOptionIds={selectedOptionIds}
+          items={question.options.map((option) => ({
+            id: option.id,
+            label: option.label,
+          }))}
+        />
+      </Box>
+      {saving ? (
+        <Box marginTop={1}>
+          <Text color={theme.accent}>Saving section…</Text>
+        </Box>
+      ) : null}
+    </Box>
+  );
+});
+
+const WorkflowSectionPreview = memo(function WorkflowSectionPreview({
+  sectionId,
+  questionIndex,
+  optionIndex,
+}: {
+  sectionId: WorkflowSectionId;
+  questionIndex: number;
+  optionIndex: number;
+}) {
+  const section = WORKFLOW_SECTIONS.find((item) => item.id === sectionId)!;
+  const question = section.questions[questionIndex];
+
+  return (
+    <OptionPreview
+      title="Option Preview"
+      detail={question.options[optionIndex]?.detail ?? null}
+    />
+  );
+});
+
 type NavigationPanelProps = {
   screen: AppScreen;
   state: AppState;
   selectedIndex: number;
   engineeringSession: EngineeringSession | null;
+  workflowSession: WorkflowSession | null;
 };
 
 type ContentPanelProps = NavigationPanelProps & {
@@ -221,6 +341,7 @@ export const NavigationPanel = memo(function NavigationPanel({
   state,
   selectedIndex,
   engineeringSession,
+  workflowSession,
 }: NavigationPanelProps) {
   if (screen.name === "project-type") {
     return <ProjectTypeNavigation selectedIndex={selectedIndex} />;
@@ -320,6 +441,79 @@ export const NavigationPanel = memo(function NavigationPanel({
     );
   }
 
+  if (screen.name === "workflow-dashboard") {
+    const completed = countCompletedWorkflowSections(state.workflowAnswers);
+    const items = WORKFLOW_SECTION_ITEMS.map((item) => ({
+      id: item.id,
+      label: item.label,
+      icon: statusIcon(
+        getWorkflowSectionStatus(item.id, state.workflowAnswers),
+      ),
+    }));
+
+    return (
+      <Box flexDirection="column">
+        <SelectableList
+          title="Sections"
+          selectedIndex={selectedIndex}
+          items={items}
+        />
+        <Box
+          marginTop={2}
+          flexDirection="column"
+          borderStyle="single"
+          borderColor={theme.border}
+          paddingX={1}
+        >
+          <Text bold>Progress</Text>
+          <Text>
+            {completed} / {WORKFLOW_LEAF_SECTION_COUNT} completed
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (screen.name === "workflow-section" && workflowSession) {
+    return (
+      <WorkflowSectionNavigation
+        sectionId={workflowSession.sectionId}
+        questionIndex={workflowSession.questionIndex}
+        optionIndex={workflowSession.optionIndex}
+        selectedOptionIds={workflowSession.selectedOptionIds}
+        answers={workflowSession.answers}
+        saving={workflowSession.saving}
+        customEntry={workflowSession.customEntry}
+      />
+    );
+  }
+
+  if (screen.name === "workflow-summary") {
+    const sections = WORKFLOW_SECTION_ITEMS.map((item) => ({
+      label: item.label,
+      status: getWorkflowSectionStatus(item.id, state.workflowAnswers),
+    }));
+
+    return (
+      <Box flexDirection="column">
+        <Text bold color={theme.accent}>
+          Workflow configuration complete
+        </Text>
+        <Box marginTop={1}>
+          <Text wrap="wrap">
+            All {WORKFLOW_LEAF_SECTION_COUNT} sections were saved to your
+            workspace.
+          </Text>
+        </Box>
+        {sections.map((section) => (
+          <Text key={section.label}>
+            {statusIcon(section.status)} {section.label}
+          </Text>
+        ))}
+      </Box>
+    );
+  }
+
   if (screen.name === "engineering-summary") {
     const sections = [
       ...ENGINEERING_SECTION_ITEMS.filter((item) => item.id !== "patterns").map(
@@ -382,6 +576,7 @@ export const ContentPanel = memo(function ContentPanel({
   state,
   selectedIndex,
   engineeringSession,
+  workflowSession,
   resultLines,
 }: ContentPanelProps) {
   if (screen.name === "brownfield-notice") {
@@ -483,6 +678,63 @@ export const ContentPanel = memo(function ContentPanel({
         questionIndex={engineeringSession.questionIndex}
         optionIndex={engineeringSession.optionIndex}
       />
+    );
+  }
+
+  if (screen.name === "workflow-dashboard") {
+    const selected = WORKFLOW_SECTION_ITEMS[selectedIndex];
+    const status = getWorkflowSectionStatus(
+      selected.id,
+      state.workflowAnswers,
+    );
+
+    return (
+      <Box flexDirection="column">
+        <Text bold color={theme.accent}>
+          {selected.label}
+        </Text>
+        <Text wrap="wrap">{selected.description}</Text>
+        <Box marginTop={1} flexDirection="column">
+          <Text bold>Status</Text>
+          <Text>
+            {statusIcon(status)} {status.replace("-", " ")}
+          </Text>
+        </Box>
+        <Box marginTop={1} flexDirection="column">
+          <Text bold>Generates</Text>
+          <Text>{selected.filesAffected.join(", ")}</Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (screen.name === "workflow-section" && workflowSession) {
+    return (
+      <WorkflowSectionPreview
+        sectionId={workflowSession.sectionId}
+        questionIndex={workflowSession.questionIndex}
+        optionIndex={workflowSession.optionIndex}
+      />
+    );
+  }
+
+  if (screen.name === "workflow-summary") {
+    return (
+      <Box flexDirection="column">
+        <Text bold color={theme.accent}>
+          Success
+        </Text>
+        <Text wrap="wrap">
+          Your workflow configuration is ready in workflow-config.md.
+        </Text>
+        <Box marginTop={2} flexDirection="column">
+          <Text bold>Next step</Text>
+          <Text wrap="wrap">
+            Run **sdd-plan** to generate roadmaps, milestones, and releases
+            under `.workspace/workflow/`.
+          </Text>
+        </Box>
+      </Box>
     );
   }
 

@@ -126,4 +126,7 @@ Do not report completion until the script exits with code 0.
 1. Identified domains
 2. Files created or updated
 3. Open `TODO:` items
-4. Next step: **sdd-review** or **sdd-plan**
+4. Ask which work provider to use:
+   - **SDD Studio** → run `sdd-studio configure-workflow`, then **sdd-plan**
+   - **Linear / GitHub Issues / other** → skip SDD workflow install; **sdd-plan** remains available when needed
+5. Optional before planning: **sdd-review**

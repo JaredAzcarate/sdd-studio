@@ -1,5 +1,6 @@
 import type { FooterShortcut } from "../types.js";
 import type { EngineeringDashboardItemId } from "../../engineering-config/types.js";
+import type { WorkflowSectionId } from "../../workflow-config/types.js";
 
 export type MenuItem = {
   id: string;
@@ -17,6 +18,10 @@ export type EngineeringDashboardItem = MenuItem & {
 
 export type EngineeringPatternsItem = MenuItem & {
   id: "frontend-patterns" | "backend-patterns" | "contribution-patterns";
+};
+
+export type WorkflowDashboardItem = MenuItem & {
+  id: WorkflowSectionId;
 };
 
 export const PROJECT_TYPE_ITEMS: MenuItem[] = [
@@ -83,12 +88,12 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
   },
   {
     id: "configure-workflow",
-    label: "Configure Workflow (coming soon)",
+    label: "Configure Workflow",
     description:
-      "Workflow methodology and task conventions under .workspace/workflow/.",
-    why: "Plan releases after specification — available in a future release.",
-    filesAffected: [".workspace/workflow/"],
-    estimatedTime: "—",
+      "Interactive workflow setup: planning methodology and task conventions under .workspace/workflow/.",
+    why: "Define how releases and tasks are planned before running sdd-plan.",
+    filesAffected: ["workflow-config.md"],
+    estimatedTime: "3–8 min",
     recommendedUsage: "After sdd-spec, before sdd-plan.",
   },
   {
@@ -189,6 +194,29 @@ export const ENGINEERING_PATTERNS_ITEMS: EngineeringPatternsItem[] = [
     filesAffected: ["engineering-contribution-patterns.md"],
     estimatedTime: "2–4 min",
     recommendedUsage: "Complete for every team using Git — required before sdd-technical.",
+  },
+];
+
+export const WORKFLOW_SECTION_ITEMS: WorkflowDashboardItem[] = [
+  {
+    id: "methodology",
+    label: "Planning Methodology",
+    description:
+      "Planning approach, release cadence, and ceremony depth for delivery.",
+    why: "Shapes how sdd-plan structures roadmaps, milestones, and releases.",
+    filesAffected: ["workflow-config.md"],
+    estimatedTime: "2–5 min",
+    recommendedUsage: "Complete first — defines planning rhythm.",
+  },
+  {
+    id: "task-conventions",
+    label: "Task Conventions",
+    description:
+      "Task ID format, granularity, and definition style for workflow tasks.",
+    why: "Ensures humans and AI agents write consistent, traceable tasks.",
+    filesAffected: ["workflow-config.md"],
+    estimatedTime: "2–4 min",
+    recommendedUsage: "After methodology — required before sdd-plan.",
   },
 ];
 

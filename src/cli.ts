@@ -4,6 +4,7 @@ import { cwd } from "node:process";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { createConfigureCommand } from "./commands/configure.command.js";
+import { createConfigureWorkflowCommand } from "./commands/configure-workflow.command.js";
 import { createInitCommand } from "./commands/init.command.js";
 import { createMigrateCommand } from "./commands/migrate.command.js";
 import { createSyncCommand } from "./commands/sync.command.js";
@@ -27,6 +28,7 @@ program
 
 program.addCommand(createInitCommand(pkg.version));
 program.addCommand(createConfigureCommand(pkg.version));
+program.addCommand(createConfigureWorkflowCommand(pkg.version));
 program.addCommand(createMigrateCommand());
 program.addCommand(createSyncCommand());
 
