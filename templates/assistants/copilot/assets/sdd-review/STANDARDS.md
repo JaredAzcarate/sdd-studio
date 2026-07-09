@@ -6,8 +6,7 @@ Mandatory rules when reviewing and updating `.workspace/brief/` and `.workspace/
 
 - May modify `.workspace/brief/business/product-guide.md` for functional or user-facing changes
 - May modify `.workspace/brief/business/product-principles.md` for conceptual changes
-- May modify `.workspace/brief/technical/engineering-modeling.md` for domain modeling changes
-- May modify files under `.workspace/spec/business/` and `.workspace/spec/technical/` for specification changes
+- May modify files under `.workspace/spec/business/` and `.workspace/spec/technical/` for specification and domain modeling changes
 - **Never** modify `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md` (use `sdd-studio configure`)
 - **Never** modify `engineering-stack.md` (use **sdd-technical**)
 - **Never** modify `.workspace/workflow/`
@@ -22,12 +21,14 @@ If the change requires replanning, suggest **sdd-plan**. Do not create tasks or 
 | ---- | ------------ |
 | `.workspace/brief/business/product-principles.md` | Conceptual principles or product foundations change |
 | `.workspace/brief/business/product-guide.md` | User journey, experiences, scope, or product narrative change |
-| `.workspace/brief/technical/engineering-modeling.md` | Modeling approach, DDD, or domain boundaries change |
 | `.workspace/brief/technical/engineering-principles.md` | Read only — recommend `sdd-studio configure` |
-| `.workspace/brief/technical/engineering-decisions.md` | Read only — recommend `sdd-studio configure` |
+| `.workspace/brief/technical/engineering-decisions.md` | Read only — recommend `sdd-studio configure` (includes **Business Modeling**) |
 | `.workspace/brief/technical/engineering-conventions.md` | Read only — recommend `sdd-studio configure` |
+| `.workspace/brief/technical/engineering-frontend-patterns.md` | Read only — recommend `sdd-studio configure` |
+| `.workspace/brief/technical/engineering-backend-patterns.md` | Read only — recommend `sdd-studio configure` |
+| `.workspace/brief/technical/engineering-contribution-patterns.md` | Read only — recommend `sdd-studio configure` |
 | `.workspace/brief/technical/engineering-stack.md` | Read only — recommend **sdd-technical** |
-| `.workspace/spec/<business\|technical>/<category>/<domain>-*.md` | Domain-level specification change |
+| `.workspace/spec/<business\|technical>/<category>/<domain>-*.md` | Domain-level specification or modeling change |
 
 Do not put technical details in `product-guide.md`. Do not put product behavior in the Technical Brief.
 
@@ -77,11 +78,11 @@ Forbidden in `spec/`: `index.md`, `README.md`, `map.md`, per-domain folders, and
 - Requires explicit approval for scope changes that contradict existing domain specs
 - After functional changes, ensure `.workspace/spec/` stays aligned
 
-## brief/technical/engineering-modeling.md
+## Domain modeling in spec
 
-- Modify only for **domain modeling** changes
-- Keep section structure from **sdd-idea** STANDARDS
-- No specific technologies, API contracts, or user journeys
+- Domain boundaries, aggregates, ubiquitous language, and DDD structure live in `.workspace/spec/`, not in the Brief
+- For modeling-only changes, update the relevant `*-domain.md`, `*-relations.md`, and related spec files per **sdd-spec** STANDARDS
+- If **Business Modeling** in `engineering-decisions.md` must change, recommend `sdd-studio configure` and then reconcile spec files
 
 ## One question per document
 
@@ -105,14 +106,14 @@ Do not move business rules to `*-ui.md`. Do not put UI states in `*-flows.md`.
 | Engineering principles change | Recommend `sdd-studio configure` (`engineering-principles.md`) |
 | Engineering decisions change | Recommend `sdd-studio configure` (`engineering-decisions.md`); may require path updates in `*-api.md` and `*-architecture.md` |
 | Engineering conventions change | Recommend `sdd-studio configure` (`engineering-conventions.md`) |
-| Modeling change | `brief/technical/engineering-modeling.md` |
+| Domain modeling or boundary change | `*-domain.md`, `*-relations.md`, and related spec files; recommend **sdd-spec** for new domains |
 | Technical stack change | Recommend **sdd-technical** (`engineering-stack.md`) |
 | New domain | 12 domain files (7 business + 5 technical) |
 | New capability | `*-capabilities.md`, possibly `*-flows.md`, `*-api.md` |
 | Rule change | `*-rules.md`; verify `*-flows.md`, `*-testing.md` |
 | API change | `*-api.md` per **sdd-spec** + `engineering-stack.md` (Backend + API); verify `*-capabilities.md`, `*-security.md` |
 | UI change | `*-ui.md` for interface only |
-| Architecture change | `*-architecture.md` per **sdd-spec** + `engineering-decisions.md` Project Organization; verify `engineering-modeling.md` |
+| Architecture change | `*-architecture.md` per **sdd-spec** + `engineering-decisions.md` Project Organization |
 | Repository / layout change | Recommend `sdd-studio configure` (`engineering-decisions.md`); then update paths in all `*-api.md` and `*-architecture.md` |
 | Database change | `*-database.md`; verify `engineering-stack.md` (Database section) |
 | New relationship | `*-relations.md` in both affected domains |

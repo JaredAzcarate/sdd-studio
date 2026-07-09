@@ -28,12 +28,13 @@ Before planning, read:
 
 1. Read `.workspace/brief/business/product-principles.md`.
 2. Read `.workspace/brief/business/product-guide.md`.
-3. Read `.workspace/brief/technical/engineering-decisions.md`, `engineering-modeling.md`, and `engineering-stack.md`.
-4. Read all of `.workspace/spec/business/` and `.workspace/spec/technical/`.
-5. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
-6. Verify substantial spec (domains with 12 files each).
-7. If critical `TODO:` items exist, stop and suggest **sdd-spec** or **sdd-review**.
-8. Inventory existing `.workspace/workflow/`.
+3. Read `.workspace/brief/technical/engineering-decisions.md` (including **Business Modeling**), `engineering-frontend-patterns.md`, `engineering-backend-patterns.md`, `engineering-contribution-patterns.md`, and `engineering-stack.md`.
+4. If `.workspace/workflow/workflow-config.md` exists, read it for methodology and task conventions.
+5. Read all of `.workspace/spec/business/` and `.workspace/spec/technical/`.
+6. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
+7. Verify substantial spec (domains with 12 files each).
+8. If critical `TODO:` items exist, stop and suggest **sdd-spec** or **sdd-review**.
+9. Inventory existing `.workspace/workflow/`.
 
 ## Flow
 
@@ -41,7 +42,8 @@ Before planning, read:
 
 From brief/ and spec/, extract:
 
-- Technical constraints (stack from `engineering-stack.md`, architecture and organization from `engineering-decisions.md`, modeling from `engineering-modeling.md`)
+- Technical constraints (stack from `engineering-stack.md`, architecture and organization from `engineering-decisions.md`, cross-cutting patterns from `engineering-*-patterns.md`)
+- Domain model and boundaries from `.workspace/spec/business/` and `.workspace/spec/technical/` (owned by **sdd-spec**)
 - Product constraints (user journeys and experiences from `brief/business/product-guide.md`)
 - Domains and dependencies (`*-relations.md`)
 - Priority capabilities and flows

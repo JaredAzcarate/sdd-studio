@@ -31,7 +31,7 @@ Before editing, read:
 
 1. Read `.workspace/brief/business/product-principles.md`.
 2. Read `.workspace/brief/business/product-guide.md`.
-3. Read `.workspace/brief/technical/engineering-decisions.md`, `engineering-modeling.md`, and `engineering-stack.md`.
+3. Read `.workspace/brief/technical/engineering-decisions.md`, `engineering-frontend-patterns.md`, `engineering-backend-patterns.md`, `engineering-contribution-patterns.md`, and `engineering-stack.md`.
 4. Resolve `<resolved-code-root>` and domain folder pattern from `engineering-decisions.md` Project Organization (for any technical spec edit).
 5. Read all of `.workspace/spec/business/` and `.workspace/spec/technical/`.
 6. Read [STANDARDS.md](STANDARDS.md), [EXAMPLES.md](EXAMPLES.md), and `../sdd-spec/STANDARDS.md` when API or architecture files are in scope.
@@ -71,10 +71,12 @@ Follow [STANDARDS.md](STANDARDS.md):
 
 - Functional or user-facing changes → `.workspace/brief/business/product-guide.md` (journey narrative)
 - Conceptual changes → `.workspace/brief/business/product-principles.md`
-- Technical context changes → `.workspace/brief/technical/engineering-modeling.md` (or recommend `sdd-studio configure` / **sdd-technical** for other engineering files)
-- Domain changes → files under `.workspace/spec/business/` and `.workspace/spec/technical/`
+- Engineering principles, decisions, conventions, or patterns → recommend `sdd-studio configure` (do not edit those files here)
+- Stack or technology changes → recommend **sdd-technical** (`engineering-stack.md`)
+- Domain modeling, boundaries, aggregates, or domain structure → `.workspace/spec/business/` and `.workspace/spec/technical/` (use **sdd-spec** STANDARDS; recommend **sdd-spec** for large domain additions)
+- Domain specification changes → files under `.workspace/spec/business/` and `.workspace/spec/technical/`
 - Keep `<domain>-<category>.md` naming and section templates from **sdd-spec** STANDARDS
-- For `*-api.md` and `*-architecture.md`: use paths from `engineering-decisions.md` (Project Organization) and format from `engineering-stack.md` (Backend + API)
+- For `*-api.md` and `*-architecture.md`: use paths from `engineering-decisions.md` (Project Organization), patterns from `engineering-*-patterns.md`, and format from `engineering-stack.md` (Backend + API)
 - When adding a domain: create all 12 files (7 business + 5 technical)
 - When removing a domain: delete all 12 files
 - Propagate changes to `relations`, `rules`, `api`, `ui`, `architecture`, `database` as needed
@@ -92,7 +94,7 @@ Fix errors and re-run until `OK`.
 
 ```
 - [ ] STANDARDS.md, EXAMPLES.md, and sdd-spec STANDARDS (if technical spec) read
-- [ ] engineering-decisions.md and engineering-stack.md consulted for api/architecture edits
+- [ ] engineering-decisions.md, patterns, and engineering-stack.md consulted for api/architecture edits
 - [ ] brief/ and spec/ reviewed
 - [ ] Impact documented and confirmed if applicable
 - [ ] Only brief/ and/or spec/ modified
@@ -107,3 +109,4 @@ Fix errors and re-run until `OK`.
 3. Resolved and open inconsistencies
 4. If replanning is needed: **sdd-plan**
 5. If Brief discovery is needed: **sdd-idea**
+6. If domain modeling needs a full pass: **sdd-spec**
