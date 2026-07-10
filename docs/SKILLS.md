@@ -10,7 +10,7 @@ Idea → Brief → Specification → Planning → Implementation → Code
 
 Las skills cubren las etapas de Idea, Brief, Specification y Planning. La implementación la haces tú (o tu agente de desarrollo) siguiendo lo que quedó escrito en `.workspace/spec/` y `.workspace/workflow/`.
 
-Hoy existen **seis skills**, idénticas en los tres asistentes empaquetados (Cursor, Claude y Codex). No hay una skill `sdd-studio`: lo que hace el paquete CLI (init, configure, migrate, sync) se ejecuta en la terminal o en la TUI, no como skill de chat.
+Hoy existen **siete skills**, idénticas en los tres asistentes empaquetados (Cursor, Claude y Codex). No hay una skill `sdd-studio`: lo que hace el paquete CLI (init, configure, migrate, sync) se ejecuta en la terminal o en la TUI, no como skill de chat.
 
 ---
 
@@ -27,7 +27,7 @@ Tras `sdd-studio init` (o la opción **Create brief scaffold** en la TUI), las s
 En el chat, invócalas de forma explícita:
 
 - Escribe el nombre de la skill: **sdd-idea**, **sdd-spec**, etc.
-- O usa el comando slash si tu herramienta lo soporta: `/sdd-idea`, `/sdd-spec`, `/sdd-generate`, `/sdd-technical`, `/sdd-plan`, `/sdd-review`
+- O usa el comando slash si tu herramienta lo soporta: `/sdd-idea`, `/sdd-spec`, `/sdd-generate`, `/sdd-technical`, `/sdd-find-skills`, `/sdd-plan`, `/sdd-review`
 
 Todas llevan `disable-model-invocation: true`, lo que significa que no se activan solas: tú decides cuándo arrancar cada una. Eso evita que el asistente escriba spec o planificación sin que lo hayas pedido.
 
@@ -101,7 +101,27 @@ Si alguno falta o sigue siendo un stub vacío, **se detiene** y pide completar c
 
 **Qué no toca:** los archivos de entrada del brief técnico ni `.workspace/spec/`.
 
-**Siguiente paso típico:** crear el scaffold de spec (TUI o `init --spec`) → **sdd-spec**.
+**Siguiente paso típico:** opcional **sdd-find-skills** (skills de implementación del ecosistema abierto) → crear el scaffold de spec (TUI o `init --spec`) → **sdd-spec**.
+
+---
+
+## sdd-find-skills — Descubrir skills de implementación (opcional)
+
+Lee el Engineering Brief confirmado y `engineering-stack.md`, extrae señales del **stack** (tecnologías elegidas) y de las **estrategias** (decisiones y patrones de configure), y busca skills en el ecosistema abierto (`npx skills`, https://skills.sh/).
+
+**No usa un catálogo fijo en SDD Studio.** Cada recomendación se deriva del brief del proyecto y se valida con criterios de calidad (instalaciones, fuente, ajuste al trigger).
+
+**Qué lee:** `manifest.yaml` y todos los archivos bajo `brief/technical/<current>/`, especialmente `engineering-stack.md`.
+
+**Qué escribe:** nada en `.workspace/`. Opcionalmente instala skills aprobadas con `npx skills add ... -g -y`.
+
+**Presentación:** tabla con columnas `Trigger type` (Stack o Strategy), trigger, skill sugerida, instalaciones, fuente, comando de install y estado. El usuario puede excluir filas antes de instalar.
+
+**Qué no toca:** brief, spec, workflow.
+
+**Siguiente paso típico:** **sdd-spec** o continuar implementación con las skills instaladas.
+
+**Cuándo omitirla:** si ya usas tus propias skills o agentes.
 
 ---
 
@@ -181,7 +201,7 @@ Deriva tareas (`TASK-001`, …) desde capacidades y flujos de la spec. Valida co
 Proyecto nuevo, sin código (o sin código relevante que analizar):
 
 ```text
-configure → sdd-idea → sdd-technical → [spec scaffold] → sdd-spec → [configure-workflow] → sdd-plan
+configure → sdd-idea → sdd-technical → [sdd-find-skills] → [spec scaffold] → sdd-spec → [configure-workflow] → sdd-plan
 ```
 
 Puedes invertir el inicio: **sdd-idea** antes de configure. Cuando el producto esté claro, completas el Engineering Brief con `sdd-studio configure`, sigues con **sdd-technical**, y el resto del camino igual.
@@ -235,7 +255,8 @@ flowchart LR
 | Skill | Cuándo usarla | Lee principalmente | Escribe principalmente | Siguiente paso |
 | ----- | ------------- | ------------------ | ---------------------- | -------------- |
 | **sdd-idea** | Greenfield; definir producto por conversación | `brief/` (contexto) | `brief/business/` | configure → sdd-technical |
-| **sdd-technical** | Engineering Brief completo; elegir stack | `brief/technical/` (6 archivos de configure) | `engineering-stack.md` | spec scaffold → sdd-spec |
+| **sdd-technical** | Engineering Brief completo; elegir stack | `brief/technical/` (6 archivos de configure) | `engineering-stack.md` | sdd-find-skills (opc.) → spec scaffold → sdd-spec |
+| **sdd-find-skills** | Stack confirmado; buscar skills de implementación | `brief/technical/` + `engineering-stack.md` | — (instala skills externas con aprobación) | sdd-spec o implementación |
 | **sdd-spec** | Brief listo; generar especificación por dominios | Todo `brief/` | `spec/business/` + `spec/technical/` | configure-workflow → sdd-plan |
 | **sdd-generate** | Brownfield; código existente sin spec o desalineada | Código + `brief/` + `spec/` | `brief/` + `spec/` (con aprobación) | sdd-review → sdd-plan |
 | **sdd-review** | Cambios, inconsistencias, validación | `brief/` + `spec/` | `brief/` + `spec/` (acotado) | sdd-plan o implementación |

@@ -72,6 +72,7 @@ const CURSOR_PATHS = [
   ".cursor/rules/sdd-studio.mdc",
   ".cursor/skills/sdd-idea/SKILL.md",
   ".cursor/skills/sdd-technical/SKILL.md",
+  ".cursor/skills/sdd-find-skills/SKILL.md",
   ".cursor/skills/sdd-generate/SKILL.md",
   ".cursor/skills/sdd-spec/SKILL.md",
   ".cursor/skills/sdd-review/SKILL.md",

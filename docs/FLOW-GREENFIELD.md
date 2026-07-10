@@ -15,7 +15,7 @@ Fuente de verdad del camino feliz para proyectos **greenfield** (sin código exi
 ### Orden canónico de skills
 
 ```text
-configure → sdd-idea → sdd-technical → sdd-spec → [workflow] → sdd-plan
+configure → sdd-idea → sdd-technical → [sdd-find-skills] → sdd-spec → [workflow] → sdd-plan
 ```
 
 **Camino flexible:** puedes empezar por **sdd-idea**. Cuando el producto esté claro, ejecuta **configure** y luego **sdd-technical**.
@@ -123,7 +123,27 @@ Preguntas por superficie (web, mobile, backend, DB, auth, …) → confirmación
 
 - `brief/technical/<current>/engineering-stack.md`
 
+**Next step (opcional):** **sdd-find-skills** — descubrir e instalar skills de implementación del ecosistema abierto según stack y estrategias del Brief. Omitir si ya usas tus propias skills o agentes.
+
 **Next step:** **sdd-spec**
+
+---
+
+## 6b. Skills de implementación — sdd-find-skills (opcional)
+
+Lee `manifest.yaml` y el Engineering Brief técnico confirmado (`engineering-stack.md` + decisiones y patrones de configure).
+
+**No modifica** `.workspace/`. Busca skills en el ecosistema abierto (`npx skills`, https://skills.sh/) — **sin catálogo fijo** en SDD Studio.
+
+**Flujo:**
+
+1. Extrae señales del **stack** (`**Selected:**` en `engineering-stack.md`) y de **estrategias** (decisiones y patrones).
+2. Busca y valida skills por señal (instalaciones, fuente, ajuste).
+3. Presenta tabla con columnas `Trigger type` (Stack o Strategy), trigger, skill sugerida, installs, source, install command, status.
+4. El usuario puede excluir filas; confirma si desea instalar.
+5. Instala con `npx skills add <owner/repo@skill> -g -y` solo tras aprobación explícita.
+
+**Next step:** **sdd-spec** o implementación con las skills instaladas.
 
 ---
 
@@ -175,6 +195,7 @@ Propuesta → confirmación → genera:
 | Skill | Cuándo |
 | ----- | ------ |
 | **sdd-review** | Opcional; validar cambios contra Brief o spec |
+| **sdd-find-skills** | Opcional; tras stack confirmado — skills de implementación del ecosistema abierto |
 | **sdd-generate** | Brownfield — ver `FLOW-BROWNFIELD.md` |
 
 ---
@@ -186,8 +207,10 @@ flowchart LR
   INIT[Foundation] --> CFG[Configure Engineering]
   CFG --> IDEA[sdd-idea]
   IDEA --> TECH[sdd-technical]
-  SCAFFOLD[Spec scaffold] --> SPEC[sdd-spec]
-  TECH --> SPEC
+  TECH --> FIND{sdd-find-skills?}
+  FIND -->|Opcional| SPEC[sdd-spec]
+  FIND -->|Omitir| SPEC
+  SCAFFOLD[Spec scaffold] --> SPEC
   SPEC --> WF{Workflow?}
   WF -->|SDD Studio| CW[configure-workflow]
   WF -->|Externo| PLAN[sdd-plan]

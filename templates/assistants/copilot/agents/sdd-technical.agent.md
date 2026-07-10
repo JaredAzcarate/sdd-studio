@@ -193,4 +193,5 @@ After writing the file:
 2. Table of areas and **user-selected** technologies
 3. Areas skipped because the Brief does not require them
 4. Contradictions found (if any)
-5. Next step: **sdd-spec** (or **sdd-review** if the user wants to validate changes first)
+5. Optional: **sdd-find-skills** to discover and install implementation skills from the open ecosystem based on the confirmed stack and engineering strategies (skip if you already use your own skills or agents)
+6. Next step: **sdd-spec** (or **sdd-review** if the user wants to validate changes first)

@@ -27,6 +27,9 @@ describe("CursorAssistantStrategy", () => {
     expect(
       existsSync(join(tempDir, ".cursor/skills/sdd-technical/SKILL.md")),
     ).toBe(true);
+    expect(
+      existsSync(join(tempDir, ".cursor/skills/sdd-find-skills/SKILL.md")),
+    ).toBe(true);
     expect(existsSync(join(tempDir, ".cursor/skills/sdd-generate/SKILL.md"))).toBe(
       true,
     );

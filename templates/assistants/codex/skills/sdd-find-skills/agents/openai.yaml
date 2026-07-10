@@ -1,0 +1,3 @@
+display_name: SDD Find Skills
+short_description: Discover and install implementation skills from the open ecosystem based on the Engineering Brief and stack.
+default_prompt: Run the sdd-find-skills skill to find and optionally install implementation skills based on the project's Technical Brief and engineering-stack.md.

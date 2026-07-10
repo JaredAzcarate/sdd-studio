@@ -181,6 +181,7 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
     └── skills/
         ├── sdd-idea/
         ├── sdd-technical/
+        ├── sdd-find-skills/
         ├── sdd-generate/
         ├── sdd-spec/
         ├── sdd-review/
@@ -196,6 +197,7 @@ If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist wi
     ├── commands/
     │   ├── sdd-idea.md
     │   ├── sdd-technical.md
+    │   ├── sdd-find-skills.md
     │   ├── sdd-generate.md
     │   ├── sdd-spec.md
     │   ├── sdd-review.md
@@ -218,6 +220,7 @@ Invoke with `/sdd-idea`, `/sdd-spec`, etc.
     ├── agents/
     │   ├── sdd-idea.agent.md
     │   ├── sdd-technical.agent.md
+    │   ├── sdd-find-skills.agent.md
     │   ├── sdd-generate.agent.md
     │   ├── sdd-spec.agent.md
     │   ├── sdd-review.agent.md
@@ -242,10 +245,11 @@ See [FLOW-GREENFIELD.md](./FLOW-GREENFIELD.md) for the full greenfield path (TUI
 
 | Step | Skill / command | Purpose |
 | ---- | ----------------- | ------- |
-| 0 | `sdd-studio init` or TUI *Create brief scaffold* | Brief stubs + assistant skills |
+| 0 | `sdd-studio init` o TUI *Create brief scaffold* | Brief stubs + assistant skills |
 | 1 | `sdd-studio configure` | Engineering Brief (principles, decisions, conventions, patterns) |
 | 2 | **sdd-idea** | Business Brief (`product-principles.md`, `product-guide.md`) |
 | 3 | **sdd-technical** | Interactive stack selection → `engineering-stack.md` |
+| 3b | **sdd-find-skills** *(opcional)* | Discover and install implementation skills from open ecosystem |
 | 4 | TUI *Create spec scaffold* or `init --spec` | Empty `.workspace/spec/` folders |
 | 5 | **sdd-spec** | Generate domain files under `spec/` |
 | 6 | `sdd-studio configure-workflow` | Workflow methodology and task conventions |
