@@ -8,9 +8,9 @@ export function formatMigrateResult(
 ): string {
   if (result.alreadyMigrated) {
     return [
-      "SDD workspace already uses the Brief / Specification structure.",
+      "SDD workspace already uses versioned Brief / Specification structure.",
       "",
-      `Marker: ${SDD_WORKSPACE_DIR}/brief/technical/engineering-principles.md`,
+      `Manifest: ${SDD_WORKSPACE_DIR}/brief/manifest.yaml`,
     ].join("\n");
   }
 
@@ -22,8 +22,9 @@ export function formatMigrateResult(
     "SDD workspace migrated successfully.",
     "",
     "New structure:",
-    `  ${SDD_WORKSPACE_DIR}/brief/business/`,
-    `  ${SDD_WORKSPACE_DIR}/brief/technical/`,
+    `  ${SDD_WORKSPACE_DIR}/brief/manifest.yaml`,
+    `  ${SDD_WORKSPACE_DIR}/brief/business/${result.briefVersion ?? "0.1.0"}/`,
+    `  ${SDD_WORKSPACE_DIR}/brief/technical/${result.briefVersion ?? "0.1.0"}/`,
     `  ${SDD_WORKSPACE_DIR}/spec/business/`,
     `  ${SDD_WORKSPACE_DIR}/spec/technical/`,
     "",

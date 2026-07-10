@@ -19,9 +19,10 @@ Each stage answers a different question.
 
 | Location | Question |
 | -------- | -------- |
-| `.workspace/brief/business/product-principles.md` | What conceptual principles is the product built on? |
-| `.workspace/brief/business/product-guide.md` | How does the product work for a user? |
-| `.workspace/brief/technical/engineering-principles.md` | What engineering principles guide the product? |
+| `.workspace/brief/manifest.yaml` | Which semver version of each brief lane is active or in draft? |
+| `.workspace/brief/business/<semver>/product-principles.md` | What conceptual principles is the product built on? |
+| `.workspace/brief/business/<semver>/product-guide.md` | How does the product work for a user? |
+| `.workspace/brief/technical/<semver>/engineering-principles.md` | What engineering principles guide the product? |
 | `.workspace/brief/technical/engineering-decisions.md` | What architectural decisions have been made? |
 | `.workspace/brief/technical/engineering-conventions.md` | What development conventions apply? |
 | `.workspace/brief/technical/engineering-frontend-patterns.md` | How should frontend features behave (data flow, filters, loading, notifications)? |
@@ -34,8 +35,8 @@ Each stage answers a different question.
 
 ## Entry points
 
-- Read `.workspace/brief/business/product-principles.md` for durable conceptual foundations.
-- Read `.workspace/brief/business/product-guide.md` for the complete user journey (narrative, non-technical).
+- Read `.workspace/brief/manifest.yaml` and resolve `business.current` / `technical.current` (or `technical.target` during refactor).
+- Read versioned business brief for product foundations and guide.
 - Read `.workspace/brief/technical/` for engineering principles, decisions, conventions, patterns, and stack.
 - Read `.workspace/spec/business/` and `.workspace/spec/technical/` for structured specification.
 - Never mix principles into journeys, technical details into `product-guide.md`, or user-facing content into the Technical Brief.

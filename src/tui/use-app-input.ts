@@ -25,6 +25,7 @@ import {
   ENGINEERING_PATTERNS_ITEMS,
   ENGINEERING_SECTION_ITEMS,
   WORKFLOW_SECTION_ITEMS,
+  getVisibleBrownfieldMenuItems,
   getVisibleMainMenuItems,
   PROJECT_TYPE_ITEMS,
 } from "./data/menu-items.js";
@@ -56,6 +57,7 @@ export type EngineeringSession = {
   customNotes: EngineeringCustomNotes;
   customEntry: { questionId: string; text: string } | null;
   saving: boolean;
+  workspaceTechnicalDir: string;
 };
 
 export type WorkflowSession = {
@@ -74,8 +76,12 @@ export type AppInputActions = {
   goBack: () => void;
   onFinish: (result: TuiExitResult) => void;
   openEngineeringDashboard: () => Promise<void>;
+  openRefactorEngineeringDashboard: () => Promise<void>;
   openWorkflowDashboard: () => Promise<void>;
   runMigrate: () => Promise<void>;
+  runPromoteTechnical: () => Promise<void>;
+  finalizeRefactorEngineering: () => Promise<void>;
+  onRefactorSectionSaved: (sectionId: EngineeringSectionId) => void;
   runSync: (assistantId: AssistantId) => Promise<void>;
   runInit: (options: {
     assistantId: AssistantId;
@@ -85,6 +91,7 @@ export type AppInputActions = {
   runSpecScaffold: () => Promise<void>;
   runWorkflowScaffold: () => Promise<boolean>;
   setAssistant: (assistant: AssistantId) => void;
+  setProjectMode: (mode: AppState["projectMode"]) => void;
   setEngineeringAnswers: (answers: AppState["engineeringAnswers"]) => void;
   setEngineeringCustomNotes: (notes: EngineeringCustomNotes) => void;
   setEngineeringSession: (session: EngineeringSession | null) => void;
@@ -153,12 +160,36 @@ function cleanupAnswersAfterQuestion(
   return { answers: nextAnswers, customNotes: nextCustomNotes };
 }
 
+function isRefactorTargetMode(state: AppState): boolean {
+  return (
+    state.projectMode === "brownfield" && state.engineeringPointer === "target"
+  );
+}
+
+function resolveEngineeringWriteDir(
+  state: AppState,
+  engineeringSession: EngineeringSession | null,
+): string {
+  if (engineeringSession?.workspaceTechnicalDir) {
+    return engineeringSession.workspaceTechnicalDir;
+  }
+
+  if (state.engineeringBriefDir) {
+    return state.engineeringBriefDir;
+  }
+
+  throw new Error(
+    "Engineering brief directory is not resolved. Re-open Configure Engineering.",
+  );
+}
+
 function saveEngineeringSection(
   engineeringSession: EngineeringSession,
   nextAnswers: EngineeringConfigAnswers,
   nextCustomNotes: EngineeringCustomNotes,
-  targetDir: string,
+  workspaceTechnicalDir: string,
   actions: AppInputActions,
+  state: AppState,
 ): void {
   actions.setEngineeringSession({
     ...engineeringSession,
@@ -169,12 +200,7 @@ function saveEngineeringSection(
   });
 
   void writeEngineeringSection({
-    workspaceTechnicalDir: join(
-      targetDir,
-      SDD_WORKSPACE_DIR,
-      "brief",
-      "technical",
-    ),
+    workspaceTechnicalDir,
     sectionId: engineeringSession.sectionId,
     answers: nextAnswers,
     customNotes: nextCustomNotes,
@@ -182,6 +208,12 @@ function saveEngineeringSection(
     actions.setEngineeringAnswers(nextAnswers);
     actions.setEngineeringCustomNotes(nextCustomNotes);
     actions.setEngineeringSession(null);
+
+    if (isRefactorTargetMode(state)) {
+      actions.onRefactorSectionSaved(engineeringSession.sectionId);
+      actions.navigate({ name: "engineering-refactor-prompt" });
+      return;
+    }
 
     if (countCompletedSections(nextAnswers) === ENGINEERING_LEAF_SECTION_COUNT) {
       actions.navigate({ name: "engineering-summary" });
@@ -198,8 +230,9 @@ function advanceEngineeringAnswer(
   questionId: string,
   answerId: string,
   nextCustomNotes: EngineeringCustomNotes,
-  targetDir: string,
+  workspaceTechnicalDir: string,
   actions: AppInputActions,
+  state: AppState,
 ): void {
   const nextAnswers = {
     ...engineeringSession.answers,
@@ -227,6 +260,7 @@ function advanceEngineeringAnswer(
       customNotes: cleanedCustomNotes,
       customEntry: null,
       saving: false,
+      workspaceTechnicalDir: engineeringSession.workspaceTechnicalDir,
     });
     return;
   }
@@ -235,8 +269,9 @@ function advanceEngineeringAnswer(
     engineeringSession,
     cleanedAnswers,
     cleanedCustomNotes,
-    targetDir,
+    workspaceTechnicalDir,
     actions,
+    state,
   );
 }
 
@@ -396,16 +431,62 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
       }
 
       if (selected.id === "greenfield") {
+        actions.setProjectMode("greenfield");
         actions.navigate({ name: "main-menu" });
         return;
       }
-      actions.navigate({ name: "brownfield-notice" });
+      actions.setProjectMode("brownfield");
+      actions.navigate({ name: "brownfield-main-menu" });
       return;
     }
 
-    if (screen.name === "brownfield-notice") {
-      if (key.return || key.escape) {
-        actions.navigate({ name: "project-type" });
+    if (screen.name === "brownfield-main-menu") {
+      const brownfieldMenuItems = getVisibleBrownfieldMenuItems();
+      const selected = brownfieldMenuItems[selectedIndex];
+      if (key.upArrow) {
+        setSelectedIndex(
+          (current) =>
+            (current - 1 + brownfieldMenuItems.length) %
+            brownfieldMenuItems.length,
+        );
+        return;
+      }
+      if (key.downArrow) {
+        setSelectedIndex(
+          (current) => (current + 1) % brownfieldMenuItems.length,
+        );
+        return;
+      }
+      if (key.escape) {
+        actions.onFinish({ type: "exit" });
+        return;
+      }
+      if (!key.return) {
+        return;
+      }
+
+      switch (selected.id) {
+        case "setup-foundation":
+          actions.navigate({ name: "setup-foundation-assistant" });
+          break;
+        case "create-spec-scaffold":
+          void actions.runSpecScaffold();
+          break;
+        case "configure-refactor-engineering":
+          void actions.openRefactorEngineeringDashboard();
+          break;
+        case "promote-technical":
+          void actions.runPromoteTechnical();
+          break;
+        case "migrate":
+          void actions.runMigrate();
+          break;
+        case "sync":
+          actions.navigate({ name: "sync-assistant" });
+          break;
+        case "exit":
+          actions.onFinish({ type: "exit" });
+          break;
       }
       return;
     }
@@ -498,9 +579,55 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
       return;
     }
 
+    if (screen.name === "engineering-refactor-prompt") {
+      const REFACTOR_PROMPT_ITEMS = [
+        { id: "continue", label: "Continue configuring" },
+        { id: "finalize", label: "Finalize refactor" },
+      ] as const;
+
+      if (key.upArrow) {
+        setSelectedIndex(
+          (current) =>
+            (current - 1 + REFACTOR_PROMPT_ITEMS.length) %
+            REFACTOR_PROMPT_ITEMS.length,
+        );
+        return;
+      }
+      if (key.downArrow) {
+        setSelectedIndex(
+          (current) => (current + 1) % REFACTOR_PROMPT_ITEMS.length,
+        );
+        return;
+      }
+      if (key.escape) {
+        actions.navigate({ name: "engineering-dashboard" });
+        return;
+      }
+      if (!key.return) {
+        return;
+      }
+
+      const selected = REFACTOR_PROMPT_ITEMS[selectedIndex];
+      if (selected.id === "continue") {
+        actions.navigate({ name: "engineering-dashboard" });
+        return;
+      }
+
+      void actions.finalizeRefactorEngineering();
+      return;
+    }
+
     if (screen.name === "engineering-summary") {
       if (key.escape) {
         actions.goBack();
+        return;
+      }
+      if (
+        state.projectMode === "brownfield" &&
+        state.engineeringPointer === "target" &&
+        input === "p"
+      ) {
+        void actions.runPromoteTechnical();
         return;
       }
       if (key.return) {
@@ -802,6 +929,23 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         actions.navigate({ name: "engineering-summary" });
         return;
       }
+      if (
+        state.projectMode === "brownfield" &&
+        state.engineeringPointer === "target" &&
+        completed === ENGINEERING_LEAF_SECTION_COUNT &&
+        input === "p"
+      ) {
+        void actions.runPromoteTechnical();
+        return;
+      }
+      if (
+        state.projectMode === "brownfield" &&
+        state.engineeringPointer === "target" &&
+        input === "f"
+      ) {
+        void actions.finalizeRefactorEngineering();
+        return;
+      }
       if (!key.return) {
         return;
       }
@@ -835,6 +979,10 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         state.engineeringAnswers,
       );
 
+      if (!state.engineeringBriefDir) {
+        return;
+      }
+
       actions.setEngineeringSession({
         sectionId,
         questionIndex,
@@ -844,6 +992,7 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         customNotes: { ...state.engineeringCustomNotes },
         customEntry: null,
         saving: false,
+        workspaceTechnicalDir: state.engineeringBriefDir,
       });
       actions.navigate({ name: "engineering-section", sectionId });
       return;
@@ -898,6 +1047,10 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         state.engineeringAnswers,
       );
 
+      if (!state.engineeringBriefDir) {
+        return;
+      }
+
       actions.setEngineeringSession({
         sectionId,
         questionIndex,
@@ -907,6 +1060,7 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         customNotes: { ...state.engineeringCustomNotes },
         customEntry: null,
         saving: false,
+        workspaceTechnicalDir: state.engineeringBriefDir,
       });
       actions.navigate({ name: "engineering-section", sectionId });
       return;
@@ -917,6 +1071,10 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         (item) => item.id === engineeringSession.sectionId,
       )!;
       const question = section.questions[engineeringSession.questionIndex];
+      const workspaceTechnicalDir = resolveEngineeringWriteDir(
+        state,
+        engineeringSession,
+      );
 
       if (engineeringSession.customEntry) {
         if (key.escape || key.leftArrow) {
@@ -958,8 +1116,9 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
             question.id,
             answerId,
             nextCustomNotes,
-            state.targetDir,
+            workspaceTechnicalDir,
             actions,
+            state,
           );
           return;
         }
@@ -1069,8 +1228,9 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
           question.id,
           formatMultiAnswer(engineeringSession.selectedOptionIds),
           engineeringSession.customNotes,
-          state.targetDir,
+          workspaceTechnicalDir,
           actions,
+          state,
         );
         return;
       }
@@ -1094,8 +1254,9 @@ export function useAppInput(context: AppInputContext): (input: string, key: Key)
         question.id,
         selectedOption.id,
         engineeringSession.customNotes,
-        state.targetDir,
+        workspaceTechnicalDir,
         actions,
+        state,
       );
       return;
     }

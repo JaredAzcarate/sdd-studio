@@ -75,7 +75,9 @@ Create or update `workflow/releases/release-NNN/` with exactly:
 - `release.md`
 - `tasks.md`
 - `reviews.md`
-- `decisions.md`
+- `release.md`
+- `tasks.md`
+- `reviews.md`
 
 No additional files.
 

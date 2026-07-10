@@ -13,12 +13,25 @@ Do not create:
 - tasks, releases, roadmap, milestones, or estimates in `spec/`
 - files at the top level of `spec/` (only `business/` and `technical/` allowed)
 
+## Brief path resolution (versioned)
+
+Read `.workspace/brief/manifest.yaml` and resolve paths from semver folders:
+
+| Pointer | Use when |
+| ------- | -------- |
+| `business.current` / `technical.current` | Default reads and greenfield configure |
+| `technical.target` | Brownfield refactor draft (when non-null) |
+
+Example: `brief/technical/<technical.current>/engineering-decisions.md`
+
+Legacy flat layout (`brief/technical/*.md` without manifest) must be migrated with `sdd-studio migrate` before using versioned resolution.
+
 ## Brief-driven technical conventions
 
-Before generating `technical/api/` or `technical/architecture/` files, read:
+Before generating `technical/api/` or `technical/architecture/` files, read (via manifest resolution):
 
-- `.workspace/brief/technical/engineering-decisions.md` — **Project Organization** (resolve product code root and domain folder pattern)
-- `.workspace/brief/technical/engineering-stack.md` — **Backend**, **API**, and **Architecture Summary** (API surface and stack coherence)
+- `engineering-decisions.md` — **Project Organization** (resolve product code root and domain folder pattern)
+- `engineering-stack.md` — **Backend**, **API**, and **Architecture Summary** (API surface and stack coherence)
 
 | Principle | Rule |
 | --------- | ---- |
@@ -66,6 +79,8 @@ Domain discovery uses **Business Modeling** in `engineering-decisions.md`, not `
 
         events/
 
+        decisions/
+
     technical/
 
         api/
@@ -92,6 +107,7 @@ For each `<domain>` (kebab-case, lowercase):
 | `business/rules/` | `<domain>-rules.md` |
 | `business/security/` | `<domain>-security.md` |
 | `business/events/` | `<domain>-events.md` |
+| `business/decisions/` | `<domain>-decisions.md` |
 | `technical/api/` | `<domain>-api.md` |
 | `technical/ui/` | `<domain>-ui.md` |
 | `technical/testing/` | `<domain>-testing.md` |

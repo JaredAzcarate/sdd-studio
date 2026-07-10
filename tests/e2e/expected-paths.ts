@@ -1,12 +1,15 @@
+export const BRIEF_INITIAL_VERSION = "0.1.0";
+
 export const WORKSPACE_FOUNDATION_PATHS = [
-  ".workspace/brief/business/product-principles.md",
-  ".workspace/brief/business/product-guide.md",
-  ".workspace/brief/technical/engineering-principles.md",
-  ".workspace/brief/technical/engineering-decisions.md",
-  ".workspace/brief/technical/engineering-conventions.md",
-  ".workspace/brief/technical/engineering-frontend-patterns.md",
-  ".workspace/brief/technical/engineering-backend-patterns.md",
-  ".workspace/brief/technical/engineering-contribution-patterns.md",
+  ".workspace/brief/manifest.yaml",
+  `.workspace/brief/business/${BRIEF_INITIAL_VERSION}/product-principles.md`,
+  `.workspace/brief/business/${BRIEF_INITIAL_VERSION}/product-guide.md`,
+  `.workspace/brief/technical/${BRIEF_INITIAL_VERSION}/engineering-principles.md`,
+  `.workspace/brief/technical/${BRIEF_INITIAL_VERSION}/engineering-decisions.md`,
+  `.workspace/brief/technical/${BRIEF_INITIAL_VERSION}/engineering-conventions.md`,
+  `.workspace/brief/technical/${BRIEF_INITIAL_VERSION}/engineering-frontend-patterns.md`,
+  `.workspace/brief/technical/${BRIEF_INITIAL_VERSION}/engineering-backend-patterns.md`,
+  `.workspace/brief/technical/${BRIEF_INITIAL_VERSION}/engineering-contribution-patterns.md`,
 ] as const;
 
 export const WORKSPACE_SPEC_PATHS = [
@@ -17,6 +20,7 @@ export const WORKSPACE_SPEC_PATHS = [
   ".workspace/spec/business/rules/.gitkeep",
   ".workspace/spec/business/security/.gitkeep",
   ".workspace/spec/business/events/.gitkeep",
+  ".workspace/spec/business/decisions/.gitkeep",
   ".workspace/spec/technical/api/.gitkeep",
   ".workspace/spec/technical/ui/.gitkeep",
   ".workspace/spec/technical/testing/.gitkeep",
@@ -36,7 +40,6 @@ export const WORKFLOW_PATHS = [
   ".workspace/workflow/releases/release-001/release.md",
   ".workspace/workflow/releases/release-001/tasks.md",
   ".workspace/workflow/releases/release-001/reviews.md",
-  ".workspace/workflow/releases/release-001/decisions.md",
 ] as const;
 
 export const WORKSPACE_PATHS = [
@@ -89,6 +92,7 @@ export const NPM_PACK_REQUIRED_PATHS = [
   "package.json",
   "bin/sdd-studio.js",
   "dist/cli.js",
+  "templates/.workspace/brief/manifest.yaml",
   "templates/.workspace/brief/technical/engineering-principles.md",
   "templates/.workspace/brief/technical/engineering-frontend-patterns.md",
   "templates/.workspace/brief/technical/engineering-backend-patterns.md",

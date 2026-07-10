@@ -58,7 +58,6 @@ Each folder contains **exactly**:
 release.md
 tasks.md
 reviews.md
-decisions.md
 ```
 
 ### release.md
@@ -100,17 +99,6 @@ Each review includes:
 - reviewer
 - result
 - notes
-
-### decisions.md
-
-Each decision includes:
-
-- id (`DECISION-NNN`)
-- title
-- context
-- decision made
-- justification
-- impact
 
 ## Identifier convention
 

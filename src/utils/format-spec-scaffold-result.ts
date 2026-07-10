@@ -40,6 +40,6 @@ export function formatSpecScaffoldMissingWorkspace(): string[] {
   return [
     "No SDD workspace found.",
     "",
-    "Run **Create Business & Technical foundation** first (or `sdd-studio init`).",
+    "Run **Create brief scaffold** first (or `sdd-studio init`).",
   ];
 }

@@ -11,16 +11,19 @@ import { WORKFLOW_SECTIONS } from "../workflow-config/catalog/index.js";
 import { findPreviousVisibleQuestionIndex } from "../engineering-config/catalog/question-utils.js";
 import type { EngineeringSession, WorkflowSession } from "./use-app-input.js";
 
-export function getSectionTitle(screen: AppScreen): string {
+export function getSectionTitle(
+  screen: AppScreen,
+  projectMode: AppState["projectMode"] = "greenfield",
+): string {
   switch (screen.name) {
     case "project-type":
       return "Project Type";
-    case "brownfield-notice":
-      return "Brownfield";
+    case "brownfield-main-menu":
+      return "Brownfield Menu";
     case "main-menu":
       return "Greenfield Menu";
     case "setup-foundation-assistant":
-      return "Create Business & Technical foundation";
+      return "Create brief scaffold";
     case "sync-assistant":
       return "Sync Assistant Files";
     case "engineering-dashboard":
@@ -32,6 +35,8 @@ export function getSectionTitle(screen: AppScreen): string {
         ENGINEERING_SECTIONS.find((item) => item.id === screen.sectionId)
           ?.title ?? "Engineering"
       );
+    case "engineering-refactor-prompt":
+      return "Refactor Engineering";
     case "engineering-summary":
       return "Engineering Brief Complete";
     case "workflow-dashboard":
@@ -58,6 +63,8 @@ export function getFooterShortcuts(
   engineeringSession?: EngineeringSession | null,
   workflowAnswers: AppState["workflowAnswers"] = {},
   workflowSession?: WorkflowSession | null,
+  projectMode: AppState["projectMode"] = "greenfield",
+  engineeringPointer: AppState["engineeringPointer"] = "current",
 ): FooterShortcut[] {
   if (screen.name === "action-running") {
     return [];
@@ -79,8 +86,22 @@ export function getFooterShortcuts(
     ];
     if (completed === ENGINEERING_LEAF_SECTION_COUNT) {
       shortcuts.push({ keys: "s", label: "Summary" });
+      if (projectMode === "brownfield" && engineeringPointer === "target") {
+        shortcuts.push({ keys: "p", label: "Promote target" });
+      }
+    }
+    if (projectMode === "brownfield" && engineeringPointer === "target") {
+      shortcuts.push({ keys: "f", label: "Finalize refactor" });
     }
     return shortcuts;
+  }
+
+  if (screen.name === "engineering-refactor-prompt") {
+    return [
+      { keys: "↑↓", label: "Navigate" },
+      { keys: "Enter", label: "Select" },
+      { keys: "Esc", label: "Dashboard" },
+    ];
   }
 
   if (screen.name === "engineering-patterns-dashboard") {
@@ -136,10 +157,14 @@ export function getFooterShortcuts(
   }
 
   if (screen.name === "engineering-summary") {
-    return [
+    const shortcuts: FooterShortcut[] = [
       { keys: "Enter", label: "Main menu" },
       { keys: "Esc", label: "Dashboard" },
     ];
+    if (projectMode === "brownfield" && engineeringPointer === "target") {
+      shortcuts.unshift({ keys: "p", label: "Promote target" });
+    }
+    return shortcuts;
   }
 
   if (screen.name === "workflow-dashboard") {

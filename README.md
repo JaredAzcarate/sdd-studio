@@ -242,7 +242,7 @@ See [FLOW-GREENFIELD.md](./FLOW-GREENFIELD.md) for the full greenfield path (TUI
 
 | Step | Skill / command | Purpose |
 | ---- | ----------------- | ------- |
-| 0 | `sdd-studio init` or TUI *Create Business & Technical foundation* | Brief stubs + assistant skills |
+| 0 | `sdd-studio init` or TUI *Create brief scaffold* | Brief stubs + assistant skills |
 | 1 | `sdd-studio configure` | Engineering Brief (principles, decisions, conventions, patterns) |
 | 2 | **sdd-idea** | Business Brief (`product-principles.md`, `product-guide.md`) |
 | 3 | **sdd-technical** | Interactive stack selection → `engineering-stack.md` |

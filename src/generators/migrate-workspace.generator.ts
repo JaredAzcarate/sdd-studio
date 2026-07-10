@@ -4,10 +4,12 @@ import { join } from "node:path";
 import {
   SDD_WORKSPACE_DIR,
   SDD_WORKSPACE_LEGACY_MARKER_PATH,
-  SDD_WORKSPACE_MARKER_PATH,
 } from "../constants/sdd-workspace-path.js";
 import { copyTemplateFile } from "../core/file-system.js";
 import { resolveWorkspaceTemplatePath } from "../core/template-resolver.js";
+import { getManifestPath } from "../workspace/manifest.js";
+import { migrateFlatBriefToVersioned } from "../workspace/technical-version.js";
+import { hasSddWorkspace } from "../workspace/workspace-detection.js";
 
 export type MigrateWorkspaceOptions = {
   targetDir: string;
@@ -18,6 +20,8 @@ export type MigrateWorkspaceResult = {
   migratedPaths: string[];
   removedPaths: string[];
   alreadyMigrated: boolean;
+  manifestPath?: string;
+  briefVersion?: string;
 };
 
 const BUSINESS_SPEC_CATEGORIES = [
@@ -36,10 +40,10 @@ const ENGINEERING_BRIEF_FILES = [
   "brief/technical/engineering-principles.md",
   "brief/technical/engineering-decisions.md",
   "brief/technical/engineering-conventions.md",
+  "brief/technical/engineering-frontend-patterns.md",
+  "brief/technical/engineering-backend-patterns.md",
+  "brief/technical/engineering-contribution-patterns.md",
 ] as const;
-
-const ENGINEERING_MODELING_TEMPLATE =
-  "migrate/brief/technical/engineering-modeling.md";
 
 const STACK_FILES = [
   "frontend",
@@ -48,16 +52,6 @@ const STACK_FILES = [
   "infrastructure",
   "ai",
 ] as const;
-
-const DEVELOPMENT_SECTIONS = new Set([
-  "development model",
-  "workflow methodology",
-  "code organization",
-  "repository strategy",
-  "development conventions",
-]);
-
-const MODELING_SECTIONS = new Set(["architecture", "modeling"]);
 
 const STACK_SECTION_MAP: Record<string, string> = {
   frontend: "frontend",
@@ -126,27 +120,13 @@ async function writeBriefFromTemplate(
   templateRelativePath: string,
   destination: string,
   migratedPaths: string[],
-): Promise<string> {
+): Promise<void> {
   await copyTemplateFile(
     resolveWorkspaceTemplatePath(templateRelativePath),
     destination,
     { overwrite: true },
   );
   migratedPaths.push(destination);
-  return await readFile(destination, "utf8");
-}
-
-async function writeModelingFromTemplate(
-  destination: string,
-  migratedPaths: string[],
-): Promise<string> {
-  await copyTemplateFile(
-    resolveWorkspaceTemplatePath(ENGINEERING_MODELING_TEMPLATE),
-    destination,
-    { overwrite: true },
-  );
-  migratedPaths.push(destination);
-  return await readFile(destination, "utf8");
 }
 
 function appendSection(
@@ -169,32 +149,23 @@ async function writeEngineeringBriefTemplates(
   migratedPaths: string[],
 ): Promise<void> {
   for (const relativePath of ENGINEERING_BRIEF_FILES) {
-    await writeBriefFromTemplate(
-      relativePath,
-      join(workspaceDir, relativePath),
-      migratedPaths,
-    );
+    const destination = join(workspaceDir, relativePath);
+    if (!existsSync(destination)) {
+      await writeBriefFromTemplate(relativePath, destination, migratedPaths);
+    }
   }
 }
 
-async function buildEngineeringModelingMd(
-  sections: Map<string, string>,
-  destination: string,
+async function archiveEngineeringModeling(
+  workspaceDir: string,
+  content: string,
   migratedPaths: string[],
 ): Promise<void> {
-  const header = await writeModelingFromTemplate(destination, migratedPaths);
-  const bodyParts: string[] = [];
-
-  for (const title of sections.keys()) {
-    if (MODELING_SECTIONS.has(title)) {
-      appendSection(sections, title, bodyParts);
-    }
-  }
-
-  if (bodyParts.length > 0) {
-    const merged = `${header.trim()}\n\n${bodyParts.join("\n\n---\n\n")}\n`;
-    await writeFile(destination, merged, "utf8");
-  }
+  const archivedDir = join(workspaceDir, "brief/technical/.archived");
+  const destination = join(archivedDir, "engineering-modeling.md");
+  await ensureDir(archivedDir);
+  await writeFile(destination, content, "utf8");
+  migratedPaths.push(destination);
 }
 
 async function buildEngineeringStackMd(
@@ -239,15 +210,24 @@ async function migrateLegacyProjectMd(
   workspaceDir: string,
   projectContent: string,
   migratedPaths: string[],
+  removedPaths: string[],
 ): Promise<void> {
   const sections = parseMarkdownSections(projectContent);
-  const modelingPath = join(
-    workspaceDir,
-    "brief/technical/engineering-modeling.md",
-  );
-  const stackPath = join(workspaceDir, "brief/technical/engineering-stack.md");
+  const modelingParts: string[] = ["# Engineering Modeling (archived legacy)", ""];
 
-  await buildEngineeringModelingMd(sections, modelingPath, migratedPaths);
+  for (const title of ["architecture", "modeling"]) {
+    appendSection(sections, title, modelingParts);
+  }
+
+  if (modelingParts.length > 2) {
+    await archiveEngineeringModeling(
+      workspaceDir,
+      `${modelingParts.join("\n\n")}\n`,
+      migratedPaths,
+    );
+  }
+
+  const stackPath = join(workspaceDir, "brief/technical/engineering-stack.md");
   await buildEngineeringStackMd(
     sections,
     join(workspaceDir, "brief/technical/stack"),
@@ -262,30 +242,24 @@ async function migrateV05BriefLayout(
   removedPaths: string[],
 ): Promise<void> {
   const modelingSource = join(workspaceDir, "brief/technical/modeling.md");
-  const modelingDestination = join(
+  const legacyModeling = join(
     workspaceDir,
     "brief/technical/engineering-modeling.md",
   );
 
   if (existsSync(modelingSource)) {
-    if (!existsSync(modelingDestination)) {
-      await moveIfExists(modelingSource, modelingDestination, migratedPaths);
-    } else {
-      const legacyContent = await readFile(modelingSource, "utf8");
-      await writeFile(modelingDestination, legacyContent, "utf8");
-      migratedPaths.push(modelingDestination);
-      await rm(modelingSource);
-      removedPaths.push(modelingSource);
-    }
-  } else if (!existsSync(modelingDestination)) {
-    await writeModelingFromTemplate(modelingDestination, migratedPaths);
+    const content = await readFile(modelingSource, "utf8");
+    await archiveEngineeringModeling(workspaceDir, content, migratedPaths);
+    await rm(modelingSource);
+    removedPaths.push(modelingSource);
+  } else if (existsSync(legacyModeling)) {
+    const content = await readFile(legacyModeling, "utf8");
+    await archiveEngineeringModeling(workspaceDir, content, migratedPaths);
+    await rm(legacyModeling);
+    removedPaths.push(legacyModeling);
   }
 
-  for (const relativePath of [
-    "brief/technical/engineering-principles.md",
-    "brief/technical/engineering-decisions.md",
-    "brief/technical/engineering-conventions.md",
-  ] as const) {
+  for (const relativePath of ENGINEERING_BRIEF_FILES) {
     const destination = join(workspaceDir, relativePath);
     if (!existsSync(destination)) {
       await writeBriefFromTemplate(relativePath, destination, migratedPaths);
@@ -327,11 +301,14 @@ function hasLegacyV05Layout(workspaceDir: string): boolean {
   );
 }
 
+function hasVersionedBriefLayout(workspaceDir: string): boolean {
+  return existsSync(getManifestPath(workspaceDir));
+}
+
 export async function migrateWorkspace(
   options: MigrateWorkspaceOptions,
 ): Promise<MigrateWorkspaceResult> {
   const workspaceDir = join(options.targetDir, SDD_WORKSPACE_DIR);
-  const markerPath = join(options.targetDir, SDD_WORKSPACE_MARKER_PATH);
   const legacyMarkerPath = join(
     options.targetDir,
     SDD_WORKSPACE_LEGACY_MARKER_PATH,
@@ -339,19 +316,20 @@ export async function migrateWorkspace(
   const migratedPaths: string[] = [];
   const removedPaths: string[] = [];
 
-  if (existsSync(markerPath) && !hasLegacyV05Layout(workspaceDir)) {
+  if (hasVersionedBriefLayout(workspaceDir)) {
     return {
       workspaceDir,
       migratedPaths: [],
       removedPaths: [],
       alreadyMigrated: true,
+      manifestPath: getManifestPath(workspaceDir),
     };
   }
 
   if (
     !existsSync(legacyMarkerPath) &&
     !hasLegacyV05Layout(workspaceDir) &&
-    !existsSync(markerPath)
+    !hasSddWorkspace(options.targetDir)
   ) {
     throw new Error(
       "No legacy SDD workspace found. Run `sdd-studio init` to create a new project.",
@@ -391,7 +369,12 @@ export async function migrateWorkspace(
 
     const projectContent = await readFile(legacyMarkerPath, "utf8");
     await writeEngineeringBriefTemplates(workspaceDir, migratedPaths);
-    await migrateLegacyProjectMd(workspaceDir, projectContent, migratedPaths);
+    await migrateLegacyProjectMd(
+      workspaceDir,
+      projectContent,
+      migratedPaths,
+      removedPaths,
+    );
 
     await rm(legacyMarkerPath);
     removedPaths.push(legacyMarkerPath);
@@ -401,18 +384,24 @@ export async function migrateWorkspace(
     await migrateV05BriefLayout(workspaceDir, migratedPaths, removedPaths);
   }
 
-  if (!existsSync(markerPath)) {
+  if (!hasSddWorkspace(options.targetDir)) {
     await writeBriefFromTemplate(
       "brief/technical/engineering-principles.md",
-      markerPath,
+      join(workspaceDir, "brief/technical/engineering-principles.md"),
       migratedPaths,
     );
   }
+
+  const { manifestPath, version } = await migrateFlatBriefToVersioned(
+    workspaceDir,
+  );
 
   return {
     workspaceDir,
     migratedPaths,
     removedPaths,
     alreadyMigrated: false,
+    manifestPath,
+    briefVersion: version,
   };
 }

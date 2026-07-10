@@ -1,98 +1,102 @@
 # EXAMPLES — sdd-technical
 
-## Chat — turno 1 (intro + primera pregunta)
+## Chat — turno 1 (intro + `AskQuestion`)
+
+**Mensaje en chat:**
 
 ```markdown
 Basado en `.workspace/brief/technical`, voy a proponerte tecnologías, librerías e integraciones para definir el stack del proyecto.
 
 Veo **web + iOS/Android + desktop** con **máximo code sharing**, **App Router** y backend **integrado**. Empecemos por web.
-
-¿Qué te gustaría usar para desarrollo web?
-
-1. Next.js (Recommended) — App Router, SSR, React para compartir con mobile
-2. Remix — file routing, React, loaders/actions
-3. Nuxt — Vue; menos alineado si mobile será React/Expo
-
-Responde con el número o describe otra opción.
 ```
+
+**Luego `AskQuestion` (no repetir opciones en markdown):**
+
+- **title:** `Stack — Web`
+- **prompt:** `¿Qué te gustaría usar para desarrollo web?`
+- **options:**
+  - `Next.js (Recommended) — App Router, SSR, React para compartir con mobile`
+  - `Remix — file routing, React, loaders/actions`
+  - `Nuxt — Vue; menos alineado si mobile será React/Expo`
 
 ## Chat — turno 2 (mobile)
 
+**Chat:**
+
 ```markdown
 Confirmado: Web=Next.js
-
-¿Cómo quieres abordar mobile nativo (iOS/Android)? El Brief pide máximo code sharing.
-
-1. Expo (Recommended) — React Native, alinea con Next.js
-2. React Native sin Expo
-3. Capacitor — empaquetar la app web
-
-Responde con el número o describe otra opción.
 ```
+
+**`AskQuestion`:**
+
+- **title:** `Stack — Mobile`
+- **prompt:** `¿Cómo quieres abordar mobile nativo (iOS/Android)? El Brief pide máximo code sharing.`
+- **options:**
+  - `Expo (Recommended) — React Native, alinea con Next.js`
+  - `React Native sin Expo`
+  - `Capacitor — empaquetar la app web`
 
 ## Chat — turno 3 (desktop)
 
+**Chat:**
+
 ```markdown
 Confirmado: Web=Next.js, Mobile=Expo
-
-¿Qué prefieren para desktop?
-
-1. Tauri (Recommended) — binario ligero, reutiliza UI web
-2. Electron
-3. PWA / shell web mínimo
-
-Responde con el número o describe otra opción.
 ```
+
+**`AskQuestion`:**
+
+- **title:** `Stack — Desktop`
+- **prompt:** `¿Qué prefieren para desktop?`
+- **options:**
+  - `Tauri (Recommended) — binario ligero, reutiliza UI web`
+  - `Electron`
+  - `PWA / shell web mínimo`
 
 ## Chat — turno N (base de datos)
 
-```markdown
-¿Qué base de datos relacional usamos?
+**`AskQuestion`:**
 
-1. PostgreSQL (Recommended) — ACID, JSON, ecosistema amplio
-2. MySQL 8
-3. SQLite — single-node / dev
-
-Responde con el número o describe otra opción.
-```
+- **title:** `Stack — Database`
+- **prompt:** `¿Qué base de datos relacional usamos?`
+- **options:**
+  - `PostgreSQL (Recommended) — ACID, JSON, ecosistema amplio`
+  - `MySQL 8`
+  - `SQLite — single-node / dev`
 
 ## Chat — bloqueo (auditor)
 
-Explica el conflicto en lenguaje plano (2–4 frases), luego:
+**Chat** explica el conflicto en lenguaje plano (2–4 frases).
 
-```markdown
-¿Cómo quieren resolver el code sharing entre plataformas?
+**`AskQuestion`:**
 
-1. <enfoque viable A según Brief>
-2. <enfoque viable B>
-3. <enfoque viable C>
-
-Responde con el número o describe otra opción.
-```
+- **prompt:** `¿Cómo quieren resolver el code sharing entre plataformas?`
+- **options:** enfoques viables según el Brief (no tecnologías aún si el bloqueo es arquitectónico)
 
 ## Chat — resumen final
 
-Tabla área → selección, luego:
+**Chat:** tabla área → selección.
+
+**`AskQuestion`:**
+
+- **title:** `Stack — Aprobación`
+- **prompt:** `¿Apruebas este stack para escribir engineering-stack.md?`
+- **options:**
+  - `Sí, escribir engineering-stack.md`
+  - `Quiero edits`
+
+## Anti-ejemplo — tabla markdown (incorrecto)
 
 ```markdown
-¿Apruebas este stack para escribir engineering-stack.md?
+| Opción | Tecnología |
+| ------ | ---------- |
+| 1 | Next.js |
+| 2 | Remix |
 
-1. Sí, escribir engineering-stack.md
-2. Quiero edits
-
-Responde con el número.
+Responde con 1, 2, 3, 4 u Other.
 ```
 
-## Anti-ejemplo — tabla markdown ancha (incorrecto)
-
-```markdown
-| Opción | Tecnología | Pros | Cons |
-| ------ | ---------- | ---- | ---- |
-| 1 | Next.js | … | … |
-| 2 | Remix | … | … |
-```
-
-**Correcto:** intro breve + lista numerada compacta (3–4 opciones).
+**Correcto:** intro breve en chat + `AskQuestion` con opciones clicables.
 
 ## Anti-ejemplo — estilo arquitecto (incorrecto)
 
@@ -100,7 +104,7 @@ Responde con el número.
 Fase 3/18 — Frontend [Brief-locked]
 ```
 
-**Correcto:** intro de equipo + pregunta natural con opciones numeradas.
+**Correcto:** intro de equipo + `AskQuestion` con pregunta natural.
 
 ## Anti-ejemplo — opciones hardcodeadas
 
@@ -138,4 +142,4 @@ Next.js hosts the integrated backend and web UI. Expo and Tauri extend the produ
 
 ## Anti-ejemplo — escribir sin confirmación
 
-Writing `engineering-stack.md` without per-area answers and final approval question.
+Writing `engineering-stack.md` without per-area `AskQuestion` answers and final approval question.

@@ -1,5 +1,5 @@
 import { writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import {
   ENGINEERING_LEAF_SECTION_IDS,
   ENGINEERING_SECTIONS,
@@ -97,7 +97,7 @@ export async function writeEngineeringSection(
   const answers = options.answers ?? getDefaultEngineeringAnswers();
   const customNotes = options.customNotes ?? {};
   const fileName = OUTPUT_FILES[options.sectionId];
-  const filePath = join(options.workspaceTechnicalDir, fileName);
+  const filePath = resolve(options.workspaceTechnicalDir, fileName);
   const content = renderSectionDocument(
     options.sectionId,
     answers,

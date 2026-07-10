@@ -7,8 +7,8 @@ import type {
   WorkspaceModules,
 } from "../types/init-context.js";
 import { generateWorkspace } from "../generators/workspace.generator.js";
-import { join } from "node:path";
-import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
+import { resolveTechnicalBriefDirFromManifest } from "../workspace/brief-paths.js";
+import { readManifest } from "../workspace/manifest.js";
 
 export type InitWorkspaceOptions = {
   context: InitContextWithLabels;
@@ -44,12 +44,19 @@ export async function initWorkspace(
   let engineering: EngineeringConfig | undefined;
 
   if (context.engineering) {
+    const manifest = await readManifest(workspace.workspaceDir);
+
+    if (!manifest) {
+      throw new Error(
+        `Missing brief manifest in ${workspace.workspaceDir} after workspace generation.`,
+      );
+    }
+
     const engineeringResult = await writeEngineeringBrief({
-      workspaceTechnicalDir: join(
-        targetDir,
-        SDD_WORKSPACE_DIR,
-        "brief",
-        "technical",
+      workspaceTechnicalDir: resolveTechnicalBriefDirFromManifest(
+        workspace.workspaceDir,
+        "current",
+        manifest,
       ),
       answers: context.engineering.answers,
       customNotes: context.engineering.customNotes,

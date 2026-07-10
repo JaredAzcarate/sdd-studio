@@ -9,6 +9,7 @@ import {
   ALL_CURSOR_INIT_PATHS,
   ALL_CURSOR_INIT_WITH_SPEC_PATHS,
   ALL_CURSOR_INIT_WITH_WORKFLOW_PATHS,
+  BRIEF_INITIAL_VERSION,
   WORKFLOW_PATHS,
 } from "./expected-paths.js";
 
@@ -44,15 +45,24 @@ describe("cli init e2e", () => {
     }
 
     const engineeringPrinciplesMd = readFileSync(
-      join(tempDir, ".workspace/brief/technical/engineering-principles.md"),
+      join(
+        tempDir,
+        `.workspace/brief/technical/${BRIEF_INITIAL_VERSION}/engineering-principles.md`,
+      ),
       "utf8",
     );
     const productPrinciplesMd = readFileSync(
-      join(tempDir, ".workspace/brief/business/product-principles.md"),
+      join(
+        tempDir,
+        `.workspace/brief/business/${BRIEF_INITIAL_VERSION}/product-principles.md`,
+      ),
       "utf8",
     );
     const productGuideMd = readFileSync(
-      join(tempDir, ".workspace/brief/business/product-guide.md"),
+      join(
+        tempDir,
+        `.workspace/brief/business/${BRIEF_INITIAL_VERSION}/product-guide.md`,
+      ),
       "utf8",
     );
 

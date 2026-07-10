@@ -1,8 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { basename, join } from "node:path";
 import { existsSync } from "node:fs";
-import { SDD_WORKSPACE_DIR, SDD_WORKSPACE_MARKER_PATH } from "../constants/sdd-workspace-path.js";
-import { loadEngineeringAnswersFromWorkspace } from "../engineering-config/state/engineering-section-status.js";
+import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
+import type {
+  EngineeringCustomNotes,
+  EngineeringSectionId,
+} from "../engineering-config/types.js";
+import {
+  getSectionFileName,
+  loadEngineeringAnswersFromWorkspace,
+} from "../engineering-config/state/engineering-section-status.js";
 import { loadWorkflowAnswersFromWorkspace } from "../workflow-config/state/workflow-section-status.js";
 import { buildInitContext } from "../utils/build-init-context.js";
 import { initWorkspace } from "../use-cases/init-workspace.use-case.js";
@@ -22,6 +29,19 @@ import { formatInitSummary } from "../utils/format-init-summary.js";
 import { formatMigrateResult } from "../utils/format-migrate-result.js";
 import { formatSyncResult } from "../utils/format-sync-result.js";
 import { assertTargetDirectoryAvailable } from "../policies/target-directory.policy.js";
+import { readManifest } from "../workspace/manifest.js";
+import { resolveTechnicalBriefDirFromManifest } from "../workspace/brief-paths.js";
+import {
+  finalizeTechnicalTargetVersion,
+  prepareTechnicalTargetVersion,
+  promoteTechnicalTarget,
+} from "../workspace/technical-version.js";
+import {
+  getWorkspaceDir,
+  hasSddWorkspace,
+  needsBriefVersioningMigration,
+  resolveWorkspaceTechnicalBriefDir,
+} from "../workspace/workspace-detection.js";
 import { AppLayout } from "./components/AppLayout.js";
 import { ContentPanel, NavigationPanel } from "./components/AppPanels.js";
 import { getFooterShortcuts, getSectionTitle } from "./app-chrome.js";
@@ -29,9 +49,8 @@ import { useStableInput } from "./hooks/use-stable-input.js";
 import type { EngineeringSession, WorkflowSession } from "./use-app-input.js";
 import { useAppInput } from "./use-app-input.js";
 import type { AppScreen, AppState, TuiExitResult } from "./types.js";
-import type { EngineeringCustomNotes } from "../engineering-config/types.js";
-import type { WorkflowCustomNotes } from "../workflow-config/types.js";
 import type { AssistantId } from "../types/init-context.js";
+import type { WorkflowCustomNotes } from "../workflow-config/types.js";
 
 type SddAppProps = {
   targetDir: string;
@@ -46,18 +65,22 @@ export function SddApp({
   initialScreen = { name: "project-type" },
   onFinish,
 }: SddAppProps) {
-  const workspaceTechnicalDir = join(
-    targetDir,
-    SDD_WORKSPACE_DIR,
-    "brief",
-    "technical",
-  );
-
   const workspaceWorkflowDir = join(targetDir, SDD_WORKSPACE_DIR, "workflow");
 
   const [screen, setScreen] = useState<AppScreen>(initialScreen);
   const [history, setHistory] = useState<AppScreen[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [projectMode, setProjectMode] = useState<AppState["projectMode"]>(
+    initialScreen.name === "brownfield-main-menu" ? "brownfield" : "greenfield",
+  );
+  const [engineeringPointer, setEngineeringPointer] =
+    useState<AppState["engineeringPointer"]>("current");
+  const [engineeringBriefDir, setEngineeringBriefDir] = useState<string | null>(
+    null,
+  );
+  const [refactorModifiedSections, setRefactorModifiedSections] = useState<
+    EngineeringSectionId[]
+  >([]);
   const [engineeringAnswers, setEngineeringAnswers] = useState(
     () => ({} as AppState["engineeringAnswers"]),
   );
@@ -83,12 +106,14 @@ export function SddApp({
 
   useEffect(() => {
     if (screen.name === "engineering-section" && !engineeringSession) {
+      setSelectedIndex(0);
       setScreen({ name: "engineering-dashboard" });
     }
   }, [engineeringSession, screen]);
 
   useEffect(() => {
     if (screen.name === "workflow-section" && !workflowSession) {
+      setSelectedIndex(0);
       setScreen({ name: "workflow-dashboard" });
     }
   }, [workflowSession, screen]);
@@ -99,69 +124,113 @@ export function SddApp({
       targetDir,
       projectName,
       version,
+      projectMode,
+      engineeringPointer,
       assistant,
       engineeringAnswers,
       engineeringCustomNotes,
       workflowAnswers,
       workflowCustomNotes,
       history,
+      engineeringBriefDir,
+      refactorModifiedSections,
     }),
     [
       screen,
       targetDir,
       projectName,
       version,
+      projectMode,
+      engineeringPointer,
       assistant,
       engineeringAnswers,
       engineeringCustomNotes,
       workflowAnswers,
       workflowCustomNotes,
       history,
+      engineeringBriefDir,
+      refactorModifiedSections,
     ],
   );
 
   const navigate = useCallback((next: AppScreen) => {
+    setSelectedIndex(0);
     setHistory((current) => [...current, screen]);
     setScreen(next);
   }, [screen]);
 
   const goBack = useCallback(() => {
+    setSelectedIndex(0);
     setEngineeringSession(null);
     setWorkflowSession(null);
     setHistory((current) => {
       const previous = current.at(-1);
       if (!previous) {
-        setScreen({ name: "main-menu" });
+        setScreen(
+          projectMode === "brownfield"
+            ? { name: "brownfield-main-menu" }
+            : { name: "main-menu" },
+        );
         return [];
       }
       setScreen(previous);
       return current.slice(0, -1);
     });
-  }, []);
+  }, [projectMode]);
 
   const resetToMainMenu = useCallback(() => {
+    setSelectedIndex(0);
     setResultLines([]);
     setEngineeringSession(null);
     setWorkflowSession(null);
-    setScreen({ name: "main-menu" });
+    setEngineeringPointer("current");
+    setRefactorModifiedSections([]);
+    setScreen(
+      projectMode === "brownfield"
+        ? { name: "brownfield-main-menu" }
+        : { name: "main-menu" },
+    );
     setHistory([]);
-  }, []);
+  }, [projectMode]);
 
-  const ensureEngineeringAnswersLoaded = useCallback(async () => {
-    if (loadedAnswers) {
-      return;
-    }
+  const resolveAndSetEngineeringBriefDir = useCallback(
+    async (pointer: "current" | "target"): Promise<string | null> => {
+      if (!hasSddWorkspace(targetDir)) {
+        return null;
+      }
 
-    if (existsSync(workspaceTechnicalDir)) {
-      const { answers, customNotes } = await loadEngineeringAnswersFromWorkspace(
-        workspaceTechnicalDir,
-      );
-      setEngineeringAnswers(answers);
-      setEngineeringCustomNotes(customNotes);
-    }
+      if (needsBriefVersioningMigration(targetDir)) {
+        return join(getWorkspaceDir(targetDir), "brief", "technical");
+      }
 
-    setLoadedAnswers(true);
-  }, [loadedAnswers, workspaceTechnicalDir]);
+      try {
+        const dir = await resolveWorkspaceTechnicalBriefDir(targetDir, pointer);
+        setEngineeringBriefDir(dir);
+        return dir;
+      } catch {
+        return null;
+      }
+    },
+    [targetDir],
+  );
+
+  const ensureEngineeringAnswersLoaded = useCallback(
+    async (dir: string) => {
+      if (loadedAnswers && engineeringBriefDir === dir) {
+        return;
+      }
+
+      if (existsSync(dir)) {
+        const { answers, customNotes } =
+          await loadEngineeringAnswersFromWorkspace(dir);
+        setEngineeringAnswers(answers);
+        setEngineeringCustomNotes(customNotes);
+      }
+
+      setLoadedAnswers(true);
+    },
+    [engineeringBriefDir, loadedAnswers],
+  );
 
   const ensureWorkflowAnswersLoaded = useCallback(async () => {
     if (loadedWorkflowAnswers) {
@@ -180,11 +249,10 @@ export function SddApp({
   }, [loadedWorkflowAnswers, workspaceWorkflowDir]);
 
   const openEngineeringDashboard = useCallback(async () => {
-    const markerPath = join(targetDir, SDD_WORKSPACE_MARKER_PATH);
-    if (!existsSync(markerPath)) {
+    if (!hasSddWorkspace(targetDir)) {
       setResultLines([
         "No SDD workspace found.",
-        "Run Create Business & Technical foundation first.",
+        "Run Create brief scaffold first.",
       ]);
       setScreen({
         name: "action-result",
@@ -194,13 +262,218 @@ export function SddApp({
       return;
     }
 
-    await ensureEngineeringAnswersLoaded();
+    if (needsBriefVersioningMigration(targetDir)) {
+      setResultLines([
+        "Brief uses legacy flat layout.",
+        "Run Migrate from the brownfield menu first.",
+      ]);
+      setScreen({
+        name: "action-result",
+        title: "Configure Engineering",
+        lines: [],
+      });
+      return;
+    }
+
+    setEngineeringPointer("current");
+    const dir = await resolveAndSetEngineeringBriefDir("current");
+    if (!dir) {
+      setResultLines(["Could not resolve technical brief directory."]);
+      setScreen({
+        name: "action-result",
+        title: "Configure Engineering",
+        lines: [],
+      });
+      return;
+    }
+
+    setLoadedAnswers(false);
+    await ensureEngineeringAnswersLoaded(dir);
     navigate({ name: "engineering-dashboard" });
-  }, [ensureEngineeringAnswersLoaded, navigate, targetDir]);
+  }, [
+    ensureEngineeringAnswersLoaded,
+    navigate,
+    resolveAndSetEngineeringBriefDir,
+    targetDir,
+  ]);
+
+  useEffect(() => {
+    if (
+      initialScreen.name !== "engineering-dashboard" ||
+      screen.name !== "engineering-dashboard" ||
+      engineeringBriefDir ||
+      !hasSddWorkspace(targetDir)
+    ) {
+      return;
+    }
+
+    void openEngineeringDashboard();
+  }, [
+    engineeringBriefDir,
+    initialScreen.name,
+    openEngineeringDashboard,
+    screen.name,
+    targetDir,
+  ]);
+
+  const openRefactorEngineeringDashboard = useCallback(async () => {
+    if (!hasSddWorkspace(targetDir)) {
+      setResultLines([
+        "No SDD workspace found.",
+        "Run Create brief scaffold first.",
+      ]);
+      setScreen({
+        name: "action-result",
+        title: "Configure Refactor Engineering",
+        lines: [],
+      });
+      return;
+    }
+
+    if (needsBriefVersioningMigration(targetDir)) {
+      setResultLines([
+        "Brief uses legacy flat layout.",
+        "Run Migrate first to create manifest.yaml and versioned folders.",
+      ]);
+      setScreen({
+        name: "action-result",
+        title: "Configure Refactor Engineering",
+        lines: [],
+      });
+      return;
+    }
+
+    setScreen({
+      name: "action-running",
+      label: "Preparing engineering target version…",
+    });
+
+    try {
+      const workspaceDir = getWorkspaceDir(targetDir);
+      const manifest = await readManifest(workspaceDir);
+
+      if (!manifest) {
+        throw new Error("Missing brief manifest.");
+      }
+
+      const currentTechnicalDir = resolveTechnicalBriefDirFromManifest(
+        workspaceDir,
+        "current",
+        manifest,
+      );
+
+      await prepareTechnicalTargetVersion(workspaceDir);
+      setEngineeringPointer("target");
+      setRefactorModifiedSections([]);
+      const dir = await resolveAndSetEngineeringBriefDir("target");
+
+      if (!dir) {
+        throw new Error("Could not resolve technical target directory.");
+      }
+
+      setLoadedAnswers(false);
+      await ensureEngineeringAnswersLoaded(currentTechnicalDir);
+      navigate({ name: "engineering-dashboard" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setResultLines([`Error: ${message}`]);
+      setScreen({
+        name: "action-result",
+        title: "Configure Refactor Engineering",
+        lines: [],
+      });
+    }
+  }, [
+    ensureEngineeringAnswersLoaded,
+    navigate,
+    resolveAndSetEngineeringBriefDir,
+    targetDir,
+  ]);
+
+  const onRefactorSectionSaved = useCallback((sectionId: EngineeringSectionId) => {
+    setRefactorModifiedSections((current) =>
+      current.includes(sectionId) ? current : [...current, sectionId],
+    );
+  }, []);
+
+  const finalizeRefactorEngineering = useCallback(async () => {
+    setScreen({
+      name: "action-running",
+      label: "Finalizing engineering target version…",
+    });
+
+    try {
+      if (!hasSddWorkspace(targetDir)) {
+        throw new Error("No SDD workspace found.");
+      }
+
+      const workspaceDir = getWorkspaceDir(targetDir);
+      const modifiedFileNames = refactorModifiedSections.map((sectionId) =>
+        getSectionFileName(sectionId),
+      );
+      const result = await finalizeTechnicalTargetVersion(
+        workspaceDir,
+        modifiedFileNames,
+      );
+
+      setResultLines([
+        "Engineering refactor target finalized.",
+        "",
+        `Copied ${result.copiedFiles.length} unchanged file(s) from current.`,
+        "",
+        "Next step: run **sdd-technical** against the target version,",
+        "then use Promote Engineering Target when ready.",
+      ]);
+      navigate({ name: "engineering-summary" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setResultLines([`Error: ${message}`]);
+      setScreen({
+        name: "action-result",
+        title: "Finalize Engineering Refactor",
+        lines: [],
+      });
+    }
+  }, [navigate, refactorModifiedSections, targetDir]);
+
+  const runPromoteTechnical = useCallback(async () => {
+    setScreen({ name: "action-running", label: "Promoting technical target…" });
+
+    try {
+      if (!hasSddWorkspace(targetDir)) {
+        throw new Error("No SDD workspace found.");
+      }
+
+      const manifest = await readManifest(getWorkspaceDir(targetDir));
+      if (!manifest?.technical.target) {
+        throw new Error(
+          "No technical target version set. Run Configure Refactor Engineering first.",
+        );
+      }
+
+      const result = await promoteTechnicalTarget(getWorkspaceDir(targetDir));
+      setResultLines([
+        "Technical brief target promoted successfully.",
+        "",
+        `Previous current: ${result.previousCurrent}`,
+        `New current: ${result.newCurrent}`,
+        "",
+        "Next step: run **sdd-technical** against the new current version.",
+      ]);
+      setScreen({
+        name: "action-result",
+        title: "Promote Engineering Target",
+        lines: [],
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setResultLines([`Error: ${message}`]);
+      setScreen({ name: "action-result", title: "Error", lines: [] });
+    }
+  }, [targetDir]);
 
   const runWorkflowScaffold = useCallback(async () => {
-    const markerPath = join(targetDir, SDD_WORKSPACE_MARKER_PATH);
-    if (!existsSync(markerPath)) {
+    if (!hasSddWorkspace(targetDir)) {
       return false;
     }
 
@@ -220,11 +493,10 @@ export function SddApp({
   }, [targetDir]);
 
   const openWorkflowDashboard = useCallback(async () => {
-    const markerPath = join(targetDir, SDD_WORKSPACE_MARKER_PATH);
-    if (!existsSync(markerPath)) {
+    if (!hasSddWorkspace(targetDir)) {
       setResultLines([
         "No SDD workspace found.",
-        "Run Create Business & Technical foundation first.",
+        "Run Create brief scaffold first.",
       ]);
       setScreen({
         name: "action-result",
@@ -278,13 +550,13 @@ export function SddApp({
 
         setScreen({
           name: "action-result",
-          title: "Create Business & Technical foundation",
+          title: "Create brief scaffold",
           lines: [],
         });
       } catch (error) {
-      const message =
-        error instanceof Error ? error.message : String(error);
-      setResultLines(formatSpecScaffoldError(message));
+        const message =
+          error instanceof Error ? error.message : String(error);
+        setResultLines(formatSpecScaffoldError(message));
         setScreen({
           name: "action-result",
           title: "Error",
@@ -299,8 +571,7 @@ export function SddApp({
     setScreen({ name: "action-running", label: "Creating spec scaffold…" });
 
     try {
-      const markerPath = join(targetDir, SDD_WORKSPACE_MARKER_PATH);
-      if (!existsSync(markerPath)) {
+      if (!hasSddWorkspace(targetDir)) {
         setResultLines(formatSpecScaffoldMissingWorkspace());
         setScreen({
           name: "action-result",
@@ -393,13 +664,18 @@ export function SddApp({
       goBack,
       onFinish,
       openEngineeringDashboard,
+      openRefactorEngineeringDashboard,
       openWorkflowDashboard,
       runMigrate,
+      runPromoteTechnical,
+      finalizeRefactorEngineering,
+      onRefactorSectionSaved,
       runSync,
       runInit,
       runSpecScaffold,
       runWorkflowScaffold,
       setAssistant,
+      setProjectMode,
       setEngineeringAnswers,
       setEngineeringCustomNotes,
       setEngineeringSession,
@@ -413,8 +689,12 @@ export function SddApp({
       goBack,
       onFinish,
       openEngineeringDashboard,
+      openRefactorEngineeringDashboard,
       openWorkflowDashboard,
       runMigrate,
+      runPromoteTechnical,
+      finalizeRefactorEngineering,
+      onRefactorSectionSaved,
       runSync,
       runInit,
       runSpecScaffold,
@@ -434,13 +714,15 @@ export function SddApp({
 
   useStableInput(handleInput);
 
-  const sectionTitle = getSectionTitle(screen);
+  const sectionTitle = getSectionTitle(screen, projectMode);
   const shortcuts = getFooterShortcuts(
     screen,
     engineeringAnswers,
     engineeringSession,
     workflowAnswers,
     workflowSession,
+    projectMode,
+    engineeringPointer,
   );
 
   return (

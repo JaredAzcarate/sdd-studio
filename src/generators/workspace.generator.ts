@@ -1,8 +1,13 @@
 import { join } from "node:path";
-import { copyTemplateTree } from "../core/file-system.js";
+import { copyTemplateFile, copyTemplateTree } from "../core/file-system.js";
 import { SDD_WORKSPACE_DIR } from "../constants/sdd-workspace-path.js";
 import { resolveWorkspaceTemplatePath } from "../core/template-resolver.js";
 import type { WorkspaceModules } from "../types/init-context.js";
+import {
+  createDefaultManifest,
+  DEFAULT_INITIAL_VERSION,
+  writeManifest,
+} from "../workspace/manifest.js";
 
 export type GenerateWorkspaceOptions = {
   targetDir: string;
@@ -16,15 +21,30 @@ export type GenerateWorkspaceResult = {
   modules: WorkspaceModules;
 };
 
+const TECHNICAL_BRIEF_TEMPLATE_FILES = [
+  "engineering-principles.md",
+  "engineering-decisions.md",
+  "engineering-conventions.md",
+  "engineering-frontend-patterns.md",
+  "engineering-backend-patterns.md",
+  "engineering-contribution-patterns.md",
+] as const;
+
+function versionedBriefPath(
+  lane: "business" | "technical",
+  fileName: string,
+  version: string = DEFAULT_INITIAL_VERSION,
+): string {
+  return `brief/${lane}/${version}/${fileName}`;
+}
+
 const REQUIRED_BRIEF_FILES = [
-  "brief/business/product-principles.md",
-  "brief/business/product-guide.md",
-  "brief/technical/engineering-principles.md",
-  "brief/technical/engineering-decisions.md",
-  "brief/technical/engineering-conventions.md",
-  "brief/technical/engineering-frontend-patterns.md",
-  "brief/technical/engineering-backend-patterns.md",
-  "brief/technical/engineering-contribution-patterns.md",
+  "brief/manifest.yaml",
+  versionedBriefPath("business", "product-principles.md"),
+  versionedBriefPath("business", "product-guide.md"),
+  ...TECHNICAL_BRIEF_TEMPLATE_FILES.map((fileName) =>
+    versionedBriefPath("technical", fileName),
+  ),
 ] as const;
 
 const REQUIRED_SPEC_MARKERS = [
@@ -35,6 +55,7 @@ const REQUIRED_SPEC_MARKERS = [
   "spec/business/rules/.gitkeep",
   "spec/business/security/.gitkeep",
   "spec/business/events/.gitkeep",
+  "spec/business/decisions/.gitkeep",
   "spec/technical/api/.gitkeep",
   "spec/technical/ui/.gitkeep",
   "spec/technical/testing/.gitkeep",
@@ -47,6 +68,38 @@ export const DEFAULT_WORKSPACE_MODULES: WorkspaceModules = {
   spec: false,
 };
 
+async function copyVersionedBriefTemplates(
+  workspaceTarget: string,
+  overwrite: boolean,
+): Promise<string[]> {
+  const version = DEFAULT_INITIAL_VERSION;
+  const createdPaths: string[] = [];
+
+  const manifestPath = await writeManifest(
+    workspaceTarget,
+    createDefaultManifest(version),
+  );
+  createdPaths.push(manifestPath);
+
+  const { createdPaths: businessPaths } = await copyTemplateTree(
+    resolveWorkspaceTemplatePath("brief", "business"),
+    join(workspaceTarget, "brief", "business", version),
+    { overwrite },
+  );
+  createdPaths.push(...businessPaths);
+
+  for (const fileName of TECHNICAL_BRIEF_TEMPLATE_FILES) {
+    const { createdPaths: filePaths } = await copyTemplateFile(
+      resolveWorkspaceTemplatePath("brief", "technical", fileName),
+      join(workspaceTarget, "brief", "technical", version, fileName),
+      { overwrite },
+    );
+    createdPaths.push(...filePaths);
+  }
+
+  return createdPaths;
+}
+
 export async function generateWorkspace(
   options: GenerateWorkspaceOptions,
 ): Promise<GenerateWorkspaceResult> {
@@ -58,10 +111,9 @@ export async function generateWorkspace(
   const workspaceTarget = join(options.targetDir, SDD_WORKSPACE_DIR);
   const createdPaths: string[] = [];
 
-  const { createdPaths: briefPaths } = await copyTemplateTree(
-    resolveWorkspaceTemplatePath("brief"),
-    join(workspaceTarget, "brief"),
-    { overwrite },
+  const briefPaths = await copyVersionedBriefTemplates(
+    workspaceTarget,
+    overwrite,
   );
   createdPaths.push(...briefPaths);
 
@@ -117,7 +169,6 @@ const REQUIRED_WORKFLOW_MARKERS = [
   "workflow/releases/release-001/release.md",
   "workflow/releases/release-001/tasks.md",
   "workflow/releases/release-001/reviews.md",
-  "workflow/releases/release-001/decisions.md",
   "workflow/workflow-config.md",
 ] as const;
 

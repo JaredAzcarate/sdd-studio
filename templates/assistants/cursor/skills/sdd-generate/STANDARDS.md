@@ -27,8 +27,8 @@ If the user says "generate everything without asking", still present a one-page 
 
 Triggers: only Brief TODOs, no domain files.
 
-1. Infer domain modeling → draft `brief/technical/engineering-modeling.md`
-2. Infer product from README, naming, features → draft `brief/business/product-guide.md` (mark low-confidence items `TODO:`)
+1. Infer domain modeling from code structure and `engineering-decisions.md` (Business Modeling section)
+2. Infer product from README, naming, features → draft `brief/business/<current>/product-guide.md` (mark low-confidence items `TODO:`)
 3. Propose domains from code structure
 4. After approval, generate domain files per **sdd-spec** STANDARDS
 
@@ -102,38 +102,50 @@ Do not read `.env` or credential files.
 | Polyrepo-aware | Orchestrator repos may have zero product code at root |
 | Evidence label | Inferred paths must cite resolved code root from Brief, not generic templates |
 
+## Brief path resolution (versioned)
+
+Read `.workspace/brief/manifest.yaml` and resolve semver folders before any read or write.
+
+| Path pattern | Pointer |
+| ------------ | ------- |
+| `brief/business/<business.current>/` | Business brief |
+| `brief/technical/<technical.current>/` | Technical brief (reads) |
+| `brief/technical/<technical.target>/` | Refactor draft (when set) |
+
+Legacy flat layout requires `sdd-studio migrate` first.
+
 ## Write scope (workspace)
 
 | Path | When |
 | ---- | ---- |
-| `.workspace/brief/business/product-principles.md` | Missing, stub, or approved conceptual update |
-| `.workspace/brief/business/product-guide.md` | Missing, stub, or approved product guide update |
-| `.workspace/brief/technical/engineering-modeling.md` | Missing, stub, or approved modeling update |
-| `.workspace/spec/business/<category>/<domain>-*.md` | Approved domain generation or update |
-| `.workspace/spec/technical/<category>/<domain>-*.md` | Approved domain generation or update |
+| `brief/business/<current>/product-principles.md` | Missing, stub, or approved conceptual update |
+| `brief/business/<current>/product-guide.md` | Missing, stub, or approved product guide update |
+| `brief/technical/<current>/engineering-inventory.md` | Brownfield codebase inventory (Phase B only; not scaffold) |
+| `spec/business/<category>/<domain>-*.md` | Approved domain generation or update |
+| `spec/technical/<category>/<domain>-*.md` | Approved domain generation or update |
 
-**Do not write:** `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md` (use `sdd-studio configure`), `engineering-stack.md` (use **sdd-technical**), `.workspace/workflow/`, `src/`, `tests/` (application tests).
+**Do not write:** `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md`, `engineering-*-patterns.md` (use `sdd-studio configure`), `engineering-stack.md` (use **sdd-technical**), `engineering-modeling.md` (legacy), `.workspace/workflow/`, `src/`, application `tests/`.
 
 ## Business Brief vs Technical Brief (strict)
 
 Same separation as **sdd-idea**:
 
-- `brief/business/product-principles.md` — conceptual foundations only
-- `brief/business/product-guide.md` — narrative user-facing manual only (no technical content)
-- `brief/technical/engineering-modeling.md` — modeling approach and DDD context (no specific technologies)
+- `brief/business/<current>/product-principles.md` — conceptual foundations only
+- `brief/business/<current>/product-guide.md` — narrative user-facing manual only
+- `brief/technical/<current>/engineering-inventory.md` — factual codebase inventory (brownfield)
 
 When inferring from code:
 
 - Framework, language, DB → recommend **sdd-technical** to update `engineering-stack.md`
-- Architecture patterns, DDD → `brief/technical/engineering-modeling.md`
-- Engineering principles, decisions, conventions → recommend `sdd-studio configure`
-- User-facing purpose → `brief/business/product-guide.md` (confirm with user if unclear)
+- Architecture patterns, DDD → `engineering-decisions.md` (Business Modeling) via configure, or spec domain files
+- Engineering principles, decisions, conventions, patterns → recommend `sdd-studio configure`
+- User-facing purpose → `brief/business/<current>/product-guide.md` (confirm with user if unclear)
 
 ## Domain generation
 
 Follow **sdd-spec** STANDARDS exactly:
 
-- 12 files per domain: 7 business (`domain`, `relations`, `capabilities`, `flows`, `rules`, `security`, `events`) + 5 technical (`api`, `ui`, `testing`, `architecture`, `database`)
+- **13 files per domain**: 8 business (`domain`, `relations`, `capabilities`, `flows`, `rules`, `security`, `events`, `decisions`) + 5 technical (`api`, `ui`, `testing`, `architecture`, `database`)
 - Naming: `<domain>-<category>.md`
 - One question per document
 

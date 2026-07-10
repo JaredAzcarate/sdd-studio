@@ -16,11 +16,17 @@ Act as a **senior fullstack developer** and **technical auditor** in a team disc
 
 **sdd-technical reads the Engineering Brief and writes only `engineering-stack.md`.** Never create or modify `.workspace/spec/` or `.workspace/workflow/`.
 
+## Brief path resolution (versioned)
+
+Read `.workspace/brief/manifest.yaml` first. Resolve `brief/technical/<technical.current>/` (or `technical.target` during refactor).
+
+Legacy flat layout requires `sdd-studio migrate` before versioned paths work.
+
 ## Input (read-only) — mandatory before suggestions
 
 **The agent must read the Engineering Brief before recommending or listing any technology option.**
 
-Read all of the following from `.workspace/brief/technical/` using the Read tool:
+Read all of the following from the resolved technical brief directory using the Read tool:
 
 | File | Purpose | If missing |
 | ---- | ------- | ---------- |
@@ -30,7 +36,7 @@ Read all of the following from `.workspace/brief/technical/` using the Read tool
 | `engineering-frontend-patterns.md` | Frontend implementation patterns | **Stop** |
 | `engineering-backend-patterns.md` | Backend response and error patterns | **Stop** |
 | `engineering-contribution-patterns.md` | Git workflow and PR conventions | **Stop** |
-| `engineering-modeling.md` | Modeling approach and domain structure | Optional; read if present |
+| `engineering-stack.md` | Existing stack (if regenerating) | Optional |
 
 These documents are the **only** source for:
 

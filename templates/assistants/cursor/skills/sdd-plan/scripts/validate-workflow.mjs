@@ -112,7 +112,7 @@ function validateReleases(wf) {
 
   if (releaseDirs.length === 0) warnings.push("No release folders in workflow/releases/");
 
-  const REQUIRED_FILES = ["release.md", "tasks.md", "reviews.md", "decisions.md"];
+  const REQUIRED_FILES = ["release.md", "tasks.md", "reviews.md"];
 
   for (const relDir of releaseDirs) {
     if (!/^release-\d{3}$/.test(relDir)) {
@@ -140,7 +140,6 @@ function validateReleases(wf) {
         validateH1(fp);
         if (req === "tasks.md") checkIdsInFile(fp, ID_PATTERNS.task, "TASK-NNN");
         if (req === "reviews.md") checkIdsInFile(fp, ID_PATTERNS.review, "REVIEW-NNN");
-        if (req === "decisions.md") checkIdsInFile(fp, ID_PATTERNS.decision, "DECISION-NNN");
       }
     }
   }

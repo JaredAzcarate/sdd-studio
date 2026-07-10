@@ -10,6 +10,9 @@ import {
 } from "../src/generators/workspace.generator.js";
 import { initWorkspace } from "../src/use-cases/init-workspace.use-case.js";
 import type { InitContextWithLabels } from "../src/types/init-context.js";
+import { DEFAULT_INITIAL_VERSION } from "../src/workspace/manifest.js";
+
+const BRIEF_VERSION = DEFAULT_INITIAL_VERSION;
 
 function createContext(
   targetDir: string,
@@ -29,14 +32,15 @@ function createContext(
 }
 
 const FOUNDATION_PATHS = [
-  ".workspace/brief/business/product-principles.md",
-  ".workspace/brief/business/product-guide.md",
-  ".workspace/brief/technical/engineering-principles.md",
-  ".workspace/brief/technical/engineering-decisions.md",
-  ".workspace/brief/technical/engineering-conventions.md",
-  ".workspace/brief/technical/engineering-frontend-patterns.md",
-  ".workspace/brief/technical/engineering-backend-patterns.md",
-  ".workspace/brief/technical/engineering-contribution-patterns.md",
+  ".workspace/brief/manifest.yaml",
+  `.workspace/brief/business/${BRIEF_VERSION}/product-principles.md`,
+  `.workspace/brief/business/${BRIEF_VERSION}/product-guide.md`,
+  `.workspace/brief/technical/${BRIEF_VERSION}/engineering-principles.md`,
+  `.workspace/brief/technical/${BRIEF_VERSION}/engineering-decisions.md`,
+  `.workspace/brief/technical/${BRIEF_VERSION}/engineering-conventions.md`,
+  `.workspace/brief/technical/${BRIEF_VERSION}/engineering-frontend-patterns.md`,
+  `.workspace/brief/technical/${BRIEF_VERSION}/engineering-backend-patterns.md`,
+  `.workspace/brief/technical/${BRIEF_VERSION}/engineering-contribution-patterns.md`,
 ];
 
 const SPEC_PATHS = [
@@ -47,6 +51,7 @@ const SPEC_PATHS = [
   ".workspace/spec/business/rules/.gitkeep",
   ".workspace/spec/business/security/.gitkeep",
   ".workspace/spec/business/events/.gitkeep",
+  ".workspace/spec/business/decisions/.gitkeep",
   ".workspace/spec/technical/api/.gitkeep",
   ".workspace/spec/technical/ui/.gitkeep",
   ".workspace/spec/technical/testing/.gitkeep",
@@ -61,7 +66,6 @@ const WORKFLOW_PATHS = [
   ".workspace/workflow/releases/release-001/release.md",
   ".workspace/workflow/releases/release-001/tasks.md",
   ".workspace/workflow/releases/release-001/reviews.md",
-  ".workspace/workflow/releases/release-001/decisions.md",
 ];
 
 const CURSOR_PATHS = [
@@ -106,16 +110,25 @@ describe("initWorkspace", () => {
 
     expect(
       existsSync(
-        join(tempDir, ".workspace/brief/technical/engineering-modeling.md"),
+        join(
+          tempDir,
+          `.workspace/brief/technical/${BRIEF_VERSION}/engineering-modeling.md`,
+        ),
       ),
     ).toBe(false);
 
     const engineeringPrinciplesMd = readFileSync(
-      join(tempDir, ".workspace/brief/technical/engineering-principles.md"),
+      join(
+        tempDir,
+        `.workspace/brief/technical/${BRIEF_VERSION}/engineering-principles.md`,
+      ),
       "utf8",
     );
     const productGuideMd = readFileSync(
-      join(tempDir, ".workspace/brief/business/product-guide.md"),
+      join(
+        tempDir,
+        `.workspace/brief/business/${BRIEF_VERSION}/product-guide.md`,
+      ),
       "utf8",
     );
 

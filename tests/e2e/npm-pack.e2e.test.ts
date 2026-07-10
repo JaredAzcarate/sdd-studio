@@ -10,7 +10,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { NPM_PACK_REQUIRED_PATHS } from "./expected-paths.js";
+import { NPM_PACK_REQUIRED_PATHS, BRIEF_INITIAL_VERSION } from "./expected-paths.js";
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const packageJson = JSON.parse(
@@ -84,15 +84,24 @@ describe("npm pack e2e", () => {
     });
 
     const engineeringPrinciplesMd = readFileSync(
-      join(targetDir, ".workspace/brief/technical/engineering-principles.md"),
+      join(
+        targetDir,
+        `.workspace/brief/technical/${BRIEF_INITIAL_VERSION}/engineering-principles.md`,
+      ),
       "utf8",
     );
     const productPrinciplesMd = readFileSync(
-      join(targetDir, ".workspace/brief/business/product-principles.md"),
+      join(
+        targetDir,
+        `.workspace/brief/business/${BRIEF_INITIAL_VERSION}/product-principles.md`,
+      ),
       "utf8",
     );
     const productMd = readFileSync(
-      join(targetDir, ".workspace/brief/business/product-guide.md"),
+      join(
+        targetDir,
+        `.workspace/brief/business/${BRIEF_INITIAL_VERSION}/product-guide.md`,
+      ),
       "utf8",
     );
 

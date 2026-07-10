@@ -20,6 +20,7 @@ const CATEGORIES = [
   { perspective: "business", folder: "rules", suffix: "rules" },
   { perspective: "business", folder: "security", suffix: "security" },
   { perspective: "business", folder: "events", suffix: "events" },
+  { perspective: "business", folder: "decisions", suffix: "decisions" },
   { perspective: "technical", folder: "api", suffix: "api" },
   { perspective: "technical", folder: "ui", suffix: "ui" },
   { perspective: "technical", folder: "testing", suffix: "testing" },

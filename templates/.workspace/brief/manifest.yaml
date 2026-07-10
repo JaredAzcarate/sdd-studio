@@ -1,0 +1,16 @@
+schema: 1
+
+business:
+  current: "0.1.0"
+  target: null
+  archived: []
+
+technical:
+  current: "0.1.0"
+  target: null
+  archived: []
+
+spec:
+  aligned_with:
+    business: "0.1.0"
+    technical: "0.1.0"

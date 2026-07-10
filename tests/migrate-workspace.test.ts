@@ -1,8 +1,11 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { migrateWorkspace } from "../src/generators/migrate-workspace.generator.js";
+import { DEFAULT_INITIAL_VERSION } from "../src/workspace/manifest.js";
+
+const BRIEF_VERSION = DEFAULT_INITIAL_VERSION;
 
 describe("migrateWorkspace", () => {
   let tempDir = "";
@@ -14,7 +17,7 @@ describe("migrateWorkspace", () => {
     }
   });
 
-  it("migrates a legacy flat workspace to brief/spec structure", async () => {
+  it("migrates a legacy flat workspace to versioned brief/spec structure", async () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-migrate-"));
     const workspaceDir = join(tempDir, ".workspace");
 
@@ -83,24 +86,34 @@ Cursor
     const result = await migrateWorkspace({ targetDir: tempDir });
 
     expect(result.alreadyMigrated).toBe(false);
+    expect(result.briefVersion).toBe(BRIEF_VERSION);
     expect(
       readFileSync(
-        join(workspaceDir, "brief/business/product-principles.md"),
+        join(
+          workspaceDir,
+          `brief/business/${BRIEF_VERSION}/product-principles.md`,
+        ),
         "utf8",
       ),
     ).toContain("# Product Principles");
     expect(
       readFileSync(
-        join(workspaceDir, "brief/technical/engineering-principles.md"),
+        join(
+          workspaceDir,
+          `brief/technical/${BRIEF_VERSION}/engineering-principles.md`,
+        ),
         "utf8",
       ),
     ).toContain("# Engineering Principles");
     expect(
       readFileSync(
-        join(workspaceDir, "brief/technical/engineering-modeling.md"),
+        join(workspaceDir, "brief/technical/.archived/engineering-modeling.md"),
         "utf8",
       ),
     ).toContain("Domain Driven Design");
+    expect(
+      existsSync(join(workspaceDir, "brief/manifest.yaml")),
+    ).toBe(true);
     expect(
       readFileSync(
         join(workspaceDir, "spec/business/domain/task-domain.md"),
@@ -113,16 +126,38 @@ Cursor
         "utf8",
       ),
     ).toContain("# Task API");
+    expect(
+      existsSync(
+        join(
+          workspaceDir,
+          `brief/technical/${BRIEF_VERSION}/engineering-modeling.md`,
+        ),
+      ),
+    ).toBe(false);
   });
 
-  it("is idempotent when the new marker already exists", async () => {
+  it("is idempotent when manifest already exists", async () => {
     tempDir = mkdtempSync(join(tmpdir(), "sdd-studio-migrate-"));
-    const marker = join(
-      tempDir,
-      ".workspace/brief/technical/engineering-principles.md",
+    const workspaceDir = join(tempDir, ".workspace");
+    const manifest = join(workspaceDir, "brief/manifest.yaml");
+    mkdirSync(join(manifest, ".."), { recursive: true });
+    writeFileSync(
+      manifest,
+      `schema: 1
+business:
+  current: "0.1.0"
+  target: null
+  archived: []
+technical:
+  current: "0.1.0"
+  target: null
+  archived: []
+spec:
+  aligned_with:
+    business: "0.1.0"
+    technical: "0.1.0"
+`,
     );
-    mkdirSync(join(marker, ".."), { recursive: true });
-    writeFileSync(marker, "# Engineering Principles\n");
 
     const result = await migrateWorkspace({ targetDir: tempDir });
 

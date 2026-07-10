@@ -52,7 +52,7 @@ Before any write, read:
 ## Pre-execution
 
 1. Read [STANDARDS.md](STANDARDS.md) and [EXAMPLES.md](EXAMPLES.md).
-2. Read `.workspace/brief/technical/engineering-decisions.md` and resolve the **product code root** (Project Organization). Read `brief/technical/engineering-stack.md` (Backend + API sections) for API conventions.
+2. Read `.workspace/brief/manifest.yaml` and resolve `brief/technical/<technical.current>/`. Read `engineering-decisions.md` (Project Organization) and `engineering-stack.md` (Backend + API sections).
 3. Inventory `.workspace/brief/`, `.workspace/spec/`, and `.workspace/workflow/` (read-only).
 4. Inventory codebase under the resolved code root: `package.json`, README, domain folders, tests, handlers/actions per `engineering-stack.md`.
 5. Determine mode: empty spec, partial spec, or compare/drift.
@@ -103,14 +103,24 @@ Wait for explicit user approval. If the user adjusts the proposal, revise and co
 
 ### Phase 4 — Generation (approved scope only)
 
-Write only approved files:
+Write only approved files. Resolve brief paths via `manifest.yaml` (`business.current`, `technical.current`).
 
-- `.workspace/brief/business/product-principles.md` — per **sdd-idea** STANDARDS
-- `.workspace/brief/business/product-guide.md` — per **sdd-idea** STANDARDS (narrative, no technical content)
-- `.workspace/brief/technical/engineering-modeling.md` — per **sdd-idea** STANDARDS
-- Domain files — per **sdd-spec** STANDARDS (12 files per approved domain)
+**Phase A — Business brief**
 
-Do not write `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md`, or `engineering-stack.md` — recommend `sdd-studio configure` or **sdd-technical** instead.
+- `brief/business/<current>/product-principles.md` — per **sdd-idea** STANDARDS
+- `brief/business/<current>/product-guide.md` — per **sdd-idea** STANDARDS
+
+**Phase B — Engineering inventory (brownfield only)**
+
+- `brief/technical/<current>/engineering-inventory.md` — codebase inventory: modules, APIs, data stores, integrations (small factual actions; cite file paths)
+
+**Phase C — Spec (one domain per run)**
+
+- Domain files — per **sdd-spec** STANDARDS (**13 files** per approved domain, including `business/decisions/<domain>-decisions.md`)
+
+Do not write `engineering-principles.md`, `engineering-decisions.md`, `engineering-conventions.md`, `engineering-*-patterns.md`, or `engineering-stack.md` — recommend `sdd-studio configure` or **sdd-technical** instead.
+
+Do not write `engineering-modeling.md` (legacy; archived on migrate).
 
 Use `TODO:` for anything not confirmed.
 
