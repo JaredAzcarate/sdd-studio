@@ -4,7 +4,7 @@
 
 Build software from shared knowledge instead of scattered AI conversations.
 
-**v0.7.0** — early access. Feedback welcome.
+**v0.8.0** — early access. Feedback welcome.
 
 ---
 

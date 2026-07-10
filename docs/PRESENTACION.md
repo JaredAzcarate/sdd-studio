@@ -2,7 +2,7 @@
 
 Documento de referencia para presentar la solución a equipos de producto y desarrollo. Explica el **por qué** del modelado, el versionado, las skills, el workflow y las secciones de configure.
 
-**Versión del producto:** 0.7.0 (versión de prueba / early access)
+**Versión del producto:** 0.8.0 (versión de prueba / early access)
 
 ## Slogan
 
@@ -503,7 +503,7 @@ Knowledge Workspace for AI Development
 El espacio donde brief, spec, patrones y agentes
 dan a la IA el contexto completo del producto.
 
-v0.7.0 — versión de prueba — tu feedback cuenta
+v0.8.0 — versión de prueba — tu feedback cuenta
 ```
 
 ---
