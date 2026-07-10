@@ -1,37 +1,98 @@
-# sdd-studio
+# SDD Studio
 
-Bootstrap a **Specification Driven Development (SDD)** workspace for AI-assisted projects.
+> **Knowledge Workspace for AI Development**
 
-SDD Studio targets **web, mobile-native, and hybrid** client applications — not terminal-only or CLI-primary products.
+Build software from shared knowledge instead of scattered AI conversations.
 
-The CLI prepares your folder structure and assistant-specific SDD skills. The intelligence lives in the skills — not in this tool.
+**v0.7.0** — early access. Feedback welcome.
 
-```bash
-npx sdd-studio
+---
+
+## Why SDD Studio?
+
+AI coding assistants are incredibly good at writing code.
+
+The problem isn't the code anymore.
+
+The problem is context.
+
+Every new conversation starts with incomplete knowledge. Product decisions get forgotten, engineering conventions drift, and implementations become inconsistent over time.
+
+**SDD Studio solves this by giving your project a dedicated knowledge workspace where both humans and AI share the same source of truth.**
+
+---
+
+## What is SDD Studio?
+
+SDD Studio is a Specification-Driven Development toolkit for **web, mobile-native, and hybrid** client applications — not terminal-only or CLI-primary products.
+
+It helps teams organize product knowledge before writing code.
+
+Instead of asking AI to guess your architecture, requirements, or conventions, SDD Studio guides you through building a structured knowledge base that AI can reliably use throughout the entire development lifecycle.
+
+**The CLI prepares your folder structure and assistant-specific SDD skills. The intelligence lives in the skills — not in the CLI.**
+
+The result is better implementations, fewer assumptions, and more consistent software.
+
+---
+
+## The `.workspace` Philosophy
+
+SDD Studio separates **product knowledge** from **application code**:
+
+```text
+my-project/
+
+├── src/                    # Your application code
+├── .cursor/                # Assistant skills & rules (or .claude/, .agents/, etc.)
+└── .workspace/             # Shared product knowledge
+    ├── brief/
+    ├── spec/
+    └── workflow/
 ```
 
-Or use subcommands directly:
+Your application code stays exactly where it belongs.
 
-```bash
-npx sdd-studio init
+**`.workspace/`** holds structured knowledge the whole team (and every AI session) can read:
+
+- Product and engineering briefs (versioned)
+- Domain specifications
+- Workflow planning (roadmap, releases, tasks)
+
+**Assistant files** (skills, rules, agents) are installed next to your code — for example `.cursor/skills/` and `.cursor/rules/` — not inside `.workspace/`. Run `sdd-studio sync` to update packaged skills from the npm package.
+
+Keep implementation and knowledge separate.
+
+---
+
+## Why this matters
+
+Modern AI doesn't need better prompts.
+
+It needs better knowledge.
+
+SDD Studio helps you build that knowledge once, so every future AI conversation starts with the full context instead of starting from zero.
+
+---
+
+## Multi-Repository Products
+
+If your frontend, backend, mobile app, or services live in separate repositories, we recommend creating a dedicated **Workspace Repository**.
+
+```text
+workspace/
+
+├── frontend/    (git submodule)
+├── backend/     (git submodule)
+├── mobile/      (git submodule)
+└── .workspace/
 ```
 
-## What it does
+This gives AI a complete view of the product while keeping every repository independent.
 
-`sdd-studio init` scaffolds by default:
+This pattern is optional but highly recommended when front and back already live in separate repos.
 
-- `.workspace/brief/business/` — product principles and narrative product guide
-- `.workspace/brief/technical/` — engineering stubs (completed via `configure` + skills)
-- Assistant files — skills, rules, or commands for your chosen AI tool
-
-It does **not** create `.workspace/spec/` or `.workspace/workflow/` unless you opt in:
-
-- **Spec scaffold** — TUI menu *Create spec scaffold*, or `init --spec` / `init --yes --spec`
-- **Workflow scaffold** — TUI *Configure Workflow* (creates folders as needed), or `init --workflow` / `init --yes --workflow`
-
-After foundation, use **sdd-spec** to fill `.workspace/spec/business/` and `.workspace/spec/technical/`.
-
-It does **not** generate application code (`src/`, `tests/`, etc.). You implement after the spec is ready.
+---
 
 ## Official cycle
 
@@ -39,288 +100,171 @@ It does **not** generate application code (`src/`, `tests/`, etc.). You implemen
 Idea → Brief → Specification → Planning → Implementation → Code
 ```
 
-## Document map
+---
 
-| Location | Question |
-| -------- | -------- |
-| `.workspace/brief/business/` | What product do we want to build? |
-| `.workspace/brief/technical/` | How do we decide to build it? |
-| `.workspace/spec/business/` | How does the business work? |
-| `.workspace/spec/technical/` | How must it be implemented? |
-| `.workspace/workflow/` | How do we organize the work? (optional) |
+## Features
 
-The Product Guide is the root of functional knowledge. Specification derives entirely from it.
+SDD Studio has three layers: **CLI/TUI**, **`.workspace/` knowledge**, and **chat skills**.
 
-## Quick start
+### CLI & TUI
+
+| Command / action | Purpose |
+| ---------------- | ------- |
+| `sdd-studio init` | Brief scaffold (`manifest.yaml`), versioned stubs, assistant skills |
+| `sdd-studio` (TUI) | Greenfield / Brownfield menu — foundation, spec scaffold, configure, sync |
+| `sdd-studio configure` | Engineering Brief — principles, decisions, conventions, FE/BE/contribution patterns |
+| `sdd-studio configure-workflow` | Methodology and task conventions in `.workspace/workflow/` |
+| `sdd-studio migrate` | Upgrade legacy flat brief layouts to versioned semver folders |
+| `sdd-studio sync` | Refresh packaged skills and rules from the npm package (does not modify `.workspace/`) |
+
+### Knowledge workspace (`.workspace/`)
+
+| Area | What it stores |
+| ---- | -------------- |
+| `brief/business/<version>/` | Product principles and user journey (`sdd-idea`) |
+| `brief/technical/<version>/` | Engineering decisions, patterns, and stack (`configure`, `sdd-technical`) |
+| `brief/manifest.yaml` | Active brief versions (`current`, `target`, `archived`) and spec alignment |
+| `spec/` | Domain specification — 13 files per domain (`sdd-spec`) |
+| `workflow/` | Roadmap, milestones, releases, `TASK-NNN` (`configure-workflow`, `sdd-plan`) |
+
+Cross-cutting **engineering patterns** (API envelopes, async UI states, PR conventions) live in the technical brief and must align with `*-api.md` and `*-ui.md` in spec.
+
+**Validators:** `sdd-spec` and `sdd-plan` ship scripts (`validate-spec.mjs`, `validate-workflow.mjs`) to check structure before you rely on the output.
+
+### Packaged AI skills (7)
+
+Invoke explicitly in your assistant — they do not run automatically.
+
+| Skill | Role |
+| ----- | ---- |
+| **sdd-idea** | Discover the product → Business Brief |
+| **sdd-technical** | Choose concrete stack → `engineering-stack.md` |
+| **sdd-find-skills** | *(Optional)* Search the open skills ecosystem (`npx skills`, skills.sh) from your stack and engineering strategies; install only after you approve |
+| **sdd-spec** | Generate full domain specification under `spec/` |
+| **sdd-plan** | Plan roadmap, milestones, and releases |
+| **sdd-review** | *(Optional)* Validate or align brief and spec after changes |
+| **sdd-generate** | *(Brownfield)* Explore existing code and propose brief/spec alignment |
+
+### Also included
+
+- **Greenfield & brownfield** entry paths (TUI asks on startup)
+- **Versioned brief** — evolve product or architecture without losing traceability
+- **Refactor engineering** — draft technical brief in `target`, then promote (brownfield stack changes)
+- **Multi-assistant** — Cursor (default), Claude, Codex, OpenCode, GitHub Copilot
+- **Markdown-first** — human-readable, git-friendly knowledge
+
+### What SDD Studio does not do
+
+- Generate application code (`src/`, `app/`, `tests/`)
+- Replace issue trackers (Linear, Jira) — SDD workflow is optional
+- Install external skills without your confirmation (`sdd-find-skills` always asks first)
+- Guarantee a perfect spec in one pass — iteration and review are expected
+
+**Learn more:** [SKILLS.md](./docs/SKILLS.md) · [ARQUITECTURA-WORKSPACE.md](./docs/ARQUITECTURA-WORKSPACE.md) (full file tree)
+
+---
+
+## Quick Start
+
+SDD Studio supports **two entry paths**. Choose based on whether you already have application code.
+
+| Path | When to use it |
+| ---- | -------------- |
+| **Greenfield** | New product or no meaningful codebase yet — you define knowledge before writing code |
+| **Brownfield** | Existing codebase — you extract and align knowledge from what is already built |
+
+Initialize your workspace:
 
 ```bash
-mkdir my-product && cd my-product
 npx sdd-studio init
 ```
 
-Non-interactive (defaults to Cursor, without workflow):
+Or launch the interactive TUI — it asks **Greenfield** or **Brownfield** on startup:
 
 ```bash
-npx sdd-studio init --yes --assistant cursor
+npx sdd-studio
 ```
 
-Include the SDD workflow module:
+Invoke skills in your AI assistant (e.g. **sdd-idea**, `/sdd-idea` in OpenCode). See [Packaged AI skills](#packaged-ai-skills-7) above. Do not implement without a specification.
 
-```bash
-npx sdd-studio init --yes --assistant cursor --workflow
+### Step reference
+
+| Step | Command / skill | Output |
+| ---- | --------------- | ------ |
+| Foundation | `init` / TUI *Create brief scaffold* | `.workspace/brief/` stubs + assistant skills |
+| Engineering | `configure` | 6 files in `brief/technical/<version>/` |
+| Product | **sdd-idea** | `product-principles.md`, `product-guide.md` |
+| Stack | **sdd-technical** | `engineering-stack.md` |
+| Ecosystem skills | **sdd-find-skills** *(optional)* | Recommended / installed implementation skills |
+| Spec scaffold | TUI *Create spec scaffold* | Empty `spec/` folders |
+| Specification | **sdd-spec** | Domain files (13 per domain) |
+| Workflow | `configure-workflow` | `workflow-config.md` |
+| Planning | **sdd-plan** | Roadmap, milestones, releases |
+| Brownfield | **sdd-generate** | Brief + spec from codebase |
+| Review | **sdd-review** *(optional)* | Alignment check |
+| Legacy | `migrate` | Versioned brief layout |
+
+Full reference: [FLOW-GREENFIELD.md](./docs/FLOW-GREENFIELD.md) · [FLOW-BROWNFIELD.md](./docs/FLOW-BROWNFIELD.md)
+
+### Greenfield flow
+
+Recommended order when starting from scratch:
+
+```text
+configure → sdd-idea → sdd-technical → [sdd-find-skills] → sdd-spec → [configure-workflow] → sdd-plan
 ```
 
-Then run the **sdd-idea** skill (or `/sdd-idea` in OpenCode) to complete the Business Brief under `.workspace/brief/business/`.
+| # | Action | Output |
+| - | ------ | ------ |
+| 0 | `sdd-studio init` | Brief stubs + skills |
+| 1 | `sdd-studio configure` | Engineering Brief (6 files) |
+| 2 | **sdd-idea** | Business Brief |
+| 3 | **sdd-technical** | `engineering-stack.md` |
+| 4 | **sdd-find-skills** *(optional)* | Installed implementation skills |
+| 5 | Create spec scaffold, then **sdd-spec** | Domain specification |
+| 6 | `sdd-studio configure-workflow` *(if using SDD workflow)* | Workflow config |
+| 7 | **sdd-plan** | Roadmap and release tasks |
 
-The interactive TUI (`sdd-studio`) starts with **Greenfield** and a main menu: foundation, spec scaffold, configure engineering, configure workflow, and sync. Engineering configuration is a separate step:
+**Flexible start:** you may run **sdd-idea** before step 1. Once the product is clear, run `configure`, then **sdd-technical**.
 
-```bash
-npx sdd-studio configure
+```text
+Idea → Brief → Technical Decisions → Specification → Workflow → Implementation
 ```
 
-Non-interactive defaults for the Engineering Brief:
+### Brownfield flow
 
-```bash
-npx sdd-studio init --yes --assistant cursor --engineering
+Recommended order when code already exists:
+
+```text
+[migrate] → sdd-generate → [sdd-review] → [configure-workflow] → sdd-plan
 ```
 
-### Migrating an existing workspace
+| # | Action | Output |
+| - | ------ | ------ |
+| 0 | `sdd-studio init` | Versioned brief scaffold + **sdd-generate** skill |
+| 1 | `sdd-studio migrate` *(only if legacy layout)* | `manifest.yaml` + semver folders |
+| 2 | **sdd-generate** | Completes Brief and generates spec from the codebase |
+| 3 | **sdd-review** *(optional)* | Validates alignment with the real project |
+| 4 | `sdd-studio configure-workflow` *(optional)* | Workflow config |
+| 5 | **sdd-plan** | Roadmap and release tasks |
 
-If your project was created with sdd-studio 0.4.x (flat `project.md` and `spec/` layout) or 0.5.x (`development.md`, `modeling.md`, `stack/`):
+**Evolving the stack:** when architecture or technology changes, use TUI *Configure Refactor Engineering* → **sdd-technical** (target version) → *Promote Engineering Target*.
 
-```bash
-npx sdd-studio migrate
-```
-
-## Updating assistant files
-
-After upgrading `sdd-studio`, refresh assistant files without touching your `.workspace/`:
-
-```bash
-npx sdd-studio sync
-```
-
-Sync only skills (keep your rules or project instructions as-is):
-
-```bash
-npx sdd-studio sync --skills
-```
-
-Requires an existing SDD project (`.workspace/brief/technical/engineering-principles.md`, legacy `.workspace/project.md`, or installed assistant skills from a prior `init`).
-
-## Assistant-specific layout
-
-`--assistant` controls which AI tooling receives the SDD skills:
-
-| Assistant | Project instructions | Skills / commands |
-| --------- | ---------------------- | ----------------- |
-| `cursor` (default) | `.cursor/rules/sdd-studio.mdc` | `.cursor/skills/sdd-*/` |
-| `claude` | `CLAUDE.md` | `.claude/skills/sdd-*/` |
-| `codex` | `AGENTS.md` | `.agents/skills/sdd-*/` (+ `agents/openai.yaml` per skill) |
-| `opencode` | — | `.opencode/commands/sdd-*.md` (+ assets in `.opencode/sdd-studio/`) |
-| `copilot` | `.github/copilot-instructions.md` | `.github/agents/sdd-*.agent.md` + `.github/prompts/sdd-*.prompt.md` (+ assets in `.github/sdd-studio/`) |
-
-`.workspace/` is identical for all assistants.
-
-```bash
-npx sdd-studio init --yes --assistant claude
-npx sdd-studio init --yes --assistant codex
-npx sdd-studio init --yes --assistant opencode
-npx sdd-studio init --yes --assistant copilot
-npx sdd-studio sync --assistant opencode
-npx sdd-studio sync --assistant copilot
-```
-
-### Merge-safe install
-
-If `.cursor/skills/`, `.opencode/commands/`, or similar folders already exist with your own skills or commands, `init` adds only the SDD files and **does not delete** unrelated entries. Run `sync` to overwrite SDD files from the package.
-
-## Generated structure (Cursor)
-
-```
-./
-├── .workspace/
-│   ├── brief/
-│   │   ├── business/
-│   │   │   ├── product-principles.md
-│   │   │   └── product-guide.md
-│   │   └── technical/
-│   │       ├── engineering-principles.md   # sdd-studio configure
-│   │       ├── engineering-decisions.md    # sdd-studio configure
-│   │       ├── engineering-conventions.md  # sdd-studio configure
-│   │       ├── engineering-frontend-patterns.md  # sdd-studio configure
-│   │       ├── engineering-backend-patterns.md   # sdd-studio configure
-│   │       ├── engineering-contribution-patterns.md  # sdd-studio configure
-│   │       └── engineering-stack.md        # sdd-technical (generated)
-│   ├── spec/                   # Create spec scaffold (separate step)
-│   │   ├── business/
-│   │   │   ├── domain/
-│   │   │   ├── relations/
-│   │   │   ├── capabilities/
-│   │   │   ├── flows/
-│   │   │   ├── rules/
-│   │   │   ├── security/
-│   │   │   └── events/
-│   │   └── technical/
-│   │       ├── api/
-│   │       ├── ui/
-│   │       ├── testing/
-│   │       ├── architecture/
-│   │       └── database/
-│   └── workflow/               # only with --workflow
-│       ├── roadmap/
-│       ├── milestones/
-│       └── releases/
-│           └── release-001/
-│               ├── release.md
-│               ├── tasks.md
-│               ├── reviews.md
-│               └── decisions.md
-└── .cursor/                    # Cursor only
-    ├── rules/sdd-studio.mdc
-    └── skills/
-        ├── sdd-idea/
-        ├── sdd-technical/
-        ├── sdd-find-skills/
-        ├── sdd-generate/
-        ├── sdd-spec/
-        ├── sdd-review/
-        └── sdd-plan/
-```
-
-### OpenCode layout
-
-```
-./
-├── .workspace/                 # same as above
-└── .opencode/
-    ├── commands/
-    │   ├── sdd-idea.md
-    │   ├── sdd-technical.md
-    │   ├── sdd-find-skills.md
-    │   ├── sdd-generate.md
-    │   ├── sdd-spec.md
-    │   ├── sdd-review.md
-    │   └── sdd-plan.md
-    └── sdd-studio/             # STANDARDS, EXAMPLES, validation scripts
-        ├── sdd-idea/
-        ├── sdd-spec/
-        └── ...
-```
-
-Invoke with `/sdd-idea`, `/sdd-spec`, etc.
-
-### GitHub Copilot layout
-
-```
-./
-├── .workspace/                 # same as above
-└── .github/
-    ├── copilot-instructions.md # repo-wide SDD context (always on)
-    ├── agents/
-    │   ├── sdd-idea.agent.md
-    │   ├── sdd-technical.agent.md
-    │   ├── sdd-find-skills.agent.md
-    │   ├── sdd-generate.agent.md
-    │   ├── sdd-spec.agent.md
-    │   ├── sdd-review.agent.md
-    │   └── sdd-plan.agent.md
-    ├── prompts/
-    │   ├── sdd-idea.prompt.md
-    │   └── ...
-    └── sdd-studio/             # STANDARDS, EXAMPLES, validation scripts
-        ├── sdd-idea/
-        └── ...
-```
-
-- **Agents** (`.github/agents/*.agent.md`): specialist personas with full SDD instructions ([custom agents](https://docs.github.com/en/copilot/reference/custom-agents-configuration)).
-- **Prompts** (`.github/prompts/*.prompt.md`): slash commands that delegate to the matching agent ([prompt files](https://code.visualstudio.com/docs/copilot/customization/prompt-files)).
-- Invoke prompts with `/sdd-idea`, `/sdd-spec`, etc. in VS Code or select the agent from the dropdown.
-
-## Skill workflow
-
-See [FLOW-GREENFIELD.md](./FLOW-GREENFIELD.md) for the full greenfield path (TUI menu + skills).
-
-### Greenfield
-
-| Step | Skill / command | Purpose |
-| ---- | ----------------- | ------- |
-| 0 | `sdd-studio init` o TUI *Create brief scaffold* | Brief stubs + assistant skills |
-| 1 | `sdd-studio configure` | Engineering Brief (principles, decisions, conventions, patterns) |
-| 2 | **sdd-idea** | Business Brief (`product-principles.md`, `product-guide.md`) |
-| 3 | **sdd-technical** | Interactive stack selection → `engineering-stack.md` |
-| 3b | **sdd-find-skills** *(opcional)* | Discover and install implementation skills from open ecosystem |
-| 4 | TUI *Create spec scaffold* or `init --spec` | Empty `.workspace/spec/` folders |
-| 5 | **sdd-spec** | Generate domain files under `spec/` |
-| 6 | `sdd-studio configure-workflow` | Workflow methodology and task conventions |
-| 7 | **sdd-plan** | Roadmap, milestones, releases under `.workspace/workflow/` |
-
-You may start with **sdd-idea** before step 1; after the product is defined, run configure, then **sdd-technical**.
-
-### Existing codebase
-
-| Skill | Purpose |
-| ----- | ------- |
-| **sdd-generate** | Explore code, compare with Brief/spec, propose gaps; align workspace (conservative) |
-| **sdd-review** / **sdd-plan** | After spec is aligned |
-
-Invoke skills explicitly in your AI assistant. Do not implement without a specification.
-
-## CLI reference
-
-Launch the Terminal UI (default):
-
-```bash
-sdd-studio
-```
-
-Subcommands:
-
-```bash
-sdd-studio init [options]
-sdd-studio configure
-sdd-studio configure-workflow
-sdd-studio migrate
-sdd-studio sync [options]
-```
-
-| Command | Description |
-| ------- | ----------- |
-| `(default)` | Launch the SDD Studio Terminal UI |
-| `init` | Scaffold a new SDD workspace (foundation only by default) |
-| `configure` | Configure the Engineering Brief (TUI) |
-| `configure-workflow` | Configure workflow methodology and task conventions (TUI) |
-| `migrate` | Migrate a legacy workspace to the Engineering Brief structure |
-| `sync` | Update assistant files from the installed package |
-
-| Option | Description |
-| ------ | ----------- |
-| `--yes` | Skip prompts; use defaults (`init` only) |
-| `--assistant <id>` | `cursor` (default), `claude`, `codex`, `opencode`, or `copilot` |
-| `--spec` | Include `.workspace/spec/` scaffold (`init` only, default: off) |
-| `--workflow` | Include `.workspace/workflow/` scaffold (`init` only, default: off) |
-| `--engineering` | Write default Engineering Brief answers (`init --yes` only) |
-| `--skills` | Sync only skills/commands, not instructions or rules (`sync` only) |
-
-All assistants install the same six SDD skills with provider-native paths.
-
-## Requirements
-
-- Node.js **20+**
-- npm or npx
+---
 
 ## Philosophy
 
-| Layer | Responsibility |
-| ----- | -------------- |
-| **Brief** | Project context — business and technical decisions |
-| **Specification** | Formal product definition — business and technical |
-| **Workflow** | Work organization only |
-| **CLI** | Scaffold folders, templates, and assistant setup |
-| **Skills** | Discovery, specification, review, and planning |
-| **You** | Implementation in your codebase |
+> AI doesn't need better prompts.
 
-The Brief explains what we build and how we decide to build it. The Specification is the formal source of truth. The Workflow is the plan.
+It needs better knowledge.
+
+The most valuable asset of a software project isn't its code.
+
+It's the knowledge behind it.
+
+SDD Studio exists to make that knowledge explicit.
+
+---
 
 ## License
 

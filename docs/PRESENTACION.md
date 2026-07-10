@@ -4,6 +4,14 @@ Documento de referencia para presentar la solución a equipos de producto y desa
 
 **Versión del producto:** 0.7.0 (versión de prueba / early access)
 
+## Slogan
+
+> **SDD Studio — Knowledge Workspace for AI Development**
+
+*El espacio donde el equipo y la IA comparten el mismo conocimiento del producto.*
+
+SDD Studio no es un framework ni un generador de código: es un **knowledge workspace** — un lugar único donde vive todo lo que la IA necesita para respetar el producto, las decisiones técnicas y los patrones del equipo.
+
 ---
 
 ## Audiencia
@@ -17,6 +25,22 @@ SDD Studio está pensado para **product designers** y **developers** que trabaja
 | **Ambos** | Misma fuente de verdad en `.workspace/`, skills con alcance acotado y validadores que reducen desalineación |
 
 No está orientado a productos cuya superficie principal sea solo terminal o CLI.
+
+---
+
+## Origen — por qué existe esto
+
+Narrativa personal para abrir la charla (Acto 0, ~3 min).
+
+Llevo años desarrollando aplicaciones en **React**, cada vez más apoyado en **IA** para ir más rápido. Eso funciona… hasta que no.
+
+Cada sesión nueva, cada modelo mejor, el asistente vuelve a “olvidar” cómo queremos que respondan las APIs, cómo manejamos loading y errores, cómo nombramos cosas, qué es el producto y qué no. **Hoy sigo renegando con lo mismo:** repetir contexto, corregir desvíos, re-explicar patrones.
+
+A medida que la IA mejora, uso más IA — y la necesidad de **configuraciones técnicas agnósticas del stack concreto** pero **obligatorias para el equipo** se vuelve más urgente, no menos. No alcanza con “ser bueno pidiendo cosas al chat”. Hace falta un **contrato persistente** que diseñadores, desarrolladores y agentes lean igual.
+
+SDD Studio nace de esa fricción real: no de una teoría de documentación, sino de días en los que la IA aceleraba el código pero **ralentizaba la coherencia**.
+
+**Puente al problema:** el problema no es que la IA sea mala. Es que **no tiene dónde leer el contrato** del proyecto.
 
 ---
 
@@ -41,6 +65,14 @@ SDD Studio **no es un generador de código**. Es **infraestructura de conocimien
 ---
 
 ## Estructura sugerida de la presentación (30–45 min)
+
+### Acto 0 — Origen y motivación (3 min)
+
+**Título:** *De React + IA a un knowledge workspace*
+
+- Experiencia desarrollando con IA: velocidad sí, coherencia no siempre.
+- La necesidad crece a medida que los modelos mejoran.
+- SDD Studio como respuesta a la fricción diaria (“seguir renegando”).
 
 ### Acto 1 — El problema (5–7 min)
 
@@ -90,7 +122,81 @@ Cada etapa responde una pregunta distinta. No se mezclan responsabilidades.
 | `.workspace/spec/business/` + `.workspace/spec/technical/` | ¿Cómo está modelado y especificado cada dominio? |
 | `.workspace/workflow/` | ¿Cómo planificamos releases y tareas? |
 
-Ver también la regla de workspace en `.cursor/rules/sdd-studio.mdc` para el mapa completo de fuentes de verdad.
+Ver también la regla de workspace en `.cursor/rules/sdd-studio.mdc` para el mapa completo de fuentes de verdad. Árbol detallado en [ARQUITECTURA-WORKSPACE.md](./ARQUITECTURA-WORKSPACE.md).
+
+---
+
+## Qué es el Brief (para quien no viene de agencia)
+
+En agencias y estudios, el **brief** es el documento donde se levantan las necesidades del **cliente** antes de diseñar o construir.
+
+En SDD Studio hacemos lo mismo, pero el “cliente” es **el producto**:
+
+| Brief | Pregunta | Archivos principales |
+| --- | --- | --- |
+| **Business** | ¿Qué producto queremos? | `product-principles.md`, `product-guide.md` |
+| **Technical** | ¿Cómo decidimos construirlo? | `engineering-*.md`, `engineering-stack.md` |
+
+No es spec todavía. Es **contexto acordado** antes de especificar dominios y antes de implementar en `src/`.
+
+**Analogía en una frase:** *el brief responde “qué queremos y bajo qué reglas”; la spec responde “cómo está definido el sistema”.*
+
+---
+
+## Dónde vive el knowledge workspace
+
+SDD Studio está pensado para que el **espacio de trabajo completo** viva en **un solo lugar**: la IA necesita el **mayor contexto posible** (brief, spec, workflow, código, agentes).
+
+### Opción A — Monorepo (caso simple)
+
+Ideal cuando front, back y paquetes compartidos ya conviven en un solo repositorio.
+
+```text
+mi-producto/
+├── .workspace/          # brief, spec, workflow
+├── .cursor/             # skills, rules, agentes
+├── apps/web/
+├── apps/api/
+└── packages/shared/
+```
+
+### Opción B — Repo orquestador + submódulos (repos separados)
+
+Cuando **project-A** (front), **project-B** (back) y **project-C** (mobile, design system, etc.) viven en repos distintos, la sugerencia es crear un repositorio **`workspace`** (orquestador) que:
+
+- Monta los repos de producto como **submódulos** (o equivalente).
+- Concentra **todo lo del método SDD**: `.workspace/`, skills, rules, agentes.
+- Separa **producto** (código en cada submódulo) de **espacio de trabajo** (cómo desarrollamos con IA).
+
+```text
+mi-workspace/                    # Knowledge workspace — SDD Studio vive acá
+├── .workspace/
+│   ├── brief/
+│   ├── spec/
+│   └── workflow/
+├── .cursor/                     # skills, rules, agentes
+├── project-a/    → submodule    # frontend
+├── project-b/    → submodule    # backend
+└── project-c/    → submodule    # mobile, etc.
+```
+
+| Idea | Por qué importa |
+| --- | --- |
+| **Contexto completo para la IA** | Brief + spec + código accesibles en el mismo árbol de trabajo |
+| **Producto ≠ espacio de trabajo** | En `project-A` vive el código; en `workspace` viven decisiones, spec, agentes y planificación |
+| **Un solo hub del equipo** | No mezclar documentación de método con el repo que solo despliega la API |
+
+Esta opción está alineada con **Orchestrator repo + independent repos** en `sdd-studio configure` y con el flujo brownfield de **sdd-generate** (explorar código en el submódulo, no en la raíz del orquestador).
+
+### Cuándo usar cada patrón
+
+| Situación | Recomendación |
+| --- | --- |
+| Front + back en un monorepo | `.workspace/` en la raíz del monorepo |
+| Front y back en repos distintos | Repo `*-workspace` + submódulos |
+| Un producto, un repo greenfield | Todo junto (caso típico de demo) |
+
+**Nota honesta:** los submódulos añaden fricción operativa (clone, update, permisos). No es “siempre submódulos”; es **si ya tenés repos separados, no renuncies al contexto completo de la IA** — centralizá el workspace.
 
 ---
 
@@ -330,23 +436,27 @@ SDD Studio no es solo documentación bonita:
 
 ---
 
-## Diapositivas sugeridas (12–15 slides)
+## Diapositivas sugeridas (15–18 slides)
 
-1. Problema: IA sin contrato
-2. Audiencia: product designers + developers
-3. Estado: versión de prueba — feedback bienvenido
-4. Ciclo SDD (Idea → Code)
-5. Mapa `.workspace/` (una pregunta por carpeta)
-6. Brief vs Spec vs Workflow
-7. Por qué el dominio vive en spec
-8. `manifest.yaml`: current / target / aligned_with
-9. Skills: división del trabajo
-10. Configure: principles → decisions → conventions → patterns
-11. Qué se espera en greenfield (`product-principles` + `product-guide`)
-12. Flujo greenfield (tabla de pasos)
-13. Demo / capturas / video
-14. Qué NO hace SDD Studio (no genera `src/`)
-15. Cómo empezar (`npx sdd-studio`, [LOCAL.md](./LOCAL.md))
+0. Título + slogan (*Knowledge Workspace for AI Development*)
+1. Origen: React, IA y “seguir renegando”
+2. Problema: IA sin contrato
+3. Qué es el Brief (analogía agencia → producto)
+4. Dónde vive: monorepo vs repo orquestador
+5. Audiencia: product designers + developers
+6. Estado: versión de prueba — feedback bienvenido
+7. Ciclo SDD (Idea → Code)
+8. Mapa `.workspace/` (una pregunta por carpeta)
+9. Brief vs Spec vs Workflow
+10. Por qué el dominio vive en spec
+11. `manifest.yaml`: current / target / aligned_with
+12. Skills: división del trabajo
+13. Configure: principles → decisions → conventions → patterns
+14. Qué se espera en greenfield (`product-principles` + `product-guide`)
+15. Flujo greenfield (tabla de pasos)
+16. Demo / capturas / video
+17. Qué NO hace SDD Studio (no genera `src/`)
+18. Cómo empezar (`npx sdd-studio`, [LOCAL.md](./LOCAL.md))
 
 ---
 
@@ -354,10 +464,11 @@ SDD Studio no es solo documentación bonita:
 
 | Audiencia | Mensaje |
 | --- | --- |
-| **General** | SDD Studio convierte el desarrollo con IA en un pipeline de documentos versionados que la IA puede leer y respetar. |
-| **Developers** | Spec primero, código después; cada skill con un solo trabajo. |
-| **Product designers** | El Product Guide es la historia del usuario; la spec y el código derivan de ahí. |
-| **Arquitectura** | Configure fija decisiones y patrones; el stack viene después y la spec los aplica. |
+| **General** | SDD Studio — *Knowledge Workspace for AI Development*: brief, spec, patrones y agentes en un solo lugar para que la IA deje de inventar. |
+| **Origen (30 s)** | Desarrollo en React con IA hace años. La IA va más rápido, pero sin contrato compartido sigo corrigiendo APIs, UI y contexto perdido. SDD Studio es el workspace donde el equipo y la IA leen las mismas reglas. |
+| **Developers** | Spec primero, código después; cada skill con un solo trabajo. Monorepo o repo orquestador con submódulos — el contexto completo importa. |
+| **Product designers** | El Product Guide es la historia del usuario; la spec y el código derivan de ahí. El brief es como el documento de necesidades del producto. |
+| **Arquitectura** | Configure fija decisiones y patrones; el stack viene después y la spec los aplica. Repo orquestador cuando front y back ya están separados. |
 
 ---
 
@@ -374,11 +485,26 @@ SDD Studio no es solo documentación bonita:
 
 | Documento | Contenido |
 | --- | --- |
+| [ARQUITECTURA-WORKSPACE.md](./ARQUITECTURA-WORKSPACE.md) | Árbol completo de archivos y carpetas |
 | [FLOW-GREENFIELD.md](./FLOW-GREENFIELD.md) | Flujo greenfield paso a paso (TUI + skills) |
 | [FLOW-BROWNFIELD.md](./FLOW-BROWNFIELD.md) | Proyectos con código existente |
 | [SKILLS.md](./SKILLS.md) | Catálogo de skills |
 | [LOCAL.md](./LOCAL.md) | Pruebas locales y demo |
 | [README.md](../README.md) | Instalación, CLI y tabla de skills |
+
+---
+
+## Slide de título (ejemplo)
+
+```text
+SDD Studio
+Knowledge Workspace for AI Development
+
+El espacio donde brief, spec, patrones y agentes
+dan a la IA el contexto completo del producto.
+
+v0.7.0 — versión de prueba — tu feedback cuenta
+```
 
 ---
 
