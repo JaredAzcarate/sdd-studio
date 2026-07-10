@@ -160,7 +160,7 @@ Invoke explicitly in your assistant — they do not run automatically.
 - Install external skills without your confirmation (`sdd-find-skills` always asks first)
 - Guarantee a perfect spec in one pass — iteration and review are expected
 
-**Learn more:** [SKILLS.md](./docs/SKILLS.md) · [ARQUITECTURA-WORKSPACE.md](./docs/ARQUITECTURA-WORKSPACE.md) (full file tree)
+**Learn more:** [SKILLS.md](./docs/SKILLS.md) · [WORKSPACE-ARCHITECTURE.md](./docs/WORKSPACE-ARCHITECTURE.md) (full file tree)
 
 ---
 

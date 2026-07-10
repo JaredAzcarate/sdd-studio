@@ -1,37 +1,37 @@
-# Skills de SDD Studio
+# SDD Studio Skills
 
-SDD Studio separa dos capas de responsabilidad: la **CLI y la TUI** preparan la estructura del workspace y copian las instrucciones al asistente de IA que uses; la **inteligencia del proceso** vive en las **skills**. Cada skill es un conjunto de reglas, flujos y estándares que el asistente sigue cuando la invocas en el chat. No generan código de aplicación por sí solas: guían la conversación, leen lo que ya existe en `.workspace/` y escriben documentación en el lugar correcto.
+SDD Studio separates two layers of responsibility: the **CLI and TUI** prepare the workspace structure and copy instructions to your AI assistant; the **process intelligence** lives in **skills**. Each skill is a set of rules, flows, and standards the assistant follows when you invoke it in chat. They do not generate application code on their own: they guide the conversation, read what already exists in `.workspace/`, and write documentation in the right place.
 
-El ciclo oficial del método es:
+The official method cycle is:
 
 ```text
 Idea → Brief → Specification → Planning → Implementation → Code
 ```
 
-Las skills cubren las etapas de Idea, Brief, Specification y Planning. La implementación la haces tú (o tu agente de desarrollo) siguiendo lo que quedó escrito en `.workspace/spec/` y `.workspace/workflow/`.
+Skills cover Idea, Brief, Specification, and Planning stages. Implementation is yours (or your development agent's), following what was written in `.workspace/spec/` and `.workspace/workflow/`.
 
-Hoy existen **siete skills**, idénticas en los tres asistentes empaquetados (Cursor, Claude y Codex). No hay una skill `sdd-studio`: lo que hace el paquete CLI (init, configure, migrate, sync) se ejecuta en la terminal o en la TUI, no como skill de chat.
+There are **seven skills** today, identical across the three packaged assistants (Cursor, Claude, and Codex). There is no `sdd-studio` skill: what the CLI package does (init, configure, migrate, sync) runs in the terminal or TUI, not as a chat skill.
 
 ---
 
-## Cómo invocarlas
+## How to invoke them
 
-Tras `sdd-studio init` (o la opción **Create brief scaffold** en la TUI), las skills se instalan en la ruta nativa de tu asistente:
+After `sdd-studio init` (or TUI **Create brief scaffold**), skills install in your assistant's native path:
 
-| Asistente | Ubicación |
+| Assistant | Location |
 | --------- | --------- |
-| Cursor (por defecto) | `.cursor/skills/sdd-*/` |
+| Cursor (default) | `.cursor/skills/sdd-*/` |
 | Claude | `.claude/skills/sdd-*/` |
 | Codex | `.agents/skills/sdd-*/` |
 
-En el chat, invócalas de forma explícita:
+In chat, invoke them explicitly:
 
-- Escribe el nombre de la skill: **sdd-idea**, **sdd-spec**, etc.
-- O usa el comando slash si tu herramienta lo soporta: `/sdd-idea`, `/sdd-spec`, `/sdd-generate`, `/sdd-technical`, `/sdd-find-skills`, `/sdd-plan`, `/sdd-review`
+- Type the skill name: **sdd-idea**, **sdd-spec**, etc.
+- Or use the slash command if your tool supports it: `/sdd-idea`, `/sdd-spec`, `/sdd-generate`, `/sdd-technical`, `/sdd-find-skills`, `/sdd-plan`, `/sdd-review`
 
-Todas llevan `disable-model-invocation: true`, lo que significa que no se activan solas: tú decides cuándo arrancar cada una. Eso evita que el asistente escriba spec o planificación sin que lo hayas pedido.
+All have `disable-model-invocation: true`, meaning they do not activate on their own: you decide when to start each one. That prevents the assistant from writing spec or planning without you asking.
 
-Para actualizar las skills desde el paquete instalado:
+To update skills from the installed package:
 
 ```bash
 npx sdd-studio sync --skills
@@ -41,50 +41,50 @@ npx sdd-studio sync --skills
 
 ## Skills vs CLI / TUI
 
-No todo el flujo pasa por el chat. Algunos pasos son comandos o menús de la terminal:
+Not every step goes through chat. Some steps are terminal commands or menus:
 
-| Acción | CLI / TUI | Skill equivalente |
+| Action | CLI / TUI | Equivalent skill |
 | ------ | --------- | ----------------- |
-| Crear estructura base y copiar skills | `sdd-studio init` o TUI **Create brief scaffold** | — |
-| Completar Engineering Brief (principios, decisiones, convenciones, patrones) | `sdd-studio configure` o TUI **Configure Engineering** | — (las skills lo referencian pero no lo sustituyen) |
-| Crear carpetas vacías de spec | TUI **Create spec scaffold** o `init --spec` | — |
-| Configurar metodología de trabajo | `sdd-studio configure-workflow` o TUI **Configure Workflow** | — |
-| Migrar workspace legacy a estructura versionada | `sdd-studio migrate` | — |
-| Descubrir el producto (greenfield) | — | **sdd-idea** |
-| Elegir stack tecnológico | — | **sdd-technical** |
-| Generar especificación desde el brief | — | **sdd-spec** |
-| Alinear código existente con el workspace | — | **sdd-generate** |
-| Revisar y actualizar brief/spec ante cambios | — | **sdd-review** |
-| Planificar releases y tareas | — | **sdd-plan** |
+| Create base structure and copy skills | `sdd-studio init` or TUI **Create brief scaffold** | — |
+| Complete Engineering Brief (principles, decisions, conventions, patterns) | `sdd-studio configure` or TUI **Configure Engineering** | — (skills reference it but do not replace it) |
+| Create empty spec folders | TUI **Create spec scaffold** or `init --spec` | — |
+| Configure work methodology | `sdd-studio configure-workflow` or TUI **Configure Workflow** | — |
+| Migrate legacy workspace to versioned structure | `sdd-studio migrate` | — |
+| Discover the product (greenfield) | — | **sdd-idea** |
+| Choose technology stack | — | **sdd-technical** |
+| Generate specification from the brief | — | **sdd-spec** |
+| Align existing code with the workspace | — | **sdd-generate** |
+| Review and update brief/spec after changes | — | **sdd-review** |
+| Plan releases and tasks | — | **sdd-plan** |
 
-La regla práctica: la terminal **prepara el terreno**; las skills **conversan, descubren y documentan**.
-
----
-
-## sdd-idea — Descubrir el producto
-
-Úsala cuando empiezas un proyecto **greenfield** y aún no tienes claro (o no tienes escrito) el Business Brief. Es la skill de descubrimiento por preguntas: no lee código de aplicación ni inventa dominios técnicos.
-
-**Qué lee:** lo que exista bajo `.workspace/brief/` (solo como contexto; no modifica el brief técnico).
-
-**Qué escribe:** exclusivamente `.workspace/brief/business/`:
-
-- `product-principles.md` — qué es el producto, qué no es, principios inmutables
-- `product-guide.md` — recorrido del usuario: entrada, onboarding, bucle principal, caminos alternativos
-
-**Qué no toca:** `.workspace/spec/`, `.workspace/workflow/`, ni ningún archivo bajo `brief/technical/` (esos los crea `sdd-studio configure`).
-
-El flujo es conversacional: bloques de 3–5 preguntas, confirmación, y luego generación. Si empezaste por la idea sin haber pasado por configure, al terminar te orientará a ejecutar `sdd-studio configure` y después **sdd-technical**.
-
-**Siguiente paso típico:** `sdd-studio configure` (si falta el Engineering Brief) → **sdd-technical** → scaffold de spec → **sdd-spec**.
+The practical rule: the terminal **prepares the ground**; skills **converse, discover, and document**.
 
 ---
 
-## sdd-technical — Definir el stack
+## sdd-idea — Discover the product
 
-Actúa como un desarrollador fullstack en una reunión con el equipo: lee las decisiones de ingeniería ya tomadas y ayuda a **elegir tecnologías concretas** (web, móvil, backend, base de datos, auth, etc.) mediante preguntas de opción múltiple, una a la vez.
+Use it when you start a **greenfield** project and do not yet have (or have not written) the Business Brief. It is the discovery skill through questions: it does not read application code or invent technical domains.
 
-**Qué lee:** los seis archivos del Engineering Brief generados por configure:
+**Reads:** whatever exists under `.workspace/brief/` (context only; does not modify the technical brief).
+
+**Writes:** exclusively `.workspace/brief/business/`:
+
+- `product-principles.md` — what the product is, what it is not, immutable principles
+- `product-guide.md` — user journey: entry, onboarding, main loop, alternate paths
+
+**Does not touch:** `.workspace/spec/`, `.workspace/workflow/`, or any file under `brief/technical/` (those are created by `sdd-studio configure`).
+
+The flow is conversational: blocks of 3–5 questions, confirmation, then generation. If you started with idea before configure, on completion it guides you to run `sdd-studio configure`, then **sdd-technical**.
+
+**Typical next step:** `sdd-studio configure` (if Engineering Brief is missing) → **sdd-technical** → spec scaffold → **sdd-spec**.
+
+---
+
+## sdd-technical — Define the stack
+
+Acts like a fullstack developer in a team meeting: reads engineering decisions already made and helps **choose concrete technologies** (web, mobile, backend, database, auth, etc.) through multiple-choice questions, one at a time.
+
+**Reads:** the six Engineering Brief files generated by configure:
 
 - `engineering-principles.md`
 - `engineering-decisions.md`
@@ -93,120 +93,120 @@ Actúa como un desarrollador fullstack en una reunión con el equipo: lee las de
 - `engineering-backend-patterns.md`
 - `engineering-contribution-patterns.md`
 
-Si alguno falta o sigue siendo un stub vacío, **se detiene** y pide completar configure antes de continuar.
+If any is missing or still an empty stub, it **stops** and asks to complete configure first.
 
-**Qué escribe:** un solo archivo nuevo:
+**Writes:** one new file:
 
-- `engineering-stack.md` — solo las tecnologías confirmadas, sin recomendaciones descartadas
+- `engineering-stack.md` — only confirmed technologies, no discarded recommendations
 
-**Qué no toca:** los archivos de entrada del brief técnico ni `.workspace/spec/`.
+**Does not touch:** technical brief input files or `.workspace/spec/`.
 
-**Siguiente paso típico:** opcional **sdd-find-skills** (skills de implementación del ecosistema abierto) → crear el scaffold de spec (TUI o `init --spec`) → **sdd-spec**.
-
----
-
-## sdd-find-skills — Descubrir skills de implementación (opcional)
-
-Lee el Engineering Brief confirmado y `engineering-stack.md`, extrae señales del **stack** (tecnologías elegidas) y de las **estrategias** (decisiones y patrones de configure), y busca skills en el ecosistema abierto (`npx skills`, https://skills.sh/).
-
-**No usa un catálogo fijo en SDD Studio.** Cada recomendación se deriva del brief del proyecto y se valida con criterios de calidad (instalaciones, fuente, ajuste al trigger).
-
-**Qué lee:** `manifest.yaml` y todos los archivos bajo `brief/technical/<current>/`, especialmente `engineering-stack.md`.
-
-**Qué escribe:** nada en `.workspace/`. Opcionalmente instala skills aprobadas con `npx skills add ... -g -y`.
-
-**Presentación:** tabla con columnas `Trigger type` (Stack o Strategy), trigger, skill sugerida, instalaciones, fuente, comando de install y estado. El usuario puede excluir filas antes de instalar.
-
-**Qué no toca:** brief, spec, workflow.
-
-**Siguiente paso típico:** **sdd-spec** o continuar implementación con las skills instaladas.
-
-**Cuándo omitirla:** si ya usas tus propias skills o agentes.
+**Typical next step:** optional **sdd-find-skills** (implementation skills from the open ecosystem) → create spec scaffold (TUI or `init --spec`) → **sdd-spec**.
 
 ---
 
-## sdd-spec — Especificar dominios
+## sdd-find-skills — Discover implementation skills (optional)
 
-Transforma el brief completo en una especificación estructurada por dominios. El **Product Guide** es la fuente funcional única: todo lo que aparece en spec debe poder rastrearse a ese documento. El brief técnico aporta contexto de arquitectura, patrones y stack.
+Reads the confirmed Engineering Brief and `engineering-stack.md`, extracts signals from the **stack** (chosen technologies) and **strategies** (configure decisions and patterns), and searches skills in the open ecosystem (`npx skills`, https://skills.sh/).
 
-**Qué lee:** todo `.workspace/brief/` (business + technical, incluyendo `engineering-stack.md` y los archivos `engineering-*-patterns.md`).
+**Does not use a fixed catalog in SDD Studio.** Each recommendation derives from the project brief and is validated with quality criteria (installs, source, fit to trigger).
 
-**Qué escribe:** bajo `.workspace/spec/`, **12 archivos por dominio**:
+**Reads:** `manifest.yaml` and all files under `brief/technical/<current>/`, especially `engineering-stack.md`.
+
+**Writes:** nothing in `.workspace/`. Optionally installs approved skills with `npx skills add ... -g -y`.
+
+**Presentation:** table with columns `Trigger type` (Stack or Strategy), trigger, suggested skill, installs, source, install command, and status. The user may exclude rows before installing.
+
+**Does not touch:** brief, spec, workflow.
+
+**Typical next step:** **sdd-spec** or continue implementation with installed skills.
+
+**When to skip:** if you already use your own skills or agents.
+
+---
+
+## sdd-spec — Specify domains
+
+Transforms the full brief into a structured specification by domain. The **Product Guide** is the single functional source: everything in spec must trace back to that document. The technical brief provides architecture, patterns, and stack context.
+
+**Reads:** all of `.workspace/brief/` (business + technical, including `engineering-stack.md` and `engineering-*-patterns.md` files).
+
+**Writes:** under `.workspace/spec/`, **12 files per domain**:
 
 - Business: domain, relations, capabilities, flows, rules, security, events
 - Technical: api, ui, testing, architecture, database
 
-Primero propone el mapa de dominios y espera tu aprobación; después descubre y genera. Al final ejecuta el validador `validate-spec.mjs` hasta que pase sin errores.
+First proposes the domain map and waits for your approval; then discovers and generates. Finally runs validator `validate-spec.mjs` until it passes without errors.
 
-**Qué no toca:** `.workspace/brief/` ni `.workspace/workflow/`.
+**Does not touch:** `.workspace/brief/` or `.workspace/workflow/`.
 
-**Siguiente paso típico:** elegir proveedor de trabajo (SDD Studio → `configure-workflow`; externo → directo a **sdd-plan**) → **sdd-plan**. Opcionalmente **sdd-review** antes de planificar.
-
----
-
-## sdd-generate — Alinear un codebase existente
-
-Es la skill **brownfield**: explora el código de la aplicación, compara con lo que hay (o no hay) en `.workspace/`, y propone completar o corregir brief y spec. Opera en **modo conservador**: primero analiza y presenta un informe; solo escribe después de tu aprobación explícita.
-
-**Qué lee:** el código en la raíz de producto resuelta desde `engineering-decisions.md`, más todo `.workspace/brief/`, `.workspace/spec/` y el `manifest.yaml` en proyectos versionados.
-
-**Qué escribe:** archivos bajo `.workspace/brief/` (business y technical, incluido `engineering-stack.md` cuando aplique) y los 12 archivos por dominio en `.workspace/spec/`.
-
-**Qué no toca:** código de aplicación (`src/`, etc.) ni `.workspace/workflow/`.
-
-Para greenfield sin código, usa **sdd-idea** + **sdd-spec** en lugar de esta skill.
-
-**Siguiente paso típico:** **sdd-review** (opcional, para validar) → `configure-workflow` si aplica → **sdd-plan**.
+**Typical next step:** choose work provider (SDD Studio → `configure-workflow`; external → straight to **sdd-plan**). Optionally **sdd-review** before planning.
 
 ---
 
-## sdd-review — Revisar cambios contra el brief y la spec
+## sdd-generate — Align an existing codebase
 
-Úsala cuando algo cambia: una nueva funcionalidad, un ajuste de API, una regla de negocio distinta, o cuando quieres comprobar que brief y spec siguen siendo coherentes entre sí. Analiza el impacto, pregunta si hay ambigüedad, propone los archivos afectados y aplica los cambios tras confirmación.
+The **brownfield** skill: explores application code, compares with what exists (or does not) in `.workspace/`, and proposes completing or correcting brief and spec. Operates in **conservative mode**: first analyzes and presents a report; only writes after your explicit approval.
 
-**Qué lee:** todo `.workspace/brief/` y `.workspace/spec/`.
+**Reads:** code at the product root resolved from `engineering-decisions.md`, plus all `.workspace/brief/`, `.workspace/spec/`, and `manifest.yaml` in versioned projects.
 
-**Qué escribe:** brief business, brief technical (con límites: principios, decisiones, convenciones y patrones de ingeniería deben actualizarse vía `sdd-studio configure`; cambios de stack vía **sdd-technical**) y archivos de dominio en spec.
+**Writes:** files under `.workspace/brief/` (business and technical, including `engineering-stack.md` when applicable) and the 12 files per domain in `.workspace/spec/`.
 
-**Qué no toca:** `.workspace/workflow/` ni código de aplicación.
+**Does not touch:** application code (`src/`, etc.) or `.workspace/workflow/`.
 
-Ejecuta `validate-spec.mjs` tras editar spec.
+For greenfield without code, use **sdd-idea** + **sdd-spec** instead of this skill.
 
-**Siguiente paso típico:** si el cambio es grande en dominios nuevos, puede recomendar **sdd-spec**; si solo validaste, continúa con **sdd-plan** o implementación según el caso.
+**Typical next step:** **sdd-review** (optional, to validate) → `configure-workflow` if applicable → **sdd-plan**.
 
 ---
 
-## sdd-plan — Planificar el trabajo
+## sdd-review — Review changes against brief and spec
 
-Convierte brief + spec validada en un plan ejecutable bajo `.workspace/workflow/`. Lee las restricciones técnicas, los dominios, las capacidades prioritarias y, si existe, `workflow-config.md` (metodología Kanban, Scrum, convenciones de tareas, etc.).
+Use it when something changes: a new feature, an API adjustment, a different business rule, or when you want to check that brief and spec remain coherent. Analyzes impact, asks when ambiguous, proposes affected files, and applies changes after confirmation.
 
-**Qué lee:** todo `.workspace/brief/`, todo `.workspace/spec/`, y opcionalmente `.workspace/workflow/workflow-config.md`.
+**Reads:** all `.workspace/brief/` and `.workspace/spec/`.
 
-**Qué escribe:**
+**Writes:** business brief, technical brief (with limits: principles, decisions, conventions, and engineering patterns must be updated via `sdd-studio configure`; stack changes via **sdd-technical**) and domain files in spec.
+
+**Does not touch:** `.workspace/workflow/` or application code.
+
+Runs `validate-spec.mjs` after editing spec.
+
+**Typical next step:** if the change is large with new domains, it may recommend **sdd-spec**; if you only validated, continue with **sdd-plan** or implementation as appropriate.
+
+---
+
+## sdd-plan — Plan the work
+
+Converts brief + validated spec into an executable plan under `.workspace/workflow/`. Reads technical constraints, domains, priority capabilities, and, if present, `workflow-config.md` (Kanban, Scrum methodology, task conventions, etc.).
+
+**Reads:** all `.workspace/brief/`, all `.workspace/spec/`, and optionally `.workspace/workflow/workflow-config.md`.
+
+**Writes:**
 
 - `workflow/roadmap/roadmap-NNN.md`
 - `workflow/milestones/milestone-NNN.md`
-- `workflow/releases/release-NNN/` con `release.md`, `tasks.md`, `reviews.md` y `decisions.md`
+- `workflow/releases/release-NNN/` with `release.md`, `tasks.md`, `reviews.md`, and `decisions.md`
 
-Deriva tareas (`TASK-001`, …) desde capacidades y flujos de la spec. Valida con `validate-workflow.mjs`.
+Derives tasks (`TASK-001`, …) from capabilities and flows in spec. Validates with `validate-workflow.mjs`.
 
-**Qué no toca:** brief ni spec (si detecta huecos críticos, te manda a **sdd-spec** o **sdd-review**).
+**Does not touch:** brief or spec (if it detects critical gaps, it sends you to **sdd-spec** or **sdd-review**).
 
-**Siguiente paso típico:** implementar la primera tarea de `tasks.md` con tu agente de desarrollo.
+**Typical next step:** implement the first task in `tasks.md` with your development agent.
 
 ---
 
-## Flujo greenfield
+## Greenfield flow
 
-Proyecto nuevo, sin código (o sin código relevante que analizar):
+New project, no code (or no relevant code to analyze):
 
 ```text
 configure → sdd-idea → sdd-technical → [sdd-find-skills] → [spec scaffold] → sdd-spec → [configure-workflow] → sdd-plan
 ```
 
-Puedes invertir el inicio: **sdd-idea** antes de configure. Cuando el producto esté claro, completas el Engineering Brief con `sdd-studio configure`, sigues con **sdd-technical**, y el resto del camino igual.
+You may invert the start: **sdd-idea** before configure. Once the product is clear, complete the Engineering Brief with `sdd-studio configure`, continue with **sdd-technical**, and the rest of the path is the same.
 
-En cualquier momento del ciclo, **sdd-review** es opcional para validar coherencia antes de planificar o implementar. **sdd-generate** no forma parte de este flujo.
+At any point in the cycle, **sdd-review** is optional to validate coherence before planning or implementing. **sdd-generate** is not part of this flow.
 
 ```mermaid
 flowchart LR
@@ -217,55 +217,55 @@ flowchart LR
   TECH --> SPEC
   SPEC --> WF{Workflow?}
   WF -->|SDD Studio| CW[configure-workflow]
-  WF -->|Externo| PLAN[sdd-plan]
+  WF -->|External| PLAN[sdd-plan]
   CW --> PLAN
 ```
 
 ---
 
-## Flujo brownfield
+## Brownfield flow
 
-Proyecto con código existente que quieres documentar o alinear con SDD:
+Project with existing code you want to document or align with SDD:
 
 ```text
-migrate (si legacy) → sdd-generate → [sdd-review] → [configure-workflow] → sdd-plan
+migrate (if legacy) → sdd-generate → [sdd-review] → [configure-workflow] → sdd-plan
 ```
 
-El brief brownfield usa carpetas **semver** (`0.1.0`, `0.2.0`, …) y un `manifest.yaml` que indica qué versión de cada carril está activa (`current`), en borrador (`target`) o archivada. **sdd-generate** resuelve rutas según ese manifiesto, completa brief y spec, y pide confirmación antes de escribir.
+The brownfield brief uses **semver** folders (`0.1.0`, `0.2.0`, …) and a `manifest.yaml` indicating which version of each lane is active (`current`), in draft (`target`), or archived. **sdd-generate** resolves paths from that manifest, completes brief and spec, and asks for confirmation before writing.
 
-**sdd-idea**, **sdd-technical** y **sdd-spec** siguen siendo válidas en brownfield si prefieres el camino por fases (por ejemplo, redefinir producto con **sdd-idea** en una nueva versión `target`), pero el punto de entrada habitual es **sdd-generate**.
+**sdd-idea**, **sdd-technical**, and **sdd-spec** remain valid in brownfield if you prefer the phased path (e.g. redefine product with **sdd-idea** in a new `target` version), but the usual entry point is **sdd-generate**.
 
 ```mermaid
 flowchart LR
-  INIT[brief versionado + manifest] --> GEN[sdd-generate]
-  GEN --> BRIEF[Completa brief semver]
-  BRIEF --> SPEC[Genera spec alineada]
+  INIT[versioned brief + manifest] --> GEN[sdd-generate]
+  GEN --> BRIEF[Completes semver brief]
+  BRIEF --> SPEC[Generates aligned spec]
   SPEC --> REV{sdd-review?}
-  REV -->|Sí| GEN
+  REV -->|Yes| GEN
   REV -->|No| WF{Workflow?}
   WF -->|SDD Studio| CW[configure-workflow]
-  WF -->|Externo| PLAN[sdd-plan]
+  WF -->|External| PLAN[sdd-plan]
   CW --> PLAN
 ```
 
 ---
 
-## Tabla resumen
+## Summary table
 
-| Skill | Cuándo usarla | Lee principalmente | Escribe principalmente | Siguiente paso |
+| Skill | When to use | Reads mainly | Writes mainly | Next step |
 | ----- | ------------- | ------------------ | ---------------------- | -------------- |
-| **sdd-idea** | Greenfield; definir producto por conversación | `brief/` (contexto) | `brief/business/` | configure → sdd-technical |
-| **sdd-technical** | Engineering Brief completo; elegir stack | `brief/technical/` (6 archivos de configure) | `engineering-stack.md` | sdd-find-skills (opc.) → spec scaffold → sdd-spec |
-| **sdd-find-skills** | Stack confirmado; buscar skills de implementación | `brief/technical/` + `engineering-stack.md` | — (instala skills externas con aprobación) | sdd-spec o implementación |
-| **sdd-spec** | Brief listo; generar especificación por dominios | Todo `brief/` | `spec/business/` + `spec/technical/` | configure-workflow → sdd-plan |
-| **sdd-generate** | Brownfield; código existente sin spec o desalineada | Código + `brief/` + `spec/` | `brief/` + `spec/` (con aprobación) | sdd-review → sdd-plan |
-| **sdd-review** | Cambios, inconsistencias, validación | `brief/` + `spec/` | `brief/` + `spec/` (acotado) | sdd-plan o implementación |
-| **sdd-plan** | Spec validada; organizar trabajo | `brief/` + `spec/` + workflow config | `workflow/` | Implementar `tasks.md` |
+| **sdd-idea** | Greenfield; define product through conversation | `brief/` (context) | `brief/business/` | configure → sdd-technical |
+| **sdd-technical** | Engineering Brief complete; choose stack | `brief/technical/` (6 configure files) | `engineering-stack.md` | sdd-find-skills (opt.) → spec scaffold → sdd-spec |
+| **sdd-find-skills** | Stack confirmed; search implementation skills | `brief/technical/` + `engineering-stack.md` | — (installs external skills with approval) | sdd-spec or implementation |
+| **sdd-spec** | Brief ready; generate specification by domain | All `brief/` | `spec/business/` + `spec/technical/` | configure-workflow → sdd-plan |
+| **sdd-generate** | Brownfield; existing code without spec or misaligned | Code + `brief/` + `spec/` | `brief/` + `spec/` (with approval) | sdd-review → sdd-plan |
+| **sdd-review** | Changes, inconsistencies, validation | `brief/` + `spec/` | `brief/` + `spec/` (scoped) | sdd-plan or implementation |
+| **sdd-plan** | Validated spec; organize work | `brief/` + `spec/` + workflow config | `workflow/` | Implement `tasks.md` |
 
 ---
 
-## Documentación relacionada
+## Related documentation
 
-- [FLOW-GREENFIELD.md](./FLOW-GREENFIELD.md) — camino feliz greenfield (TUI + skills)
-- [FLOW-BROWNFIELD.md](./FLOW-BROWNFIELD.md) — camino feliz brownfield (manifest, semver, sdd-generate)
-- [README.md](./README.md) — instalación, asistentes soportados y referencia CLI
+- [FLOW-GREENFIELD.md](./FLOW-GREENFIELD.md) — greenfield happy path (TUI + skills)
+- [FLOW-BROWNFIELD.md](./FLOW-BROWNFIELD.md) — brownfield happy path (manifest, semver, sdd-generate)
+- [README.md](../README.md) — installation, supported assistants, and CLI reference

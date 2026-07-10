@@ -1,40 +1,40 @@
-# Flujo Brownfield — SDD Studio
+# Brownfield Flow — SDD Studio
 
-Fuente de verdad del camino feliz para proyectos **brownfield** (código existente).
+Source of truth for the happy path on **brownfield** projects (existing code).
 
-## Convenciones
+## Conventions
 
-| Concepto | Valor |
+| Concept | Value |
 | -------- | ----- |
-| CLI | `npx sdd-studio` o `sdd-studio` |
-| Menú brownfield | TUI **Brownfield** al arrancar `sdd-studio` |
-| Migrate legacy | `sdd-studio migrate` o TUI **Migrate** |
-| Skills | Invocar en el asistente elegido (`/sdd-generate`, skill **sdd-generate**, etc.) |
+| CLI | `npx sdd-studio` or `sdd-studio` |
+| Brownfield menu | TUI **Brownfield** when starting `sdd-studio` |
+| Migrate legacy | `sdd-studio migrate` or TUI **Migrate** |
+| Skills | Invoke in your chosen assistant (`/sdd-generate`, skill **sdd-generate**, etc.) |
 
-### Orden canónico de skills
+### Canonical skill order
 
 ```text
-migrate (si legacy) → sdd-generate → [sdd-review] → sdd-plan
+migrate (if legacy) → sdd-generate → [sdd-review] → sdd-plan
 ```
 
-Para cambios de stack o arquitectura:
+For stack or architecture changes:
 
 ```text
 Configure Refactor Engineering → sdd-technical (target) → Promote Engineering Target
 ```
 
-### Versionado del Brief
+### Brief versioning
 
-El brief brownfield usa **carpetas semver** y un manifiesto central:
+The brownfield brief uses **semver folders** and a central manifest:
 
-| Archivo / carpeta | Rol |
+| File / folder | Role |
 | ----------------- | --- |
-| `.workspace/brief/manifest.yaml` | Punteros `current`, `target` y `archived` por carril |
-| `.workspace/brief/business/<semver>/` | Business Brief versionado (`0.1.0`, `0.2.0`, …) |
-| `.workspace/brief/technical/<semver>/` | Technical Brief versionado |
-| `.workspace/spec/` | Spec viva, alineada con versiones declaradas en el manifiesto |
+| `.workspace/brief/manifest.yaml` | `current`, `target`, and `archived` pointers per lane |
+| `.workspace/brief/business/<semver>/` | Versioned Business Brief (`0.1.0`, `0.2.0`, …) |
+| `.workspace/brief/technical/<semver>/` | Versioned Technical Brief |
+| `.workspace/spec/` | Living spec, aligned with versions declared in the manifest |
 
-**Contrato `manifest.yaml` (schema: 1):**
+**`manifest.yaml` contract (schema: 1):**
 
 ```yaml
 schema: 1
@@ -46,7 +46,7 @@ business:
 
 technical:
   current: "0.1.0"
-  target: "0.2.0"  # o null si no hay borrador en curso
+  target: "0.2.0"  # or null if no draft in progress
   archived: []
 
 spec:
@@ -55,86 +55,86 @@ spec:
     technical: "0.1.0"
 ```
 
-- **Semver completo** en nombres de carpeta: `0.1.0`, no `0.1`.
-- **`current`**: versión activa del carril.
-- **`target`**: borrador de la siguiente versión (`null` si no hay trabajo en curso).
-- **`archived`**: versiones anteriores conservadas.
-- **`spec.aligned_with`**: versiones del brief con las que la spec está alineada.
+- **Full semver** in folder names: `0.1.0`, not `0.1`.
+- **`current`**: active version of the lane.
+- **`target`**: draft of the next version (`null` if no work in progress).
+- **`archived`**: preserved previous versions.
+- **`spec.aligned_with`**: brief versions the spec is aligned with.
 
-Layouts **planos** legacy (`brief/business/product-guide.md` sin semver) se detectan cuando falta `manifest.yaml`; deben migrarse con **Migrate** antes de usar resolución de rutas versionadas.
+**Flat** legacy layouts (`brief/business/product-guide.md` without semver) are detected when `manifest.yaml` is missing; migrate with **Migrate** before using versioned path resolution.
 
-### Mapa `.workspace/`
+### `.workspace/` map
 
-| Carpeta | Pregunta |
+| Folder | Question |
 | ------- | -------- |
-| `brief/manifest.yaml` | ¿Qué versión de cada carril está activa o en borrador? |
-| `brief/business/<semver>/` | ¿Qué producto describe esta versión? |
-| `brief/technical/<semver>/` | ¿Cómo decidimos construirlo en esta versión? |
-| `spec/business/` + `spec/technical/` | ¿Cómo está especificado (alineado al manifiesto)? |
-| `workflow/` | ¿Cómo organizamos el trabajo? (opcional, post-spec) |
+| `brief/manifest.yaml` | Which version of each lane is active or in draft? |
+| `brief/business/<semver>/` | What product does this version describe? |
+| `brief/technical/<semver>/` | How do we decide to build it in this version? |
+| `spec/business/` + `spec/technical/` | How is it specified (aligned to the manifest)? |
+| `workflow/` | How do we organize the work? (optional, post-spec) |
 
 ---
 
-## 1. Arranque de la terminal
+## 1. Terminal startup
 
-Al ejecutar `sdd-studio`, la TUI pregunta:
+When you run `sdd-studio`, the TUI asks:
 
-- **Greenfield** — ver `FLOW-GREENFIELD.md`
-- **Brownfield** — flujo de este documento
+- **Greenfield** — see `FLOW-GREENFIELD.md`
+- **Brownfield** — flow in this document
 
-### Menú principal (Brownfield)
+### Main menu (Brownfield)
 
-| Opción | Qué hace |
+| Option | What it does |
 | ------ | -------- |
-| **Create brief scaffold** | `manifest.yaml` + stubs `0.1.0` + skills (incl. `sdd-generate`) |
-| **Create spec scaffold** | Carpetas vacías `spec/business/` y `spec/technical/` |
-| **Configure Refactor Engineering** | Crea versión `target` y configura secciones del Technical Brief |
-| **Promote Engineering Target** | Promueve `technical.target` → `current` en el manifiesto |
-| **Migrate** | Layout plano legacy → brief versionado con `manifest.yaml` |
-| **Sync Assistant Files** | Actualiza skills del paquete |
-| **Exit** | Cierra la TUI |
+| **Create brief scaffold** | `manifest.yaml` + `0.1.0` stubs + skills (incl. `sdd-generate`) |
+| **Create spec scaffold** | Empty folders `spec/business/` and `spec/technical/` |
+| **Configure Refactor Engineering** | Creates `target` version and configures Technical Brief sections |
+| **Promote Engineering Target** | Promotes `technical.target` → `current` in the manifest |
+| **Migrate** | Flat legacy layout → versioned brief with `manifest.yaml` |
+| **Sync Assistant Files** | Updates packaged skills |
+| **Exit** | Closes the TUI |
 
-> **Configure Workflow** no está en el menú brownfield; usa `sdd-studio configure-workflow` tras tener spec, igual que en greenfield.
+> **Configure Workflow** is not in the brownfield menu; use `sdd-studio configure-workflow` after spec, same as greenfield.
 
 ---
 
 ## 2. Foundation — Create brief scaffold
 
-La CLI crea la estructura brownfield con manifiesto y carpetas semver iniciales (`0.1.0`).
+The CLI creates the brownfield structure with manifest and initial semver folders (`0.1.0`).
 
-**Genera:**
+**Generates:**
 
 - `.workspace/brief/manifest.yaml`
 - `.workspace/brief/business/0.1.0/` — stubs `product-principles.md`, `product-guide.md`
-- `.workspace/brief/technical/0.1.0/` — stubs de engineering (sin stack)
-- Skills del asistente (`.cursor/skills/`, etc.), incluyendo **sdd-generate**
+- `.workspace/brief/technical/0.1.0/` — engineering stubs (no stack)
+- Assistant skills (`.cursor/skills/`, etc.), including **sdd-generate**
 
-**No genera:** spec completa, `workflow/`, `engineering-stack.md`, código de aplicación.
+**Does not generate:** full spec, `workflow/`, `engineering-stack.md`, application code.
 
-**Next step:** abrir chat y ejecutar **sdd-generate**.
-
----
-
-## 3. Migrate (solo si legacy)
-
-Si el workspace fue creado antes del versionado semver (sin `manifest.yaml`):
-
-- TUI **Migrate** o `sdd-studio migrate`
-- Mueve archivos planos a `brief/business/0.1.0/` y `brief/technical/0.1.0/`
-- Archiva `engineering-modeling.md` si existía
-- Escribe `manifest.yaml`
-
-**Next step:** continuar con **sdd-generate** o **Configure Refactor Engineering**.
+**Next step:** open chat and run **sdd-generate**.
 
 ---
 
-## 4. Descubrimiento — sdd-generate
+## 3. Migrate (legacy only)
 
-El usuario inicia un chat y ejecuta **sdd-generate**.
+If the workspace was created before semver versioning (no `manifest.yaml`):
 
-La IA analiza el código existente y completa el Brief en las rutas resueltas por `manifest.yaml` (carril `current` por defecto).
+- TUI **Migrate** or `sdd-studio migrate`
+- Moves flat files to `brief/business/0.1.0/` and `brief/technical/0.1.0/`
+- Archives `engineering-modeling.md` if it existed
+- Writes `manifest.yaml`
 
-**Genera o completa:**
+**Next step:** continue with **sdd-generate** or **Configure Refactor Engineering**.
+
+---
+
+## 4. Discovery — sdd-generate
+
+The user starts a chat and runs **sdd-generate**.
+
+The AI analyzes existing code and completes the Brief at paths resolved by `manifest.yaml` (`current` lane by default).
+
+**Generates or completes:**
 
 ### Business (`brief/business/<semver>/`)
 
@@ -149,16 +149,16 @@ La IA analiza el código existente y completa el Brief en las rutas resueltas po
 - `engineering-frontend-patterns.md`
 - `engineering-backend-patterns.md`
 - `engineering-contribution-patterns.md`
-- `engineering-stack.md` (cuando aplique)
-- `engineering-inventory.md` (fase de inventario, cuando aplique)
+- `engineering-stack.md` (when applicable)
+- `engineering-inventory.md` (inventory phase, when applicable)
 
-Si la información no puede inferirse con confianza, la skill pregunta al usuario en lugar de asumir.
+If information cannot be inferred with confidence, the skill asks the user instead of assuming.
 
 ---
 
-## 5. Specifications — sdd-generate (continuación)
+## 5. Specifications — sdd-generate (continued)
 
-Tras el Brief, **sdd-generate** identifica dominios, flujos y superficies técnicas y genera la spec bajo `.workspace/spec/`, alineada con `spec.aligned_with` del manifiesto.
+After the Brief, **sdd-generate** identifies domains, flows, and technical surfaces and generates spec under `.workspace/spec/`, aligned with `spec.aligned_with` in the manifest.
 
 ### Business
 
@@ -168,112 +168,112 @@ Tras el Brief, **sdd-generate** identifica dominios, flujos y superficies técni
 
 - API, UI, Testing, Architecture, Database
 
-**Next step:** revisión con el usuario o **sdd-review**.
+**Next step:** review with the user or **sdd-review**.
 
 ---
 
-## 6. Revisión — sdd-review (opcional)
+## 6. Review — sdd-review (optional)
 
-Valida cambios contra Brief o Specification. El usuario puede corregir, completar o pedir regeneración parcial hasta que la documentación refleje el proyecto.
+Validates changes against Brief or Specification. The user may correct, complete, or request partial regeneration until documentation reflects the project.
 
 ---
 
-## 7. Evolución del Technical Brief — Configure Refactor Engineering
+## 7. Technical Brief evolution — Configure Refactor Engineering
 
-Para una nueva versión del stack o decisiones de arquitectura (p. ej. `0.1.0` → `0.2.0`):
+For a new version of stack or architecture decisions (e.g. `0.1.0` → `0.2.0`):
 
-### 7.1 Iniciar refactor (TUI)
+### 7.1 Start refactor (TUI)
 
 **Configure Refactor Engineering**:
 
-1. Crea la carpeta `brief/technical/<target>/` (p. ej. `0.2.0`)
-2. Actualiza `manifest.yaml` (`technical.target`)
-3. **No copia** archivos al inicio
-4. Carga respuestas del formulario desde `technical.current` (valores actuales)
+1. Creates folder `brief/technical/<target>/` (e.g. `0.2.0`)
+2. Updates `manifest.yaml` (`technical.target`)
+3. Does **not copy** files at start
+4. Loads form answers from `technical.current` (current values)
 
-### 7.2 Configurar por sección
+### 7.2 Configure by section
 
-El usuario elige secciones en el dashboard (principles, decisions, conventions, patterns):
+The user chooses sections in the dashboard (principles, decisions, conventions, patterns):
 
-- Cada sección completada **escribe de inmediato** en `brief/technical/<target>/`
-- Tras cada sección aparece el prompt:
-  - **Continue configuring** — vuelve al dashboard para otra sección
-  - **Finalize refactor** — copia desde `current` los archivos **no modificados** (p. ej. `engineering-stack.md` si no se tocó)
+- Each completed section **writes immediately** to `brief/technical/<target>/`
+- After each section, a prompt appears:
+  - **Continue configuring** — return to the dashboard for another section
+  - **Finalize refactor** — copy from `current` any **unmodified** files (e.g. `engineering-stack.md` if untouched)
 
-Atajo: **`f`** desde el dashboard para finalizar sin abrir otra sección.
+Shortcut: **`f`** from the dashboard to finalize without opening another section.
 
-### 7.3 Publicar
+### 7.3 Publish
 
-1. Ejecutar **sdd-technical** contra la versión `target`
-2. TUI **Promote Engineering Target** (o editar `manifest.yaml` manualmente):
+1. Run **sdd-technical** against the `target` version
+2. TUI **Promote Engineering Target** (or edit `manifest.yaml` manually):
    - `technical.current` ← `technical.target`
    - `technical.target` ← `null`
-   - versión anterior → `technical.archived`
-   - `spec.aligned_with.technical` actualizado
+   - previous version → `technical.archived`
+   - `spec.aligned_with.technical` updated
 
-La resolución de rutas usa `current` o `target`; si `target` es `null`, no se resuelven rutas de borrador.
+Path resolution uses `current` or `target`; if `target` is `null`, draft paths are not resolved.
 
 ---
 
-## 8. Workflow y planificación
+## 8. Workflow and planning
 
-Tras spec alineada:
+After aligned spec:
 
-| Elección | Acción |
+| Choice | Action |
 | -------- | ------ |
 | **SDD Studio** | `sdd-studio configure-workflow` → `.workspace/workflow/` |
-| **Linear / GitHub Issues / otro** | **sdd-plan** sin workflow SDD |
+| **Linear / GitHub Issues / other** | **sdd-plan** without SDD workflow |
 
-**sdd-plan** lee brief + spec + workflow config (si aplica) y genera releases bajo `workflow/`.
+**sdd-plan** reads brief + spec + workflow config (if applicable) and generates releases under `workflow/`.
 
 ---
 
-## 9. Ciclo iterativo
+## 9. Iterative cycle
 
-| Skill / comando | Cuándo |
+| Skill / command | When |
 | --------------- | ------ |
-| **sdd-generate** | Bootstrap o re-sincronización brownfield |
-| **sdd-review** | Validar cambios contra Brief o spec |
-| **sdd-plan** | Planificar trabajo sobre spec existente |
-| **migrate** | Legacy plano → brief versionado |
-| **Configure Refactor Engineering** | Nueva versión del Technical Brief |
-| **Promote Engineering Target** | Publicar `target` como `current` |
+| **sdd-generate** | Bootstrap or brownfield re-sync |
+| **sdd-review** | Validate changes against Brief or spec |
+| **sdd-plan** | Plan work on existing spec |
+| **migrate** | Flat legacy → versioned brief |
+| **Configure Refactor Engineering** | New Technical Brief version |
+| **Promote Engineering Target** | Publish `target` as `current` |
 
 ---
 
-## Diagrama
+## Diagram
 
 ```mermaid
 flowchart LR
-  INIT[Brief versionado + manifest] --> GEN[sdd-generate]
-  GEN --> BRIEF[Completa Brief semver]
-  BRIEF --> SPEC[Genera spec alineada]
+  INIT[Versioned brief + manifest] --> GEN[sdd-generate]
+  GEN --> BRIEF[Completes semver Brief]
+  BRIEF --> SPEC[Generates aligned spec]
   SPEC --> REV{sdd-review?}
-  REV -->|Sí| GEN
+  REV -->|Yes| GEN
   REV -->|No| REF{Refactor tech?}
-  REF -->|Sí| CFG[Configure Refactor Engineering]
+  REF -->|Yes| CFG[Configure Refactor Engineering]
   CFG --> TECH[sdd-technical target]
   TECH --> PROM[Promote Engineering Target]
   REF -->|No| WF{Workflow?}
   PROM --> WF
   WF -->|SDD Studio| CW[configure-workflow]
-  WF -->|Externo| PLAN[sdd-plan]
+  WF -->|External| PLAN[sdd-plan]
   CW --> PLAN
 ```
 
 ---
 
-## Fuera de alcance brownfield (este documento)
+## Out of scope (this document)
 
-- Código de aplicación (`src/`, `tests/` del producto objetivo)
-- `engineering-modeling.md` — archivado en migrate; dominio en **sdd-spec**
-- Snapshots de spec (`spec/_snapshots/`) — no soportado
+- Application code (`src/`, `tests/` of the target product)
+- `engineering-modeling.md` — archived on migrate; domain in **sdd-spec**
+- Spec snapshots (`spec/_snapshots/`) — not supported
 
-## Infraestructura
+## Infrastructure
 
-Módulos en el paquete `sdd-studio`:
+Modules in the `sdd-studio` package:
 
-- `src/workspace/manifest.ts` — lectura, escritura y validación de `manifest.yaml`
-- `src/workspace/brief-paths.ts` — resolución de rutas `current` / `target` por carril
+- `src/workspace/manifest.ts` — read, write, and validate `manifest.yaml`
+- `src/workspace/brief-paths.ts` — resolve `current` / `target` paths per lane
 - `src/workspace/technical-version.ts` — `prepareTechnicalTargetVersion`, `finalizeTechnicalTargetVersion`, `promoteTechnicalTarget`
-- TUI brownfield — menú completo con refactor y promote
+- Brownfield TUI — full menu with refactor and promote
